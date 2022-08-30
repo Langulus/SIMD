@@ -1,0 +1,140 @@
+﻿{
+  "configurations": [
+    {
+      "name": "MSVC-x64-Debug-AVX2",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": ""
+    },
+    {
+      "name": "MSVC-x64-Release-AVX2",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x64_x64" ]
+    },
+    {
+      "name": "MSVC-x86-Debug-AVX2",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ]
+    },
+    {
+      "name": "MSVC-x86-Release-AVX2",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ]
+    },
+    {
+      "name": "MSVC-x86-Debug-SSE2",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=16 -DCMAKE_CXX_FLAGS:STRING=\"/DWIN32 /D_WINDOWS /arch:SSE2 /EHsc\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ]
+    },
+    {
+      "name": "MSVC-x86-Release-SSE2",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=16 -DCMAKE_CXX_FLAGS:STRING=\"/DWIN32 /D_WINDOWS /arch:SSE2 /EHsc\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ]
+    },
+    {
+      "name": "WSL-GCC-Debug-AVX2",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeExecutable": "cmake",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-mavx2\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "linux_x64" ],
+      "wslPath": "${defaultWSLPath}"
+    },
+    {
+      "name": "WSL-GCC-Release-AVX2",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeExecutable": "cmake",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-mavx2\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "linux_x64" ],
+      "wslPath": "${defaultWSLPath}"
+    },
+    {
+      "name": "Clang-CL-x86-Debug-AVX2",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-m32 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "clang_cl_x86" ]
+    },
+    {
+      "name": "Clang-CL-x86-Release-AVX2",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-m32 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "clang_cl_x86" ]
+    },
+    {
+      "name": "Clang-CL-x64-Debug-AVX2",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-m64 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "clang_cl_x64_x64" ]
+    },
+    {
+      "name": "Clang-CL-x64-Release-AVX2",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-m64 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "clang_cl_x64_x64" ]
+    }
+  ]
+}
