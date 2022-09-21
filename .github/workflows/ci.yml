@@ -89,7 +89,6 @@ jobs:
           ${{matrix.cmake_args}}
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
           -DCMAKE_CXX_FLAGS="${{matrix.feature[2]}}"
-          -DLANGULUS_ENABLE_SAFE_MODE=ON
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
       - if: matrix.os == 'windows-latest'
         name: Configure Windows
@@ -101,7 +100,6 @@ jobs:
           ${{matrix.cmake_args}}
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
           -DCMAKE_CXX_FLAGS="/DWIN32 /D_WINDOWS /EHsc ${{matrix.feature[3]}}"
-          -DLANGULUS_ENABLE_SAFE_MODE=ON
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
       - name: Build
         run: cmake --build out/${{matrix.name}} --config ${{matrix.build}}
