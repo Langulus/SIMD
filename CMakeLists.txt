@@ -1,17 +1,47 @@
 cmake_minimum_required(VERSION 3.22)
 include(cmake/FetchLangulusModule.cmake)
-project(Langulus_TSIMDe)
+project(Langulus.SIMD)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Configure the features you require, all these are disabled by default
+option(LANGULUS_ENABLE_SAFE_MODE 
+    "Overrides additional error checking and sanity checks, \
+    incurs a serious runtime overhead")
+
+option(LANGULUS_ENABLE_PARANOIA 
+    "Make sure that any unused memory is nullified, \
+    incurs a serious runtime overhead")
+
+option(LANGULUS_ENABLE_DEBUGGING 
+    "Explicitly define debug mode, in the case that default flags are \
+    not detected by some odd reason")
+
 set(LANGULUS_ALIGNMENT 16 CACHE STRING "Overall langulus alignment")
-add_definitions(-DLANGULUS_ALIGNMENT=${LANGULUS_ALIGNMENT})
+add_compile_definitions(LANGULUS_ALIGNMENT=${LANGULUS_ALIGNMENT})
+
+if(LANGULUS_ENABLE_SAFE_MODE)
+    add_compile_definitions(LANGULUS_ENABLE_SAFE_MODE)
+endif()
+if(LANGULUS_ENABLE_PARANOIA)
+    add_compile_definitions(LANGULUS_ENABLE_PARANOIA)
+endif()
+if(LANGULUS_ENABLE_DEBUGGING)
+    add_compile_definitions(LANGULUS_ENABLE_DEBUGGING)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	message(STATUS "Debug mode, all assertions are enabled")
+	add_compile_definitions(LANGULUS_ENABLE_ASSERTION_LEVEL=1000)
+    add_compile_definitions(LANGULUS_ENABLE_DEBUGGING)
+endif()
 
 # Check if this project is built as standalone, or a part of something else
 if(PROJECT_IS_TOP_LEVEL)
     fetch_langulus_module(Core)
 
+    add_compile_definitions(LANGULUS_ENABLE_TESTING)
     enable_testing()
 	add_subdirectory(test)
 endif()
@@ -25,13 +55,19 @@ download_project(
 	UPDATE_DISCONNECTED 1
 )
 
-# Build and install TSIMDe library
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE_FILES)
-add_library(Langulus.TSIMDe INTERFACE)
+# Build and install SIMD library
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source SOURCE_FILES)
+add_library(Langulus.SIMD INTERFACE)
 
-target_link_libraries(Langulus.TSIMDe INTERFACE	Langulus.Core)
+if (MSVC)
+    target_compile_options(Langulus.SIMD INTERFACE /utf-8)
+endif()
 
-target_include_directories(Langulus.TSIMDe
+target_include_directories(Langulus.SIMD
 	INTERFACE include
 	INTERFACE ${SIMDe_SOURCE_DIR}
+)
+
+target_link_libraries(Langulus.SIMD
+    INTERFACE Langulus.Core
 )

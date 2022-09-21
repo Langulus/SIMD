@@ -1,12 +1,12 @@
 ///																									
-/// Langulus::TSIMDe																				
+/// Langulus::SIMD																				
 /// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
 ///																									
 /// Distributed under GNU General Public License v3+									
 /// See LICENSE file, or https://www.gnu.org/licenses									
 ///																									
 #pragma once
-#include <Langulus.T-SIMDe.hpp>
+#include <LangulusSIMD.hpp>
 #include <cstdint>
 #include <cstddef>
 
