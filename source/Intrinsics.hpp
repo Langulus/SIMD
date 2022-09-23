@@ -7,7 +7,7 @@
 ///																									
 #pragma once
 #include <immintrin.h>
-#include <Langulus.Core.hpp>
+#include <LangulusCore.hpp>
 #include <array>
 
 #include <simde/x86/avx2.h>
