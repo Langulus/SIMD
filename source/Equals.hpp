@@ -200,7 +200,7 @@ namespace Langulus::SIMD
 	template<class LHS, class RHS>
 	NOD() LANGULUS(ALWAYSINLINE) bool Equals(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
-		using LOSSLESS = CT::Lossless<LHS, RHS>;
+		using LOSSLESS = Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
 
 		if constexpr (S < 2 || CT::NotSupported<REGISTER>) {
