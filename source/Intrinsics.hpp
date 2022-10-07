@@ -177,9 +177,10 @@ namespace Langulus::CT
 
 	/// Vector concept																			
 	template<class T>
-	concept Vector = requires (T a) {
-		Array<decltype(a.mComponents)>;
-	};
+	concept Vector = requires {
+		DenseNumber<typename Decay<T>::MemberType>;
+		{Decay<T>::MemberCount} -> UnsignedInteger;
+	} && sizeof(T) == sizeof(typename Decay<T>::MemberType) * Decay<T>::MemberCount;
 
 	/// Concept for 128bit SIMD registers													
 	template<class T>
@@ -199,18 +200,6 @@ namespace Langulus::CT
 
 	template<class T>
 	concept NotSupported = Same<T, Inner::NotSupported>;
-
-	/// When given two arithmetic types, choose the one that is most lossless	
-	/// after an arithmetic operation of any kind is performed between both		
-	template<class T1, class T2>
-	using Lossless = Conditional<
-			// Always pick real numbers over integers if available			
-			(Real<T1> && Integer<T2>)
-			// Always pick signed type if available								
-			|| (Signed<T1> && Unsigned<T2>)
-			// Always pick the larger type as a last resort						
-			|| (sizeof(Decay<T1>) > sizeof(Decay<T2>)
-		), Decay<T1>, Decay<T2>>;
 
 	/// Byte concept																				
 	template<class T>

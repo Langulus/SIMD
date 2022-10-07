@@ -123,7 +123,7 @@ namespace Langulus::SIMD
 	template<class LHS, class RHS>
 	NOD() LANGULUS(ALWAYSINLINE) auto Max(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
-		using LOSSLESS = CT::Lossless<LHS, RHS>;
+		using LOSSLESS = Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
 
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
