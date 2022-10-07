@@ -8,6 +8,7 @@
 #pragma once
 #include <immintrin.h>
 #include <LangulusCore.hpp>
+#include <LangulusRTTI.hpp>
 #include <array>
 
 #include <simde/x86/avx2.h>

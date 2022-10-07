@@ -40,6 +40,8 @@ endif()
 # Check if this project is built as standalone, or a part of something else
 if(PROJECT_IS_TOP_LEVEL)
     fetch_langulus_module(Core)
+    fetch_langulus_module(Logger)
+    fetch_langulus_module(RTTI)
 
     add_compile_definitions(LANGULUS_ENABLE_TESTING)
     enable_testing()
@@ -69,5 +71,5 @@ target_include_directories(Langulus.SIMD
 )
 
 target_link_libraries(Langulus.SIMD
-    INTERFACE Langulus.Core
+    INTERFACE Langulus.Core Langulus.Logger Langulus.RTTI
 )
