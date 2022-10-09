@@ -177,11 +177,33 @@ namespace Langulus::CT
 	}
 
 	/// Vector concept																			
+	/// Any dense type that has MemberType type that is a dense number, has		
+	/// MemberCount that is at least 2, and its size is exactly the same as		
+	/// sizeof(MemberType) * MemberCount													
 	template<class T>
 	concept Vector = requires {
-		DenseNumber<typename Decay<T>::MemberType>;
-		{Decay<T>::MemberCount} -> UnsignedInteger;
-	} && sizeof(T) == sizeof(typename Decay<T>::MemberType) * Decay<T>::MemberCount;
+			DenseNumber<typename Decay<T>::MemberType>;
+			{Decay<T>::MemberCount} -> UnsignedInteger;
+		}
+		&& sizeof(T) == sizeof(typename Decay<T>::MemberType) * Decay<T>::MemberCount
+		&& Decay<T>::MemberCount > 1;
+
+	/// Scalar concept																			
+	/// Any number, or a dense type that has MemberType type that is a dense	
+	/// number, has MemberCount of exactly 1, and its size is exactly the same	
+	/// as sizeof(MemberType)																	
+	/// Alternatively, a bounded array of extent 1 is also considered scalar	
+	template<class T>
+	concept Scalar = DenseNumber<T>
+		|| (requires {
+				DenseNumber<typename Decay<T>::MemberType>;
+				{Decay<T>::MemberCount} -> UnsignedInteger;
+			} && sizeof(T) == sizeof(typename Decay<T>::MemberType))
+		|| (CT::Number<T> && CT::Array<T> && ExtentOf<T> == 1);
+
+	/// Scalar-or-vector concept																
+	template<class T>
+	concept ScalarOrVector = Vector<T> || Scalar<T>;
 
 	/// Concept for 128bit SIMD registers													
 	template<class T>

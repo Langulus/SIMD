@@ -149,7 +149,7 @@ namespace Langulus::SIMD
 	template<CT::Vector WRAPPER, class LHS, class RHS>
 	NOD() LANGULUS(ALWAYSINLINE) WRAPPER AddWrap(const LHS& lhs, const RHS& rhs) noexcept {
 		WRAPPER result;
-		Add<LHS, RHS>(lhs, rhs, result.mComponents);
+		Add<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;
 	}
 
