@@ -1,24 +1,19 @@
 #include "Main.hpp"
 #include <catch2/catch.hpp>
 
-using timer = Catch::Benchmark::Chronometer;
-
-template<class T>
-using uninitialized = Catch::Benchmark::storage_for<T>;
-
 template<class LHS, class RHS, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlAdd(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+LANGULUS(ALWAYSINLINE) void ControlMul(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
 	if constexpr (CT::Same<OUT, ::std::byte>) {
 		DenseCast(out) = static_cast<Decay<OUT>>(
-			reinterpret_cast<const unsigned char&>(DenseCast(lhs)) +
+			reinterpret_cast<const unsigned char&>(DenseCast(lhs)) *
 			reinterpret_cast<const unsigned char&>(DenseCast(rhs))
 		);
 	}
-	else DenseCast(out) = DenseCast(lhs) + DenseCast(rhs);
+	else DenseCast(out) = DenseCast(lhs) * DenseCast(rhs);
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlAdd(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+LANGULUS(ALWAYSINLINE) void ControlMul(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
 	auto r = out.mArray;
 	auto lhs = lhsArray.mArray;
 	auto rhs = rhsArray.mArray;
@@ -26,19 +21,19 @@ LANGULUS(ALWAYSINLINE) void ControlAdd(const Vector<LHS, C>& lhsArray, const Vec
 	while (lhs != lhsEnd) {
 		if constexpr (CT::Same<OUT, ::std::byte>) {
 			DenseCast(*r) = static_cast<Decay<OUT>>(
-				reinterpret_cast<const unsigned char&>(DenseCast(*lhs)) +
+				reinterpret_cast<const unsigned char&>(DenseCast(*lhs)) *
 				reinterpret_cast<const unsigned char&>(DenseCast(*rhs))
 			);
 		}
-		else DenseCast(*r) = DenseCast(*lhs) + DenseCast(*rhs);
+		else DenseCast(*r) = DenseCast(*lhs) * DenseCast(*rhs);
 		++lhs; ++rhs; ++r;
 	}
 }
 
-TEMPLATE_TEST_CASE("Add", "[add]"
+TEMPLATE_TEST_CASE("Multiply", "[multiply]"
+	, VECTORS_ALL(2)
 	, NUMBERS_ALL()
 	, VECTORS_ALL(1)
-	, VECTORS_ALL(2)
 	, VECTORS_ALL(3)
 	, VECTORS_ALL(4)
 	, VECTORS_ALL(5)
@@ -51,7 +46,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 ) {
 	using T = TestType;
 
-	GIVEN("x + y = r") {
+	GIVEN("x * y = r") {
 		T x, y;
 		T r, rCheck;
 
@@ -65,12 +60,12 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 			InitOne(y, -5);
 		}
 
-		WHEN("Added") {
-			ControlAdd(x, y, rCheck);
+		WHEN("Multiplied") {
+			ControlMul(x, y, rCheck);
 			if constexpr (CT::Typed<T>)
-				SIMD::Add(x.mArray, y.mArray, r.mArray);
+				SIMD::Multiply(x.mArray, y.mArray, r.mArray);
 			else
-				SIMD::Add(x, y, r);
+				SIMD::Multiply(x, y, r);
 
 			THEN("The result should be correct") {
 				REQUIRE(DenseCast(r) == DenseCast(rCheck));
@@ -92,7 +87,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 
 					some<T> nr(meter.runs());
 					meter.measure([&](int i) {
-						ControlAdd(nx[i], ny[i], nr[i]);
+						ControlMul(nx[i], ny[i], nr[i]);
 					});
 				};
 
@@ -112,20 +107,20 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 					some<T> nr(meter.runs());
 					meter.measure([&](int i) {
 						if constexpr (CT::Typed<T>)
-							SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+							SIMD::Multiply(nx[i].mArray, ny[i].mArray, nr[i].mArray);
 						else
-							SIMD::Add(nx[i], ny[i], nr[i]);
+							SIMD::Multiply(nx[i], ny[i], nr[i]);
 					});
 				};
 			#endif
 		}
 
-		WHEN("Added in reverse") {
-			ControlAdd(y, x, rCheck);
+		WHEN("Multiplied in reverse") {
+			ControlMul(y, x, rCheck);
 			if constexpr (CT::Typed<T>)
-				SIMD::Add(x.mArray, y.mArray, r.mArray);
+				SIMD::Multiply(x.mArray, y.mArray, r.mArray);
 			else
-				SIMD::Add(y, x, r);
+				SIMD::Multiply(y, x, r);
 
 			THEN("The result should be correct") {
 				REQUIRE(DenseCast(r) == DenseCast(rCheck));
