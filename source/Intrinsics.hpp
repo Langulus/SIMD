@@ -498,42 +498,69 @@ namespace Langulus::SIMD
 		if constexpr (CT::Array<LHS> && CT::Array<RHS>) {
 			// Array OP Array																
 			constexpr auto S = OverlapCount<LHS, RHS>();
-			::std::array<OUT, S> output;
-			for (Count i = 0; i < S; ++i)
-				output[i] = Fallback<LOSSLESS>(lhs[i], rhs[i], Move(op));
-			return output;
+			if constexpr (S > 1) {
+				::std::array<OUT, S> output;
+				for (Count i = 0; i < S; ++i)
+					output[i] = Fallback<LOSSLESS>(lhs[i], rhs[i], Move(op));
+				return output;
+			}
+			else return Fallback<LOSSLESS>(lhs[0], rhs[0], Move(op));
 		}
 		else if constexpr (CT::Array<LHS>) {
 			// Array OP Scalar															
 			constexpr auto S = ExtentOf<LHS>;
-			::std::array<OUT, S> output;
-			if constexpr (CT::Bool<OUT>) {
-				auto& same_rhs = DenseCast(rhs);
-				for (Count i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Move(op));
+			if constexpr (S > 1) {
+				::std::array<OUT, S> output;
+				if constexpr (CT::Bool<OUT>) {
+					auto& same_rhs = DenseCast(rhs);
+					for (Count i = 0; i < S; ++i)
+						output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Move(op));
+				}
+				else {
+					const auto same_rhs = static_cast<LOSSLESS>(DenseCast(rhs));
+					for (Count i = 0; i < S; ++i)
+						output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Move(op));
+				}
+				return output;
 			}
 			else {
-				const auto same_rhs = static_cast<LOSSLESS>(DenseCast(rhs));
-				for (Count i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Move(op));
+				if constexpr (CT::Bool<OUT>) {
+					auto& same_rhs = DenseCast(rhs);
+					return Fallback<LOSSLESS>(lhs[0], same_rhs, Move(op));
+				}
+				else {
+					const auto same_rhs = static_cast<LOSSLESS>(DenseCast(rhs));
+					return Fallback<LOSSLESS>(lhs[0], same_rhs, Move(op));
+				}
 			}
-			return output;
 		}
 		else if constexpr (CT::Array<RHS>) {
 			// Scalar OP Array															
 			constexpr auto S = ExtentOf<RHS>;
-			::std::array<OUT, S> output;
-			if constexpr (CT::Bool<OUT>) {
-				auto& same_lhs = DenseCast(lhs);
-				for (Count i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Move(op));
+			if constexpr (S > 1) {
+				::std::array<OUT, S> output;
+				if constexpr (CT::Bool<OUT>) {
+					auto& same_lhs = DenseCast(lhs);
+					for (Count i = 0; i < S; ++i)
+						output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Move(op));
+				}
+				else {
+					const auto same_lhs = static_cast<LOSSLESS>(DenseCast(lhs));
+					for (Count i = 0; i < S; ++i)
+						output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Move(op));
+				}
+				return output;
 			}
 			else {
-				const auto same_lhs = static_cast<LOSSLESS>(DenseCast(lhs));
-				for (Count i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Move(op));
+				if constexpr (CT::Bool<OUT>) {
+					auto& same_lhs = DenseCast(lhs);
+					return Fallback<LOSSLESS>(same_lhs, rhs[0], Move(op));
+				}
+				else {
+					const auto same_lhs = static_cast<LOSSLESS>(DenseCast(lhs));
+					return Fallback<LOSSLESS>(same_lhs, rhs[0], Move(op));
+				}
 			}
-			return output;
 		}
 		else {
 			// Scalar OP Scalar															
