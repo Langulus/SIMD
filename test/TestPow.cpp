@@ -1,28 +1,47 @@
 #include "Main.hpp"
 #include <catch2/catch.hpp>
+/*
+template<CT::Dense B, CT::Dense E>
+NOD() constexpr auto Pow(B base, E exponent) noexcept {
+	if constexpr (CT::IntegerX<B, E>) {
+		B result {1};
+		while (exponent != E {0}) {
+			if constexpr (CT::Unsigned<B>) {
+				if (exponent & E {1})
+					result *= base;
+				exponent >>= E {1};
+				if constexpr (CT::Byte<B, E>)
+				base *= base;
+			}
+			else {
+				result *= base;
+				--exponent;
+			}
+		}
+		return result;
+	}
+	else if constexpr (CT::Real<B, E>)
+		return ::std::pow(base, exponent);
+	else
+		LANGULUS_ERROR("T must be a number");
+}
 
 template<class LHS, class RHS, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlMul(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-	if constexpr (CT::Same<OUT, ::std::byte>) {
-		DenseCast(out) = static_cast<Decay<OUT>>(
-			reinterpret_cast<const unsigned char&>(DenseCast(lhs)) *
-			reinterpret_cast<const unsigned char&>(DenseCast(rhs))
-		);
-	}
-	else DenseCast(out) = DenseCast(lhs) * DenseCast(rhs);
+LANGULUS(ALWAYSINLINE) void ControlPow(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+	DenseCast(out) = Pow(DenseCast(lhs), DenseCast(rhs));
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlMul(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+LANGULUS(ALWAYSINLINE) void ControlPow(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
 	auto r = out.mArray;
 	auto lhs = lhsArray.mArray;
 	auto rhs = rhsArray.mArray;
 	const auto lhsEnd = lhs + C;
 	while (lhs != lhsEnd)
-		ControlMul(*lhs++, *rhs++, *r++);
+		ControlPow(*lhs++, *rhs++, *r++);
 }
 
-TEMPLATE_TEST_CASE("Multiply", "[multiply]"
+TEMPLATE_TEST_CASE("Power", "[power]"
 	, NUMBERS_ALL()
 	, VECTORS_ALL(1)
 	, VECTORS_ALL(2)
@@ -38,7 +57,7 @@ TEMPLATE_TEST_CASE("Multiply", "[multiply]"
 ) {
 	using T = TestType;
 
-	GIVEN("x * y = r") {
+	GIVEN("pow(x, y) = r") {
 		T x, y;
 		T r, rCheck;
 
@@ -54,19 +73,19 @@ TEMPLATE_TEST_CASE("Multiply", "[multiply]"
 			InitOne(y, -5);
 		}
 
-		WHEN("Multiplied") {
-			ControlMul(x, y, rCheck);
+		WHEN("Raised to a power") {
+			ControlPow(x, y, rCheck);
 			if constexpr (CT::Typed<T>)
-				SIMD::Multiply(x.mArray, y.mArray, r.mArray);
+				SIMD::Power(x.mArray, y.mArray, r.mArray);
 			else
-				SIMD::Multiply(x, y, r);
+				SIMD::Power(x, y, r);
 
 			THEN("The result should be correct") {
 				REQUIRE(DenseCast(r) == DenseCast(rCheck));
 			}
 
 			#ifdef LANGULUS_STD_BENCHMARK
-				BENCHMARK_ADVANCED("Multiply (control)") (timer meter) {
+				BENCHMARK_ADVANCED("Power (control)") (timer meter) {
 					some<T> nx(meter.runs());
 					if constexpr (!CT::Typed<T>) {
 						for (auto& i : nx)
@@ -81,11 +100,11 @@ TEMPLATE_TEST_CASE("Multiply", "[multiply]"
 
 					some<T> nr(meter.runs());
 					meter.measure([&](int i) {
-						ControlMul(nx[i], ny[i], nr[i]);
+						ControlPow(nx[i], ny[i], nr[i]);
 					});
 				};
 
-				BENCHMARK_ADVANCED("Multiply (SIMD)") (timer meter) {
+				BENCHMARK_ADVANCED("Power (SIMD)") (timer meter) {
 					some<T> nx(meter.runs());
 					if constexpr (!CT::Typed<T>) {
 						for (auto& i : nx)
@@ -101,20 +120,20 @@ TEMPLATE_TEST_CASE("Multiply", "[multiply]"
 					some<T> nr(meter.runs());
 					meter.measure([&](int i) {
 						if constexpr (CT::Typed<T>)
-							SIMD::Multiply(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+							SIMD::Power(nx[i].mArray, ny[i].mArray, nr[i].mArray);
 						else
-							SIMD::Multiply(nx[i], ny[i], nr[i]);
+							SIMD::Power(nx[i], ny[i], nr[i]);
 					});
 				};
 			#endif
 		}
 
-		WHEN("Multiplied in reverse") {
-			ControlMul(y, x, rCheck);
+		WHEN("Raise to a power in reverse") {
+			ControlPow(y, x, rCheck);
 			if constexpr (CT::Typed<T>)
-				SIMD::Multiply(x.mArray, y.mArray, r.mArray);
+				SIMD::Power(x.mArray, y.mArray, r.mArray);
 			else
-				SIMD::Multiply(y, x, r);
+				SIMD::Power(y, x, r);
 
 			THEN("The result should be correct") {
 				REQUIRE(DenseCast(r) == DenseCast(rCheck));
@@ -128,4 +147,4 @@ TEMPLATE_TEST_CASE("Multiply", "[multiply]"
 			delete y;
 		}
 	}
-}
+}*/

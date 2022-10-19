@@ -13,8 +13,8 @@
 namespace Langulus::SIMD
 {
 
-   template<class T, Count S>
-   LANGULUS(ALWAYSINLINE) constexpr auto SubtractInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+   template<class, Count>
+   LANGULUS(ALWAYSINLINE) constexpr auto SubtractInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
       return CT::Inner::NotSupported{};
    }
 
@@ -27,69 +27,71 @@ namespace Langulus::SIMD
    ///   @return the subtracted elements as a register                        
    template<class T, Count S, CT::TSIMD REGISTER>
    LANGULUS(ALWAYSINLINE) auto SubtractInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
-      if constexpr (CT::SIMD128<REGISTER>) {
-         if constexpr (CT::SignedInteger8<T>)
-            return simde_mm_sub_epi8(lhs, rhs);
-         else if constexpr (CT::UnsignedInteger8<T>)
-            return simde_mm_subs_epu8(lhs, rhs);
-         else if constexpr (CT::SignedInteger16<T>)
-            return simde_mm_sub_epi16(lhs, rhs);
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return simde_mm_subs_epu16(lhs, rhs);
-         else if constexpr (CT::Integer32<T>)
-            return simde_mm_sub_epi32(lhs, rhs);
-         else if constexpr (CT::Integer64<T>)
-            return simde_mm_sub_epi64(lhs, rhs);
-         else if constexpr (CT::RealSP<T>)
-            return simde_mm_sub_ps(lhs, rhs);
-         else if constexpr (CT::RealDP<T>)
-            return simde_mm_sub_pd(lhs, rhs);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Sub of 16-byte package");
-      }
-      else if constexpr (CT::SIMD256<REGISTER>) {
-         if constexpr (CT::SignedInteger8<T>)
-            return simde_mm256_sub_epi8(lhs, rhs);
-         else if constexpr (CT::UnsignedInteger8<T>)
-            return simde_mm256_subs_epu8(lhs, rhs);
-         else if constexpr (CT::SignedInteger16<T>)
-            return simde_mm256_sub_epi16(lhs, rhs);
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return simde_mm256_subs_epu16(lhs, rhs);
-         else if constexpr (CT::Integer32<T>)
-            return simde_mm256_sub_epi32(lhs, rhs);
-         else if constexpr (CT::Integer64<T>)
-            return simde_mm256_sub_epi64(lhs, rhs);
-         else if constexpr (CT::RealSP<T>)
-            return simde_mm256_sub_ps(lhs, rhs);
-         else if constexpr (CT::RealDP<T>)
-            return simde_mm256_sub_pd(lhs, rhs);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Sub of 32-byte package");
-      }
-      else if constexpr (CT::SIMD512<REGISTER>) {
-         if constexpr (CT::SignedInteger8<T>)
-            return simde_mm512_sub_epi8(lhs, rhs);
-         else if constexpr (CT::UnsignedInteger8<T>)
-            return simde_mm512_subs_epu8(lhs, rhs);
-         else if constexpr (CT::SignedInteger16<T>)
-            return simde_mm512_sub_epi16(lhs, rhs);
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return simde_mm512_subs_epu16(lhs, rhs);
-         else if constexpr (CT::Integer32<T>)
-            return simde_mm512_sub_epi32(lhs, rhs);
-         else if constexpr (CT::Integer64<T>)
-            return simde_mm512_sub_epi64(lhs, rhs);
-         else if constexpr (CT::RealSP<T>)
-            return simde_mm512_sub_ps(lhs, rhs);
-         else if constexpr (CT::RealDP<T>)
-            return simde_mm512_sub_pd(lhs, rhs);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Sub of 64-byte package");
-      }
-      else LANGULUS_ERROR("Unsupported type for SIMD::Sub");
+      #if LANGULUS_SIMD(128BIT)
+         if constexpr (CT::SIMD128<REGISTER>) {
+            if constexpr (CT::Integer8<T>)
+               return simde_mm_sub_epi8(lhs, rhs);
+            else if constexpr (CT::Integer16<T>)
+               return simde_mm_sub_epi16(lhs, rhs);
+            else if constexpr (CT::Integer32<T>)
+               return simde_mm_sub_epi32(lhs, rhs);
+            else if constexpr (CT::Integer64<T>)
+               return simde_mm_sub_epi64(lhs, rhs);
+            else if constexpr (CT::RealSP<T>)
+               return simde_mm_sub_ps(lhs, rhs);
+            else if constexpr (CT::RealDP<T>)
+               return simde_mm_sub_pd(lhs, rhs);
+            else
+               LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner of 16-byte package");
+         }
+         else
+      #endif
+         
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<REGISTER>) {
+            if constexpr (CT::Integer8<T>)
+               return simde_mm256_sub_epi8(lhs, rhs);
+            else if constexpr (CT::Integer16<T>)
+               return simde_mm256_sub_epi16(lhs, rhs);
+            else if constexpr (CT::Integer32<T>)
+               return simde_mm256_sub_epi32(lhs, rhs);
+            else if constexpr (CT::Integer64<T>)
+               return simde_mm256_sub_epi64(lhs, rhs);
+            else if constexpr (CT::RealSP<T>)
+               return simde_mm256_sub_ps(lhs, rhs);
+            else if constexpr (CT::RealDP<T>)
+               return simde_mm256_sub_pd(lhs, rhs);
+            else
+               LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner of 32-byte package");
+         }
+         else
+      #endif
+         
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<REGISTER>) {
+            if constexpr (CT::Integer8<T>)
+               return simde_mm512_sub_epi8(lhs, rhs);
+            else if constexpr (CT::Integer16<T>)
+               return simde_mm512_sub_epi16(lhs, rhs);
+            else if constexpr (CT::Integer32<T>)
+               return simde_mm512_sub_epi32(lhs, rhs);
+            else if constexpr (CT::Integer64<T>)
+               return simde_mm512_sub_epi64(lhs, rhs);
+            else if constexpr (CT::RealSP<T>)
+               return simde_mm512_sub_ps(lhs, rhs);
+            else if constexpr (CT::RealDP<T>)
+               return simde_mm512_sub_pd(lhs, rhs);
+            else LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner of 64-byte package");
+         }
+         else
+      #endif
+
+      LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner");
    }
 
    ///                                                                        
    template<class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) auto Subtract(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+   NOD() LANGULUS(ALWAYSINLINE) auto Subtract(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using REGISTER = CT::Register<LHS, RHS>;
       using LOSSLESS = Lossless<LHS, RHS>;
       constexpr auto S = OverlapCount<LHS, RHS>();
@@ -99,32 +101,27 @@ namespace Langulus::SIMD
             return SubtractInner<LOSSLESS, S>(lhs, rhs);
          },
          [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
-            return lhs - rhs;
+            if constexpr (CT::Same<LOSSLESS, ::std::byte>) {
+               // ::std::byte doesn't have + operator                   
+               return static_cast<LOSSLESS>(
+                  reinterpret_cast<const unsigned char&>(lhs) -
+                  reinterpret_cast<const unsigned char&>(rhs)
+               );
+            }
+            else return lhs - rhs;
          }
       );
    }
 
    ///                                                                        
    template<class LHS, class RHS, class OUT>
-   LANGULUS(ALWAYSINLINE) void Subtract(LHS& lhs, RHS& rhs, OUT& output) noexcept {
-      const auto result = Subtract<LHS, RHS>(lhs, rhs);
-      if constexpr (CT::TSIMD<decltype(result)>) {
-         // Extract from register                                       
-         Store(result, output);
-      }
-      else if constexpr (!CT::Array<OUT>) {
-         // Extract from number                                         
-         output = result;
-      }
-      else {
-         // Extract from std::array                                     
-         std::memcpy(output, result.data(), sizeof(output));
-      }
+   LANGULUS(ALWAYSINLINE) void Subtract(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
+      GeneralStore(Subtract<LHS, RHS>(lhs, rhs), output);
    }
 
    ///                                                                        
    template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) WRAPPER SubtractWrap(LHS& lhs, RHS& rhs) noexcept {
+   NOD() LANGULUS(ALWAYSINLINE) WRAPPER SubtractWrap(const LHS& lhs, const RHS& rhs) noexcept {
       WRAPPER result;
       Subtract<LHS, RHS>(lhs, rhs, result.mArray);
       return result;

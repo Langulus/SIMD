@@ -172,97 +172,117 @@ namespace Langulus::CT
 
    namespace Inner
    {
+
       /// Placeholder type for returning from unimplemented SIMD routines     
       class NotSupported {};
-   }
+
+      template<class T>
+      concept Vector = Typed<T> && DenseNumber<TypeOf<T>> && requires {
+            {Decay<T>::MemberCount} -> UnsignedInteger;
+         }
+         && sizeof(T) == sizeof(TypeOf<T>) * Decay<T>::MemberCount
+         && Decay<T>::MemberCount > 1;
+
+      template<class T>
+      concept Scalar = DenseNumber<T> 
+         || (Typed<T> && DenseNumber<TypeOf<T>> && requires {
+               {Decay<T>::MemberCount} -> UnsignedInteger;
+            }
+            && sizeof(T) == sizeof(TypeOf<T>)
+            && Decay<T>::MemberCount == 1)
+         || (CT::Number<T> && CT::Array<T> && ExtentOf<T> == 1);
+
+   } // namespace Langulus::CT::Inner
+
 
    /// Vector concept                                                         
    /// Any dense type that has MemberType type that is a dense number, has    
    /// MemberCount that is at least 2, and T's size is exactly the same as    
    /// sizeof(MemberType) * MemberCount                                       
-   template<class T>
-   concept Vector = Typed<T> && DenseNumber<TypeOf<T>> && requires {
-         {Decay<T>::MemberCount} -> UnsignedInteger;
-      }
-      && sizeof(T) == sizeof(TypeOf<T>) * Decay<T>::MemberCount
-      && Decay<T>::MemberCount > 1;
+   template<class... T>
+   concept Vector = (Inner::Vector<T> && ...);
 
    /// Scalar concept                                                         
    /// Any number, or a dense type that has MemberType type that is a dense   
    /// number, has MemberCount of exactly 1, and its size is exactly the same 
    /// as sizeof(MemberType)                                                  
    /// Alternatively, a bounded array of extent 1 is also considered scalar   
-   template<class T>
-   concept Scalar = DenseNumber<T>
-      || (Typed<T> && DenseNumber<TypeOf<T>> && requires {
-            {Decay<T>::MemberCount} -> UnsignedInteger;
-         }
-         && sizeof(T) == sizeof(TypeOf<T>)
-         && Decay<T>::MemberCount == 1)
-      || (CT::Number<T> && CT::Array<T> && ExtentOf<T> == 1);
+   template<class... T>
+   concept Scalar = (Inner::Scalar<T> && ...);
 
    /// Scalar-or-vector concept                                               
-   template<class T>
-   concept ScalarOrVector = Vector<T> || Scalar<T>;
+   template<class... T>
+   concept ScalarOrVector = ((Vector<T> || Scalar<T>) && ...);
 
    /// Concept for 128bit SIMD registers                                      
-   template<class T>
-   concept SIMD128 = SameAsOneOf<T, simde__m128, simde__m128d, simde__m128i>;
+   template<class... T>
+   concept SIMD128 = (SameAsOneOf<T, simde__m128, simde__m128d, simde__m128i> && ...);
 
    /// Concept for 256bit SIMD registers                                      
-   template<class T>
-   concept SIMD256 = SameAsOneOf<T, simde__m256, simde__m256d, simde__m256i>;
+   template<class... T>
+   concept SIMD256 = (SameAsOneOf<T, simde__m256, simde__m256d, simde__m256i> && ...);
 
    /// Concept for 512bit SIMD registers                                      
-   template<class T>
-   concept SIMD512 = SameAsOneOf<T, simde__m512, simde__m512d, simde__m512i>;
+   template<class... T>
+   concept SIMD512 = (SameAsOneOf<T, simde__m512, simde__m512d, simde__m512i> && ...);
 
    /// Concept for SIMD registers                                             
-   template<class T>
-   concept TSIMD = SIMD128<T> || SIMD256<T> || SIMD512<T>;
+   template<class... T>
+   concept TSIMD = ((SIMD128<T> || SIMD256<T> || SIMD512<T>) && ...);
 
-   template<class T>
-   concept NotSupported = Same<T, Inner::NotSupported>;
+   template<class... T>
+   concept NotSupported = (Same<T, Inner::NotSupported> && ...);
 
    /// Byte concept                                                           
-   template<class T>
-   concept Byte = Same<::Langulus::Byte, T>;
+   template<class... T>
+   concept Byte = (Same<::Langulus::Byte, T> && ...);
 
    /// Single precision real number concept                                   
-   template<class T>
-   concept RealSP = Same<float, T>;
+   template<class... T>
+   concept RealSP = (Same<::Langulus::Float, T> && ...);
 
    /// Double precision real number concept                                   
-   template<class T>
-   concept RealDP = Same<double, T>;
+   template<class... T>
+   concept RealDP = (Same<::Langulus::Double, T> && ...);
 
-   /// More precise number concepts                                           
-   template<class T>
-   concept SignedInteger8 = CT::SignedInteger<T> && sizeof(Decay<T>) == 1;
-   template<class T>
-   concept SignedInteger16 = CT::SignedInteger<T> && sizeof(Decay<T>) == 2;
-   template<class T>
-   concept SignedInteger32 = CT::SignedInteger<T> && sizeof(Decay<T>) == 4;
-   template<class T>
-   concept SignedInteger64 = CT::SignedInteger<T> && sizeof(Decay<T>) == 8;
+   /// Size-related number concepts                                           
+   /// These concepts include character and byte types                        
+   template<class... T>
+   concept SignedInteger8 = ((CT::SignedInteger<T> && sizeof(Decay<T>) == 1) && ...);
+   template<class... T>
+   concept SignedInteger16 = ((CT::SignedInteger<T> && sizeof(Decay<T>) == 2) && ...);
+   template<class... T>
+   concept SignedInteger32 = ((CT::SignedInteger<T> && sizeof(Decay<T>) == 4) && ...);
+   template<class... T>
+   concept SignedInteger64 = ((CT::SignedInteger<T> && sizeof(Decay<T>) == 8) && ...);
 
-   template<class T>
-   concept UnsignedInteger8  = (CT::UnsignedInteger<T> || CT::Character<T> || CT::Byte<T>) && sizeof(Decay<T>) == 1;
-   template<class T>
-   concept UnsignedInteger16 = (CT::UnsignedInteger<T> || CT::Character<T>) && sizeof(Decay<T>) == 2;
-   template<class T>
-   concept UnsignedInteger32 = (CT::UnsignedInteger<T> || CT::Character<T>) && sizeof(Decay<T>) == 4;
-   template<class T>
-   concept UnsignedInteger64 = (CT::UnsignedInteger<T> || CT::Character<T>) && sizeof(Decay<T>) == 8;
+   template<class... T>
+   concept UnsignedInteger8 = (
+      ((CT::UnsignedInteger<T> || CT::Character<T> || CT::Byte<T>) && sizeof(Decay<T>) == 1)
+      && ...);
+   template<class... T>
+   concept UnsignedInteger16 = (
+      ((CT::UnsignedInteger<T> || CT::Character<T>) && sizeof(Decay<T>) == 2)
+      && ...);
+   template<class... T>
+   concept UnsignedInteger32 = (
+      ((CT::UnsignedInteger<T> || CT::Character<T>) && sizeof(Decay<T>) == 4)
+      && ...);
+   template<class... T>
+   concept UnsignedInteger64 = (
+      ((CT::UnsignedInteger<T> || CT::Character<T>) && sizeof(Decay<T>) == 8)
+      && ...);
 
-   template<class T>
-   concept Integer8 = SignedInteger8<T> || UnsignedInteger8<T>;
-   template<class T>
-   concept Integer16 = SignedInteger16<T> || UnsignedInteger16<T>;
-   template<class T>
-   concept Integer32 = SignedInteger32<T> || UnsignedInteger32<T>;
-   template<class T>
-   concept Integer64 = SignedInteger64<T> || UnsignedInteger64<T>;
+   template<class... T>
+   concept Integer8 = ((SignedInteger8<T> || UnsignedInteger8<T>) && ...);
+   template<class... T>
+   concept Integer16 = ((SignedInteger16<T> || UnsignedInteger16<T>) && ...);
+   template<class... T>
+   concept Integer32 = ((SignedInteger32<T> || UnsignedInteger32<T>) && ...);
+   template<class... T>
+   concept Integer64 = ((SignedInteger64<T> || UnsignedInteger64<T>) && ...);
+   template<class... T>
+   concept IntegerX = ((Integer8<T> || Integer16<T> || Integer32<T> || Integer64<T>) && ...);
 
 } // namespace Langulus::CT
 

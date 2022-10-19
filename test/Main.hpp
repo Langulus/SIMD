@@ -64,6 +64,8 @@ template<class T, class A>
 void InitOne(T& a, A&& b) noexcept {
 	if constexpr (CT::Sparse<T>) {
 		using DT = Decay<T>;
+		if (a)
+			delete a;
 		a = new DT {static_cast<DT>(b)};
 	}
 	else a = static_cast<T>(b);
@@ -84,8 +86,14 @@ struct alignas(Langulus::Alignment) Vector {
 			if constexpr (CT::Sparse<T>) {
 				using TD = Decay<T>;
 				i = new TD {static_cast<TD>(gen() % 66)};
+				if (*i == TD {0})
+					*i = TD {1};
 			}
-			else i = static_cast<T>(gen() % 66);
+			else {
+				i = static_cast<T>(gen() % 66);
+				if (i == T {0})
+					i = T {1};
+			}
 		}
 	}
 

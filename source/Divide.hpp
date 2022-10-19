@@ -13,8 +13,8 @@
 namespace Langulus::SIMD
 {
 
-   template<class T, Count S>
-   LANGULUS(ALWAYSINLINE) constexpr auto DivideInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+   template<class, Count>
+   LANGULUS(ALWAYSINLINE) constexpr auto DivideInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
       return CT::Inner::NotSupported{};
    }
 
@@ -31,55 +31,55 @@ namespace Langulus::SIMD
       if constexpr (CT::SIMD128<REGISTER>) {
          if constexpr (CT::UnsignedInteger8<T>) {
             if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(rhs, simde_mm_setzero_si128())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_epu8(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger8<T>) {
             if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(rhs, simde_mm_setzero_si128())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_epi8(lhs, rhs);
          }
          else if constexpr (CT::UnsignedInteger16<T>) {
             if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi16(rhs, simde_mm_setzero_si128())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_epu16(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger16<T>) {
             if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi16(rhs, simde_mm_setzero_si128())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_epi16(lhs, rhs);
          }
          else if constexpr (CT::UnsignedInteger32<T>) {
             if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi32(rhs, simde_mm_setzero_si128())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_epu32(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger32<T>) {
             if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi32(rhs, simde_mm_setzero_si128())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_epi32(lhs, rhs);
          }
          else if constexpr (CT::UnsignedInteger64<T>) {
             if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi64(rhs, simde_mm_setzero_si128())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_epu64(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger64<T>) {
             if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi64(rhs, simde_mm_setzero_si128())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_epi64(lhs, rhs);
          }
          else if constexpr (CT::RealSP<T>) {
             if (simde_mm_movemask_ps(simde_mm_cmpeq_ps(rhs, simde_mm_setzero_ps())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_ps(lhs, rhs);
          }
          else if constexpr (CT::RealDP<T>) {
             if (simde_mm_movemask_pd(simde_mm_cmpeq_pd(rhs, simde_mm_setzero_pd())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_pd(lhs, rhs);
          }
-         else LANGULUS_ERROR("Unsupported type for SIMD::InnerDiv of 16-byte package");
+         else LANGULUS_ERROR("Unsupported type for SIMD::DivideInner of 16-byte package");
       }
       else
    #endif
@@ -88,55 +88,55 @@ namespace Langulus::SIMD
       if constexpr (CT::SIMD256<REGISTER>) {
          if constexpr (CT::UnsignedInteger8<T>) {
             if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(rhs, simde_mm256_setzero_si256())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_epu8(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger8<T>) {
             if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(rhs, simde_mm256_setzero_si256())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_epi8(lhs, rhs);
          }
          else if constexpr (CT::UnsignedInteger16<T>) {
             if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi16(rhs, simde_mm256_setzero_si256())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_epu16(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger16<T>) {
             if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi16(rhs, simde_mm256_setzero_si256())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_epi16(lhs, rhs);
          }
          else if constexpr (CT::UnsignedInteger32<T>) {
             if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi32(rhs, simde_mm256_setzero_si256())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_epu32(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger32<T>) {
             if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi32(rhs, simde_mm256_setzero_si256())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_epi32(lhs, rhs);
          }
          else if constexpr (CT::UnsignedInteger64<T>) {
             if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi64(rhs, simde_mm256_setzero_si256())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_epu64(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger64<T>) {
             if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi64(rhs, simde_mm256_setzero_si256())))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_epi64(lhs, rhs);
          }
          else if constexpr (CT::RealSP<T>) {
             if (simde_mm256_movemask_ps(simde_mm256_cmp_ps(rhs, simde_mm256_setzero_ps(), _CMP_EQ_OQ)))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_ps(lhs, rhs);
          }
          else if constexpr (CT::RealDP<T>) {
             if (simde_mm256_movemask_pd(simde_mm256_cmp_pd(rhs, simde_mm256_setzero_pd(), _CMP_EQ_OQ)))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_pd(lhs, rhs);
          }
-         else LANGULUS_ERROR("Unsupported type for SIMD::InnerDiv of 32-byte package");
+         else LANGULUS_ERROR("Unsupported type for SIMD::DivideInner of 32-byte package");
       }
       else
    #endif
@@ -145,104 +145,98 @@ namespace Langulus::SIMD
       if constexpr (CT::SIMD512<REGISTER>) {
          if constexpr (CT::UnsignedInteger8<T>) {
             if (simde_mm512_cmpeq_epi8(rhs, simde_mm512_setzero_si512()))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_epu8(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger8<T>) {
             if (simde_mm512_cmpeq_epi8(rhs, simde_mm512_setzero_si512()))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_epi8(lhs, rhs);
          }
          else if constexpr (CT::UnsignedInteger16<T>) {
             if (simde_mm512_cmpeq_epi16(rhs, simde_mm512_setzero_si512()))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_epu16(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger16<T>) {
             if (simde_mm512_cmpeq_epi16(rhs, simde_mm512_setzero_si512()))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_epi16(lhs, rhs);
          }
          else if constexpr (CT::UnsignedInteger32<T>) {
             if (simde_mm512_cmpeq_epi32(rhs, simde_mm512_setzero_si512()))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_epu32(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger32<T>) {
             if (simde_mm512_cmpeq_epi32(rhs, simde_mm512_setzero_si512()))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_epi32(lhs, rhs);
          }
          else if constexpr (CT::UnsignedInteger64<T>) {
             if (simde_mm512_cmpeq_epi64(rhs, simde_mm512_setzero_si512()))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_epu64(lhs, rhs);
          }
          else if constexpr (CT::SignedInteger64<T>) {
             if (simde_mm512_cmpeq_epi64(rhs, simde_mm512_setzero_si512()))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_epi64(lhs, rhs);
          }
          else if constexpr (CT::RealSP<T>) {
             if (simde_mm512_cmp_ps(rhs, simde_mm512_setzero_ps(), _CMP_EQ_OQ))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_ps(lhs, rhs);
          }
          else if constexpr (CT::RealDP<T>) {
             if (simde_mm512_cmp_pd(rhs, simde_mm512_setzero_pd(), _CMP_EQ_OQ))
-               Throw<Except::DivisionByZero>();
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_pd(lhs, rhs);
          }
          else
-            LANGULUS_ERROR("Unsupported type for SIMD::InnerDiv of 64-byte package");
+            LANGULUS_ERROR("Unsupported type for SIMD::DivideInner of 64-byte package");
       }
       else
    #endif
 
-      LANGULUS_ERROR("Unsupported type for SIMD::InnerDiv");
+      LANGULUS_ERROR("Unsupported type for SIMD::DivideInner");
    }
 
    ///                                                                        
    template<class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) auto Divide(LHS& lhsOrig, RHS& rhsOrig) {
+   NOD() LANGULUS(ALWAYSINLINE) auto Divide(const LHS& lhsOrig, const RHS& rhsOrig) {
       using REGISTER = CT::Register<LHS, RHS>;
       using LOSSLESS = Lossless<LHS, RHS>;
       constexpr auto S = OverlapCount<LHS, RHS>();
-
       return AttemptSIMD<1, REGISTER, LOSSLESS>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) {
             return DivideInner<LOSSLESS, S>(lhs, rhs);
          },
          [](const LOSSLESS& lhs, const LOSSLESS& rhs) -> LOSSLESS {
-            if (rhs == 0)
-               Throw<Except::DivisionByZero>();
-            return lhs / rhs;
+            if (rhs == LOSSLESS {0})
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
+            if constexpr (CT::Same<LOSSLESS, ::std::byte>) {
+               // ::std::byte doesn't have * operator                   
+               return static_cast<LOSSLESS>(
+                  reinterpret_cast<const unsigned char&>(lhs) /
+                  reinterpret_cast<const unsigned char&>(rhs)
+               );
+            }
+            else return lhs / rhs;
          }
       );
    }
 
    ///                                                                        
    template<class LHS, class RHS, class OUT>
-   LANGULUS(ALWAYSINLINE) void Divide(LHS& lhs, RHS& rhs, OUT& output) {
-      const auto result = Divide<LHS, RHS>(lhs, rhs);
-      if constexpr (CT::TSIMD<decltype(result)>) {
-         // Extract from register                                       
-         Store(result, output);
-      }
-      else if constexpr (!CT::Array<OUT>) {
-         // Extract from number                                         
-         output = result;
-      }
-      else {
-         // Extract from std::array                                     
-         std::memcpy(output, result.data(), sizeof(output));
-      }
+   LANGULUS(ALWAYSINLINE) void Divide(const LHS& lhs, const RHS& rhs, OUT& output) {
+      GeneralStore(Divide<LHS, RHS>(lhs, rhs), output);
    }
 
    ///                                                                        
    template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) WRAPPER DivideWrap(LHS& lhs, RHS& rhs) {
+   NOD() LANGULUS(ALWAYSINLINE) WRAPPER DivideWrap(const LHS& lhs, const RHS& rhs) {
       WRAPPER result;
       Divide<LHS, RHS>(lhs, rhs, result.mArray);
       return result;

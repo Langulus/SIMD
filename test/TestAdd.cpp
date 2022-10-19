@@ -23,16 +23,8 @@ LANGULUS(ALWAYSINLINE) void ControlAdd(const Vector<LHS, C>& lhsArray, const Vec
 	auto lhs = lhsArray.mArray;
 	auto rhs = rhsArray.mArray;
 	const auto lhsEnd = lhs + C;
-	while (lhs != lhsEnd) {
-		if constexpr (CT::Same<OUT, ::std::byte>) {
-			DenseCast(*r) = static_cast<Decay<OUT>>(
-				reinterpret_cast<const unsigned char&>(DenseCast(*lhs)) +
-				reinterpret_cast<const unsigned char&>(DenseCast(*rhs))
-			);
-		}
-		else DenseCast(*r) = DenseCast(*lhs) + DenseCast(*rhs);
-		++lhs; ++rhs; ++r;
-	}
+	while (lhs != lhsEnd)
+		ControlAdd(*lhs++, *rhs++, *r++);
 }
 
 TEMPLATE_TEST_CASE("Add", "[add]"
@@ -57,6 +49,8 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 
 		if constexpr (!CT::Typed<T>) {
 			if constexpr (CT::Sparse<T>) {
+				x = nullptr;
+				y = nullptr;
 				r = new Decay<T>;
 				rCheck = new Decay<T>;
 			}
@@ -123,7 +117,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 		WHEN("Added in reverse") {
 			ControlAdd(y, x, rCheck);
 			if constexpr (CT::Typed<T>)
-				SIMD::Add(x.mArray, y.mArray, r.mArray);
+				SIMD::Add(y.mArray, x.mArray, r.mArray);
 			else
 				SIMD::Add(y, x, r);
 
