@@ -6,13 +6,7 @@ LANGULUS(ALWAYSINLINE) void ControlDiv(const LHS& lhs, const RHS& rhs, OUT& out)
 	if (DenseCast(rhs) == Decay<RHS> {0})
 		LANGULUS_THROW(DivisionByZero, "Division by zero");
 
-	if constexpr (CT::Same<OUT, ::std::byte>) {
-		DenseCast(out) = static_cast<Decay<OUT>>(
-			reinterpret_cast<const unsigned char&>(DenseCast(lhs)) /
-			reinterpret_cast<const unsigned char&>(DenseCast(rhs))
-		);
-	}
-	else DenseCast(out) = DenseCast(lhs) / DenseCast(rhs);
+	DenseCast(out) = DenseCast(lhs) / DenseCast(rhs);
 }
 
 template<class LHS, class RHS, size_t C, class OUT>

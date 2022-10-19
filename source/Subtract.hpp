@@ -101,14 +101,7 @@ namespace Langulus::SIMD
             return SubtractInner<LOSSLESS, S>(lhs, rhs);
          },
          [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
-            if constexpr (CT::Same<LOSSLESS, ::std::byte>) {
-               // ::std::byte doesn't have + operator                   
-               return static_cast<LOSSLESS>(
-                  reinterpret_cast<const unsigned char&>(lhs) -
-                  reinterpret_cast<const unsigned char&>(rhs)
-               );
-            }
-            else return lhs - rhs;
+            return lhs - rhs;
          }
       );
    }

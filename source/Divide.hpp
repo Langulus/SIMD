@@ -216,14 +216,7 @@ namespace Langulus::SIMD
          [](const LOSSLESS& lhs, const LOSSLESS& rhs) -> LOSSLESS {
             if (rhs == LOSSLESS {0})
                LANGULUS_THROW(DivisionByZero, "Division by zero");
-            if constexpr (CT::Same<LOSSLESS, ::std::byte>) {
-               // ::std::byte doesn't have * operator                   
-               return static_cast<LOSSLESS>(
-                  reinterpret_cast<const unsigned char&>(lhs) /
-                  reinterpret_cast<const unsigned char&>(rhs)
-               );
-            }
-            else return lhs / rhs;
+            return lhs / rhs;
          }
       );
    }

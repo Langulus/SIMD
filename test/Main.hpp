@@ -22,7 +22,7 @@ using namespace Langulus;
 	::std::uint16_t PTR, \
 	::std::uint32_t PTR, \
 	::std::uint64_t PTR, \
-	::std::byte PTR, \
+	Byte PTR, \
 	char8_t PTR, char16_t PTR, char32_t PTR, wchar_t PTR
 
 #define NUMBERS_ALL() \
@@ -44,7 +44,7 @@ using namespace Langulus;
 	(Vector<::std::uint16_t PTR, S>), \
 	(Vector<::std::uint32_t PTR, S>), \
 	(Vector<::std::uint64_t PTR, S>), \
-	(Vector<::std::byte PTR, S>), \
+	(Vector<Byte PTR, S>), \
 	(Vector<char8_t PTR, S>), \
 	(Vector<char16_t PTR, S>), \
 	(Vector<char32_t PTR, S>), \
@@ -111,42 +111,3 @@ struct alignas(Langulus::Alignment) Vector {
 		return true;
 	}
 };
-
-/*template<class LHS, class RHS, class OUT>
-LANGULUS(ALWAYSINLINE) void Control(const LHS&, const RHS&, OUT&) noexcept;
-
-template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(ALWAYSINLINE) void Control(const Vector<LHS, C>&, const Vector<RHS, C>&, Vector<OUT, C>&) noexcept;
-
-#define CONTROL_SNIPPETS(OP) \
-	using timer = Catch::Benchmark::Chronometer; \
-	template<class T> \
-	using uninitialized = Catch::Benchmark::storage_for<T>; \
-	template<class LHS, class RHS, class OUT> \
-	LANGULUS(ALWAYSINLINE) void Control(const LHS& lhs, const RHS& rhs, OUT& out) noexcept { \
-		if constexpr (CT::Same<OUT, ::std::byte>) { \
-			DenseCast(out) = static_cast<Decay<OUT>>( \
-				reinterpret_cast<const unsigned char&>(DenseCast(lhs)) OP \
-				reinterpret_cast<const unsigned char&>(DenseCast(rhs)) \
-			); \
-		} \
-		else DenseCast(out) = DenseCast(lhs) OP DenseCast(rhs); \
-	} \
-	template<class LHS, class RHS, size_t C, class OUT> \
-	LANGULUS(ALWAYSINLINE) void Control(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept { \
-		auto r = out.mArray; \
-		auto lhs = lhsArray.mArray; \
-		auto rhs = rhsArray.mArray; \
-		const auto lhsEnd = lhs + C; \
-		while (lhs != lhsEnd) { \
-			if constexpr (CT::Same<OUT, ::std::byte>) { \
-				DenseCast(*r) = static_cast<Decay<OUT>>( \
-					reinterpret_cast<const unsigned char&>(DenseCast(*lhs)) OP \
-					reinterpret_cast<const unsigned char&>(DenseCast(*rhs)) \
-				); \
-			} \
-			else DenseCast(*r) = DenseCast(*lhs) OP DenseCast(*rhs); \
-			++lhs; ++rhs; ++r; \
-		} \
-	}
-	*/

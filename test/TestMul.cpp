@@ -3,13 +3,7 @@
 
 template<class LHS, class RHS, class OUT>
 LANGULUS(ALWAYSINLINE) void ControlMul(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-	if constexpr (CT::Same<OUT, ::std::byte>) {
-		DenseCast(out) = static_cast<Decay<OUT>>(
-			reinterpret_cast<const unsigned char&>(DenseCast(lhs)) *
-			reinterpret_cast<const unsigned char&>(DenseCast(rhs))
-		);
-	}
-	else DenseCast(out) = DenseCast(lhs) * DenseCast(rhs);
+	DenseCast(out) = DenseCast(lhs) * DenseCast(rhs);
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
