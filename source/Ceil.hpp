@@ -25,9 +25,9 @@ namespace Langulus::SIMD
 
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
-            if constexpr (CT::RealSP<T>)
+            if constexpr (CT::Float<T>)
                return simde_mm_ceil_ps(value);
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm_ceil_pd(value);
             else LANGULUS_ERROR("Unsupported type for SIMD::InnerCeil of 16-byte package");
          }
@@ -36,9 +36,9 @@ namespace Langulus::SIMD
 
       #if LANGULUS_SIMD(256BIT)
          if constexpr (CT::SIMD256<REGISTER>) {
-            if constexpr (CT::RealSP<T>)
+            if constexpr (CT::Float<T>)
                return simde_mm256_ceil_ps(value);
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm256_ceil_pd(value);
             else LANGULUS_ERROR("Unsupported type for SIMD::InnerCeil of 32-byte package");
          }
@@ -47,9 +47,9 @@ namespace Langulus::SIMD
 
       #if LANGULUS_SIMD(512BIT)
          if constexpr (CT::SIMD512<REGISTER>) {
-            if constexpr (CT::RealSP<T>)
+            if constexpr (CT::Float<T>)
                return simde_mm512_ceil_ps(value);
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm512_ceil_pd(value);
             else LANGULUS_ERROR("Unsupported type for SIMD::InnerCeil of 64-byte package");
          }

@@ -44,9 +44,9 @@ namespace Langulus::SIMD
                return _mm_cmpgt_epi64_mask(lhs, rhs) == 0x7;
             else if constexpr (CT::UnsignedInteger64<T>)
                return _mm_cmpgt_epu64_mask(lhs, rhs) == 0x7;
-            else if constexpr (CT::Same<T, pcr32>)
+            else if constexpr (CT::Float<T>)
                return _mm_cmp_ps_mask(lhs, rhs, _CMP_GT_OQ) == 0xF;
-            else if constexpr (CT::Same<T, pcr64>)
+            else if constexpr (CT::Double<T>)
                return _mm_cmp_pd_mask(lhs, rhs, _CMP_GT_OQ)) == 0x7;
          #else
             if constexpr (CT::Integer8<T>)
@@ -57,9 +57,9 @@ namespace Langulus::SIMD
                return simde_mm_movemask_epi8(simde_mm_cmpgt_epi32(lhs, rhs)) == 0xFFFF;
             else if constexpr (CT::Integer64<T>)
                return CT::Inner::NotSupported{};
-            else if constexpr (CT::RealSP<T>)
+            else if constexpr (CT::Float<T>)
                return simde_mm_movemask_ps(_mm_cmpgt_ps(lhs, rhs)) == 0xF;
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm_movemask_pd(_mm_cmpgt_pd(lhs, rhs)) == 0x7;
          #endif
          else LANGULUS_ERROR("Unsupported type for SIMD::InnerGreater of 16-byte package");
@@ -82,9 +82,9 @@ namespace Langulus::SIMD
                return _mm256_cmpgt_epi64_mask(lhs, rhs) == 0xF;
             else if constexpr (CT::UnsignedInteger64<T>)
                return _mm256_cmpgt_epu64_mask(lhs, rhs) == 0xF;
-            else if constexpr (CT::RealSP<T>)
+            else if constexpr (CT::Float<T>)
                return _mm256_cmp_ps_mask(lhs, rhs, _CMP_GT_OQ) == 0xFF;
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return _mm256_cmp_pd_mask(lhs, rhs, _CMP_GT_OQ)) == 0xF;
             else LANGULUS_ERROR("Unsupported type for SIMD::InnerGreater of 32-byte package");
          #else
@@ -96,9 +96,9 @@ namespace Langulus::SIMD
                return simde_mm256_movemask_epi8(simde_mm256_cmpgt_epi32(lhs, rhs)) == 0xFF;
             else if constexpr (CT::Integer64<T>)
                return simde_mm256_movemask_epi8(simde_mm256_cmpgt_epi64(lhs, rhs)) == 0xF;
-            else if constexpr (CT::RealSP<T>)
+            else if constexpr (CT::Float<T>)
                return simde_mm256_movemask_ps(simde_mm256_cmp_ps(lhs, rhs, _CMP_GT_OQ)) == 0xFF;
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm256_movemask_pd(simde_mm256_cmp_pd(lhs, rhs, _CMP_GT_OQ)) == 0xF;
          #endif
          else LANGULUS_ERROR("Unsupported type for SIMD::InnerGreater of 32-byte package");
@@ -120,9 +120,9 @@ namespace Langulus::SIMD
             return simde_mm512_cmpgt_epi64_mask(lhs, rhs) == 0xFF;
          else if constexpr (CT::UnsignedInteger64<T>)
             return simde_mm512_cmpgt_epu64_mask(lhs, rhs) == 0xFF;
-         else if constexpr (CT::RealSP<T>)
+         else if constexpr (CT::Float<T>)
             return simde_mm512_cmp_ps_mask(lhs, rhs, _CMP_GT_OQ) == 0xFFFF;
-         else if constexpr (CT::RealDP<T>)
+         else if constexpr (CT::Double<T>)
             return simde_mm512_cmp_pd_mask(lhs, rhs, _CMP_GT_OQ) == 0xFF;
          else LANGULUS_ERROR("Unsupported type for SIMD::InnerGreater of 64-byte package");
       }

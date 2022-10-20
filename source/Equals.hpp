@@ -84,9 +84,9 @@ namespace Langulus::SIMD
                return simde_mm_movemask_epi8(simde_mm_cmpeq_epi64(lhs, rhs)) == 0xFFFF; // SSE4.1
             #endif
          }
-         else if constexpr (CT::RealSP<T>)
+         else if constexpr (CT::Float<T>)
             return simde_mm_movemask_ps(simde_mm_cmpeq_ps(lhs, rhs)) == 0xF;   // SSE
-         else if constexpr (CT::RealDP<T>)
+         else if constexpr (CT::Double<T>)
             return simde_mm_movemask_pd(simde_mm_cmpeq_pd(lhs, rhs)) == 0x3;   // SSE2
          else
             LANGULUS_ERROR("Unsupported type for SIMD::InnerEquals of 16-byte package");
@@ -152,9 +152,9 @@ namespace Langulus::SIMD
                return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi64(lhs, rhs)) == 0xFFFFFFFF; // AVX2
             #endif
          }
-         else if constexpr (CT::RealSP<T>)
+         else if constexpr (CT::Float<T>)
             return simde_mm256_movemask_ps(simde_mm256_cmp_ps(lhs, rhs, _CMP_EQ_OQ)) == 0xFF;   // AVX
-         else if constexpr (CT::RealDP<T>)
+         else if constexpr (CT::Double<T>)
             return simde_mm256_movemask_pd(simde_mm256_cmp_pd(lhs, rhs, _CMP_EQ_OQ)) == 0xF;   // AVX
          else LANGULUS_ERROR("Unsupported type for SIMD::InnerEquals of 32-byte package");
       }
@@ -179,9 +179,9 @@ namespace Langulus::SIMD
             return simde_mm512_cmpeq_epi64_mask(lhs, rhs) == 0xFF;
          else if constexpr (CT::UnsignedInteger64<T>)
             return simde_mm512_cmpeq_epu64_mask(lhs, rhs) == 0xFF;
-         else if constexpr (CT::RealSP<T>)
+         else if constexpr (CT::Float<T>)
             return simde_mm512_cmp_ps_mask(lhs, rhs, _CMP_EQ_OQ) == 0xFFFF;
-         else if constexpr (CT::RealDP<T>)
+         else if constexpr (CT::Double<T>)
             return simde_mm512_cmp_pd_mask(lhs, rhs, _CMP_EQ_OQ) == 0xFF;
          else LANGULUS_ERROR("Unsupported type for SIMD::InnerEquals of 64-byte package");
       }

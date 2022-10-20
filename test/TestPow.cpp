@@ -1,24 +1,31 @@
 #include "Main.hpp"
 #include <catch2/catch.hpp>
-/*
+
 template<CT::Dense B, CT::Dense E>
-NOD() constexpr auto Pow(B base, E exponent) noexcept {
+NOD() LANGULUS(ALWAYSINLINE) constexpr auto Pow(B base, E exponent) noexcept {
+	if (base == B {1})
+		return B {1};
+
 	if constexpr (CT::IntegerX<B, E>) {
-		B result {1};
-		while (exponent != E {0}) {
-			if constexpr (CT::Unsigned<B>) {
-				if (exponent & E {1})
+		if constexpr (CT::Unsigned<B>) {
+			B result {1};
+			while (exponent != E {0}) {
+				if ((exponent & E {1}) != E {0})
 					result *= base;
 				exponent >>= E {1};
-				if constexpr (CT::Byte<B, E>)
 				base *= base;
 			}
-			else {
+			return result;
+		}
+		else if (exponent > 0) {
+			B result {1};
+			while (exponent != E {0}) {
 				result *= base;
 				--exponent;
 			}
+			return result;
 		}
-		return result;
+		else return B {0};
 	}
 	else if constexpr (CT::Real<B, E>)
 		return ::std::pow(base, exponent);
@@ -131,7 +138,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
 		WHEN("Raise to a power in reverse") {
 			ControlPow(y, x, rCheck);
 			if constexpr (CT::Typed<T>)
-				SIMD::Power(x.mArray, y.mArray, r.mArray);
+				SIMD::Power(y.mArray, x.mArray, r.mArray);
 			else
 				SIMD::Power(y, x, r);
 
@@ -147,4 +154,4 @@ TEMPLATE_TEST_CASE("Power", "[power]"
 			delete y;
 		}
 	}
-}*/
+}

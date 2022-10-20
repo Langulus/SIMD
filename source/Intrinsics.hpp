@@ -239,11 +239,11 @@ namespace Langulus::CT
 
    /// Single precision real number concept                                   
    template<class... T>
-   concept RealSP = (Same<::Langulus::Float, T> && ...);
+   concept Float = (Same<::Langulus::Float, T> && ...);
 
    /// Double precision real number concept                                   
    template<class... T>
-   concept RealDP = (Same<::Langulus::Double, T> && ...);
+   concept Double = (Same<::Langulus::Double, T> && ...);
 
    /// Size-related number concepts                                           
    /// These concepts include character and byte types                        
@@ -288,6 +288,31 @@ namespace Langulus::CT
 
 namespace Langulus::SIMD
 {
+
+   inline simde__m128i lgls_blendv_epi32(const simde__m128i& a, const simde__m128i& b, const simde__m128i& mask) {
+      return simde_mm_castps_si128(simde_mm_blendv_ps(
+         simde_mm_castsi128_ps(a),
+         simde_mm_castsi128_ps(b),
+         simde_mm_castsi128_ps(mask)
+      ));
+   }
+
+   inline simde__m256i lgls_blendv_epi32(const simde__m256i& a, const simde__m256i& b, const simde__m256i& mask) {
+      return simde_mm256_castps_si256(simde_mm256_blendv_ps(
+         simde_mm256_castsi256_ps(a),
+         simde_mm256_castsi256_ps(b),
+         simde_mm256_castsi256_ps(mask)
+      ));
+   }
+   
+   /*inline simde__m512i lgls_blendv_epi32(const simde__m512i& a, const simde__m512i& b, const simde__m512i& mask) {
+      use _mm512_mask_blend_ instead
+      return simde_mm512_castps_si512(simde_mm512_blendv_ps(
+         simde_mm512_castsi512_ps(a),
+         simde_mm512_castsi512_ps(b),
+         simde_mm512_castsi512_ps(mask)
+      ));
+   }*/
 
    /// Got these from:                                                        
    /// https://stackoverflow.com/questions/41144668                           

@@ -68,9 +68,9 @@ namespace Langulus::SIMD
                return simde_mm_set_epi64x(InnerGet<int64_t, DEF, INDICES, 2, true>(values)...);
             else if constexpr (CT::UnsignedInteger64<T>)
                return simde_mm_set_epi64x(InnerGet<int64_t, DEF, INDICES, 2, true>(values)...);
-            else if constexpr (CT::RealSP<T>)
+            else if constexpr (CT::Float<T>)
                return simde_mm_setr_ps(InnerGet<simde_float32, DEF, INDICES, 4>(values)...);
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm_setr_pd(InnerGet<simde_float64, DEF, INDICES, 2>(values)...);
             else
                LANGULUS_ERROR("Can't SIMD::InnerSet 16-byte package");
@@ -96,9 +96,9 @@ namespace Langulus::SIMD
                return simde_mm256_setr_epi64x(InnerGet<int64_t, DEF, INDICES, 4>(values)...);
             else if constexpr (CT::UnsignedInteger64<T>)
                return simde_mm256_setr_epi64x(InnerGet<int64_t, DEF, INDICES, 4>(values)...);
-            else if constexpr (CT::RealSP<T>)
+            else if constexpr (CT::Float<T>)
                return simde_mm256_setr_ps(InnerGet<simde_float32, DEF, INDICES, 8>(values)...);
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm256_setr_pd(InnerGet<simde_float64, DEF, INDICES, 4>(values)...);
             else
                LANGULUS_ERROR("Can't SIMD::InnerSet 32-byte package");
@@ -124,9 +124,9 @@ namespace Langulus::SIMD
                return simde_mm512_setr_epi64(InnerGet<int64_t, DEF, INDICES, 8>(values)...);
             else if constexpr (CT::UnsignedInteger64<T>)
                return simde_mm512_setr_epi64(InnerGet<int64_t, DEF, INDICES, 8>(values)...);
-            else if constexpr (CT::RealSP<T>)
+            else if constexpr (CT::Float<T>)
                return simde_mm512_setr_ps(InnerGet<simde_float32, DEF, INDICES, 16>(values)...);
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm512_setr_pd(InnerGet<simde_float64, DEF, INDICES, 8>(values)...);
             else
                LANGULUS_ERROR("Can't SIMD::InnerSet 64-byte package");

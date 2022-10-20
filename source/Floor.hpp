@@ -24,25 +24,25 @@ namespace Langulus::SIMD
          "SIMD::InnerFloor is suboptimal and pointless for whole numbers, avoid calling it on such");
 
       if constexpr (CT::SIMD128<REGISTER>) {
-         if constexpr (CT::RealSP<T>)
+         if constexpr (CT::Float<T>)
             return simde_mm_floor_ps(value);
-         else if constexpr (CT::RealDP<T>)
+         else if constexpr (CT::Double<T>)
             return simde_mm_floor_pd(value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::InnerFloor of 16-byte package");
       }
       else if constexpr (CT::SIMD256<REGISTER>) {
-         if constexpr (CT::RealSP<T>)
+         if constexpr (CT::Float<T>)
             return simde_mm256_floor_ps(value);
-         else if constexpr (CT::RealDP<T>)
+         else if constexpr (CT::Double<T>)
             return simde_mm256_floor_pd(value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::InnerFloor of 32-byte package");
       }
       else if constexpr (CT::SIMD512<REGISTER>) {
-         if constexpr (CT::RealSP<T>)
+         if constexpr (CT::Float<T>)
             return simde_mm512_floor_ps(value);
-         else if constexpr (CT::RealDP<T>)
+         else if constexpr (CT::Double<T>)
             return simde_mm512_floor_pd(value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::InnerFloor of 64-byte package");

@@ -69,12 +69,12 @@ namespace Langulus::SIMD
                LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_epi64(lhs, rhs);
          }
-         else if constexpr (CT::RealSP<T>) {
+         else if constexpr (CT::Float<T>) {
             if (simde_mm_movemask_ps(simde_mm_cmpeq_ps(rhs, simde_mm_setzero_ps())))
                LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_ps(lhs, rhs);
          }
-         else if constexpr (CT::RealDP<T>) {
+         else if constexpr (CT::Double<T>) {
             if (simde_mm_movemask_pd(simde_mm_cmpeq_pd(rhs, simde_mm_setzero_pd())))
                LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm_div_pd(lhs, rhs);
@@ -126,12 +126,12 @@ namespace Langulus::SIMD
                LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_epi64(lhs, rhs);
          }
-         else if constexpr (CT::RealSP<T>) {
+         else if constexpr (CT::Float<T>) {
             if (simde_mm256_movemask_ps(simde_mm256_cmp_ps(rhs, simde_mm256_setzero_ps(), _CMP_EQ_OQ)))
                LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_ps(lhs, rhs);
          }
-         else if constexpr (CT::RealDP<T>) {
+         else if constexpr (CT::Double<T>) {
             if (simde_mm256_movemask_pd(simde_mm256_cmp_pd(rhs, simde_mm256_setzero_pd(), _CMP_EQ_OQ)))
                LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm256_div_pd(lhs, rhs);
@@ -183,12 +183,12 @@ namespace Langulus::SIMD
                LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_epi64(lhs, rhs);
          }
-         else if constexpr (CT::RealSP<T>) {
+         else if constexpr (CT::Float<T>) {
             if (simde_mm512_cmp_ps(rhs, simde_mm512_setzero_ps(), _CMP_EQ_OQ))
                LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_ps(lhs, rhs);
          }
-         else if constexpr (CT::RealDP<T>) {
+         else if constexpr (CT::Double<T>) {
             if (simde_mm512_cmp_pd(rhs, simde_mm512_setzero_pd(), _CMP_EQ_OQ))
                LANGULUS_THROW(DivisionByZero, "Division by zero");
             return simde_mm512_div_pd(lhs, rhs);

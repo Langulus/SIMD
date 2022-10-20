@@ -37,9 +37,9 @@ namespace Langulus::SIMD
                return simde_mm_sub_epi32(lhs, rhs);
             else if constexpr (CT::Integer64<T>)
                return simde_mm_sub_epi64(lhs, rhs);
-            else if constexpr (CT::RealSP<T>)
+            else if constexpr (CT::Float<T>)
                return simde_mm_sub_ps(lhs, rhs);
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm_sub_pd(lhs, rhs);
             else
                LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner of 16-byte package");
@@ -57,9 +57,9 @@ namespace Langulus::SIMD
                return simde_mm256_sub_epi32(lhs, rhs);
             else if constexpr (CT::Integer64<T>)
                return simde_mm256_sub_epi64(lhs, rhs);
-            else if constexpr (CT::RealSP<T>)
+            else if constexpr (CT::Float<T>)
                return simde_mm256_sub_ps(lhs, rhs);
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm256_sub_pd(lhs, rhs);
             else
                LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner of 32-byte package");
@@ -77,9 +77,9 @@ namespace Langulus::SIMD
                return simde_mm512_sub_epi32(lhs, rhs);
             else if constexpr (CT::Integer64<T>)
                return simde_mm512_sub_epi64(lhs, rhs);
-            else if constexpr (CT::RealSP<T>)
+            else if constexpr (CT::Float<T>)
                return simde_mm512_sub_ps(lhs, rhs);
-            else if constexpr (CT::RealDP<T>)
+            else if constexpr (CT::Double<T>)
                return simde_mm512_sub_pd(lhs, rhs);
             else LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner of 64-byte package");
          }

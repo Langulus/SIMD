@@ -28,9 +28,9 @@ namespace Langulus::SIMD
             if constexpr (denseSize == 16 && CT::Dense<T>) {
                if constexpr (CT::Integer<T> || CT::Byte<T> || CT::Character<T>)
                   return simde_mm_loadu_si128(reinterpret_cast<const simde__m128i*>(v));
-               else if constexpr (CT::RealSP<T>)
+               else if constexpr (CT::Float<T>)
                   return simde_mm_loadu_ps(v);
-               else if constexpr (CT::RealDP<T>)
+               else if constexpr (CT::Double<T>)
                   return simde_mm_loadu_pd(v);
                else
                   LANGULUS_ERROR("Unsupported type for SIMD::Load 16-byte package");
@@ -46,9 +46,9 @@ namespace Langulus::SIMD
             if constexpr (denseSize == 32 && CT::Dense<T>) {
                if constexpr (CT::Integer<T> || CT::Byte<T> || CT::Character<T>)
                   return simde_mm256_loadu_si256(reinterpret_cast<const simde__m256i*>(v));
-               else if constexpr (CT::RealSP<T>)
+               else if constexpr (CT::Float<T>)
                   return simde_mm256_loadu_ps(v);
-               else if constexpr (CT::RealDP<T>)
+               else if constexpr (CT::Double<T>)
                   return simde_mm256_loadu_pd(v);
                else
                   LANGULUS_ERROR("Unsupported type for SIMD::Load 32-byte package");
@@ -64,9 +64,9 @@ namespace Langulus::SIMD
             if constexpr (denseSize == 64 && CT::Dense<T>) {
                if constexpr (CT::Integer<T> || CT::Byte<T> || CT::Character<T>)
                   return simde_mm512_loadu_si512(v);
-               else if constexpr (CT::RealSP<T>)
+               else if constexpr (CT::Float<T>)
                   return simde_mm512_loadu_ps(v);
-               else if constexpr (CT::RealDP<T>)
+               else if constexpr (CT::Double<T>)
                   return simde_mm512_loadu_pd(v);
                else
                   LANGULUS_ERROR("Unsupported type for SIMD::Load 64-byte package");

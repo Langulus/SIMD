@@ -34,12 +34,12 @@ namespace Langulus::SIMD
          else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128i");
       }
       else if constexpr (CT::Same<REGISTER,simde__m128>) {
-         if constexpr (CT::RealSP<T>)
+         if constexpr (CT::Float<T>)
             return simde_mm_broadcast_ss(&value);
          else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128");
       }
       else if constexpr (CT::Same<REGISTER,simde__m128d>) {
-         if constexpr (CT::RealDP<T>)
+         if constexpr (CT::Double<T>)
             return simde_mm_set1_pd(value);
          else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128d");
       }
@@ -55,12 +55,12 @@ namespace Langulus::SIMD
          else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256i");
       }
       else if constexpr (CT::Same<REGISTER,simde__m256>) {
-         if constexpr (CT::RealSP<T>)
+         if constexpr (CT::Float<T>)
             return simde_mm256_broadcast_ss(&value);
          else LANGULUS_ERROR("Unsupported type for SIMD::Fill __m256");
       }
       else if constexpr (CT::Same<REGISTER,simde__m256d>) {
-         if constexpr (CT::RealDP<T>)
+         if constexpr (CT::Double<T>)
             return simde_mm256_broadcast_sd(&value);
          else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256d");
       }
@@ -76,12 +76,12 @@ namespace Langulus::SIMD
          else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m512i");
       }
       else if constexpr (CT::Same<REGISTER,simde__m512>) {
-         if constexpr (CT::RealSP<T>)
+         if constexpr (CT::Float<T>)
             return simde_mm512_set1_ps(value);
          else LANGULUS_ERROR("Unsupported type for SIMD::Fill __m512");
       }
       else if constexpr (CT::Same<REGISTER,simde__m512d>) {
-         if constexpr (CT::RealDP<T>)
+         if constexpr (CT::Double<T>)
             return simde_mm512_set1_pd(&value);
          else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m512d");
       }

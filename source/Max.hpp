@@ -54,9 +54,9 @@ namespace Langulus::SIMD
                return CT::Inner::NotSupported{};
             #endif
          }
-         else if constexpr (CT::RealSP<T>)
+         else if constexpr (CT::Float<T>)
             return simde_mm_max_ps(lhs, rhs);
-         else if constexpr (CT::RealDP<T>)
+         else if constexpr (CT::Double<T>)
             return simde_mm_max_pd(lhs, rhs);
          else LANGULUS_ERROR("Unsupported type for SIMD::InnerMax of 16-byte package");
       }
@@ -87,9 +87,9 @@ namespace Langulus::SIMD
                return CT::Inner::NotSupported{};
             #endif
          }
-         else if constexpr (CT::RealSP<T>)
+         else if constexpr (CT::Float<T>)
             return simde_mm256_max_ps(lhs, rhs);
-         else if constexpr (CT::RealDP<T>)
+         else if constexpr (CT::Double<T>)
             return simde_mm256_max_pd(lhs, rhs);
          else LANGULUS_ERROR("Unsupported type for SIMD::InnerMax of 32-byte package");
       }
@@ -110,9 +110,9 @@ namespace Langulus::SIMD
             return simde_mm512_max_epi64(lhs, rhs);
          else if constexpr (CT::UnsignedInteger64<T>)
             return simde_mm512_max_epu64(lhs, rhs);
-         else if constexpr (CT::RealSP<T>)
+         else if constexpr (CT::Float<T>)
             return simde_mm512_max_ps(lhs, rhs);
-         else if constexpr (CT::RealDP<T>)
+         else if constexpr (CT::Double<T>)
             return simde_mm512_max_pd(lhs, rhs);
          else LANGULUS_ERROR("Unsupported type for SIMD::InnerMax of 64-byte package");
       }
