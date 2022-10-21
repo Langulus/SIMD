@@ -289,31 +289,6 @@ namespace Langulus::CT
 namespace Langulus::SIMD
 {
 
-   inline simde__m128i lgls_blendv_epi32(const simde__m128i& a, const simde__m128i& b, const simde__m128i& mask) {
-      return simde_mm_castps_si128(simde_mm_blendv_ps(
-         simde_mm_castsi128_ps(a),
-         simde_mm_castsi128_ps(b),
-         simde_mm_castsi128_ps(mask)
-      ));
-   }
-
-   inline simde__m256i lgls_blendv_epi32(const simde__m256i& a, const simde__m256i& b, const simde__m256i& mask) {
-      return simde_mm256_castps_si256(simde_mm256_blendv_ps(
-         simde_mm256_castsi256_ps(a),
-         simde_mm256_castsi256_ps(b),
-         simde_mm256_castsi256_ps(mask)
-      ));
-   }
-   
-   /*inline simde__m512i lgls_blendv_epi32(const simde__m512i& a, const simde__m512i& b, const simde__m512i& mask) {
-      use _mm512_mask_blend_ instead
-      return simde_mm512_castps_si512(simde_mm512_blendv_ps(
-         simde_mm512_castsi512_ps(a),
-         simde_mm512_castsi512_ps(b),
-         simde_mm512_castsi512_ps(mask)
-      ));
-   }*/
-
    /// Got these from:                                                        
    /// https://stackoverflow.com/questions/41144668                           
    inline simde__m128d uint64_to_double_full(simde__m128i x) {
@@ -497,6 +472,162 @@ namespace Langulus::SIMD
          const auto result = _mm_extract_epi64(vmax, 0); // SSE4.1
          return reinterpret_cast<const int64_t&>(result);
       #endif
+   }*/
+
+   
+   inline simde__m128i lgls_blendv_epi32(const simde__m128i& a, const simde__m128i& b, const simde__m128i& mask) {
+      return simde_mm_castps_si128(simde_mm_blendv_ps(
+         simde_mm_castsi128_ps(a),
+         simde_mm_castsi128_ps(b),
+         simde_mm_castsi128_ps(mask)
+      ));
+   }
+
+   inline simde__m256i lgls_blendv_epi32(const simde__m256i& a, const simde__m256i& b, const simde__m256i& mask) {
+      return simde_mm256_castps_si256(simde_mm256_blendv_ps(
+         simde_mm256_castsi256_ps(a),
+         simde_mm256_castsi256_ps(b),
+         simde_mm256_castsi256_ps(mask)
+      ));
+   }
+
+   /// Pack 16bit integers (signed or not) to 8bit integers with truncation   
+   ///   @param low - lower eight 16bit integers                              
+   ///   @param high - higher eight 16bit integers                            
+   ///   @return the combined 16 truncated 8bit equivalents                   
+   inline simde__m128i lgls_pack_epi16(const simde__m128i& low, const simde__m128i& high) {
+      #if LANGULUS_SIMD(512BIT)
+         return simde_mm_or_si128(
+            simde_mm_cvtepi16_epi8(low), 
+            _mm_halfflip(simde_mm_cvtepi16_epi8(high))
+         );
+      #else
+         const simde__m128i maskLo = simde_mm_set_epi8(
+            0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+            14, 12, 10, 8, 6, 4, 2, 0
+         );
+         const simde__m128i maskHi = simde_mm_set_epi8(
+            14, 12, 10, 8, 6, 4, 2, 0,
+            0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
+         );
+         return simde_mm_or_si128(
+            simde_mm_shuffle_epi8(low, maskLo),
+            simde_mm_shuffle_epi8(high, maskHi)
+         );
+      #endif
+   }
+
+   /// Pack 16bit integers (signed or not) to 8bit integers with truncation   
+   ///   @param low - lower sixteen 16bit integers                            
+   ///   @param high - higher sixteen 16bit integers                          
+   ///   @return the combined 32 truncated 8bit equivalents                   
+   inline simde__m256i lgls_pack_epi16(const simde__m256i& low, const simde__m256i& high) {
+      #if LANGULUS_SIMD(512BIT)
+         return simde_mm256_or_si256(
+            simde_mm256_cvtepi16_epi8(low), 
+            _mm_halfflip(simde_mm256_cvtepi16_epi8(high))
+         );
+      #else
+         const simde__m128i maskLo = simde_mm_set_epi8(
+            0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+            14, 12, 10, 8, 6, 4, 2, 0
+         );
+         const simde__m128i maskHi = simde_mm_set_epi8(
+            14, 12, 10, 8, 6, 4, 2, 0,
+            0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
+         );
+         const simde__m128i C1 = simde_mm_or_si128(
+            simde_mm_shuffle_epi8(_mm256_castsi256_si128(low), maskLo),
+            simde_mm_shuffle_epi8(_mm256_castsi256_si128(_mm_halfflip(low)), maskHi)
+         );
+         const simde__m128i C2 = simde_mm_or_si128(
+            simde_mm_shuffle_epi8(_mm256_castsi256_si128(high), maskLo),
+            simde_mm_shuffle_epi8(_mm256_castsi256_si128(_mm_halfflip(high)), maskHi)
+         );
+         simde__m256i C = simde_mm256_inserti128_si256(simde_mm256_setzero_si256(), C1, 0);
+         return simde_mm256_inserti128_si256(C, C2, 1);
+      #endif
+   }
+   
+   /*inline simde__m512i lgls_blendv_epi32(const simde__m512i& a, const simde__m512i& b, const simde__m512i& mask) {
+      use _mm512_mask_blend_ instead
+      return simde_mm512_castps_si512(simde_mm512_blendv_ps(
+         simde_mm512_castsi512_ps(a),
+         simde_mm512_castsi512_ps(b),
+         simde_mm512_castsi512_ps(mask)
+      ));
+   }*/
+   
+   /// Pack 32bit integers (signed or not) to 16bit integers with truncation  
+   ///   @param low - lower four 32bit integers                               
+   ///   @param high - higher four 32bit integers                             
+   ///   @return the combined 8 truncated 16bit equivalents                   
+   inline simde__m128i lgls_pack_epi32(const simde__m128i& low, const simde__m128i& high) {
+      #if LANGULUS_SIMD(512BIT)
+         return simde_mm_or_si128(
+            simde_mm_cvtepi32_epi16(low), 
+            _mm_halfflip(simde_mm_cvtepi32_epi16(high))
+         );
+      #else
+         const simde__m128i maskLo = simde_mm_setr_epi8(
+            0, 1, 4, 5, 8, 9, 12, 13, -1, -1, -1, -1, -1, -1, -1, -1
+         );
+         const simde__m128i maskHi = simde_mm_setr_epi8(
+            -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 4, 5, 8, 9, 12, 13
+         );
+         return simde_mm_or_si128(
+            simde_mm_shuffle_epi8(low, maskLo),
+            simde_mm_shuffle_epi8(high, maskHi)
+         );
+      #endif
+   }
+
+   /// Pack 32bit integers (signed or not) to 16bit integers with truncation  
+   ///   @param low - lower eight 32bit integers                              
+   ///   @param high - higher eight 32bit integers                            
+   ///   @return the combined 16 truncated 16bit equivalents                  
+   inline simde__m256i lgls_pack_epi32(const simde__m256i& low, const simde__m256i& high) {
+      #if LANGULUS_SIMD(512BIT)
+         return simde_mm_or_si128(
+            simde_mm_cvtepi32_epi16(low), 
+            _mm_halfflip(simde_mm_cvtepi32_epi16(high))
+         );
+      #else
+         /*const simde__m128i maskLo = simde_mm_setr_epi8(
+            0, 1, 4, 5, 8, 9, 12, 13, -1, -1, -1, -1, -1, -1, -1, -1
+         );
+         const simde__m128i maskHi = simde_mm_setr_epi8(
+            -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 4, 5, 8, 9, 12, 13
+         );*/
+         const simde__m128i maskLo = simde_mm_set_epi8(
+            0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+            13, 12, 9, 8, 5, 4, 1, 0
+         );
+         const simde__m128i maskHi = simde_mm_set_epi8(
+            13, 12, 9, 8, 5, 4, 1, 0,
+            0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
+         );
+
+         const simde__m128i C1 = simde_mm_or_si128(
+            simde_mm_shuffle_epi8(_mm256_castsi256_si128(low), maskLo),
+            simde_mm_shuffle_epi8(_mm256_castsi256_si128(_mm_halfflip(low)), maskHi)
+         );
+         const simde__m128i C2 = simde_mm_or_si128(
+            simde_mm_shuffle_epi8(_mm256_castsi256_si128(high), maskLo),
+            simde_mm_shuffle_epi8(_mm256_castsi256_si128(_mm_halfflip(high)), maskHi)
+         );
+         simde__m256i C = simde_mm256_inserti128_si256(simde_mm256_setzero_si256(), C1, 0);
+         return simde_mm256_inserti128_si256(C, C2, 1);
+      #endif
+   }
+   
+   /*inline simde__m512i lgls_pack_epi32(const simde__m512i& a, const simde__m512i& b, const simde__m512i& mask) {
+      use _mm512_mask_blend_ instead
+      return simde_mm512_castps_si512(simde_mm512_blendv_ps(
+         simde_mm512_castsi512_ps(a),
+         simde_mm512_castsi512_ps(b),
+         simde_mm512_castsi512_ps(mask)
+      ));
    }*/
 
    template<class F, class T>

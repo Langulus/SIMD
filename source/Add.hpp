@@ -99,8 +99,7 @@ namespace Langulus::SIMD
          }
          else
       #endif
-
-      LANGULUS_ERROR("Unsupported type for SIMD::AddInner");
+         LANGULUS_ERROR("Unsupported type for SIMD::AddInner");
    }
 
    ///                                                                        

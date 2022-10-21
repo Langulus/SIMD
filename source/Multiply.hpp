@@ -38,19 +38,7 @@ namespace Langulus::SIMD
                simde__m128i Bhi = simde_mm_unpackhi_epi8(rhs, zero);
                simde__m128i Clo = simde_mm_mullo_epi16(Alo, Blo);
                simde__m128i Chi = simde_mm_mullo_epi16(Ahi, Bhi);
-               simde__m128i maskLo = simde_mm_set_epi8(
-                  0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 
-                  14, 12, 10, 8, 6, 4, 2, 0
-               );
-               simde__m128i maskHi = simde_mm_set_epi8(
-                  14, 12, 10, 8, 6, 4, 2, 0, 
-                  0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-               );
-               simde__m128i C = simde_mm_or_si128(
-                  simde_mm_shuffle_epi8(Clo, maskLo), 
-                  simde_mm_shuffle_epi8(Chi, maskHi)
-               );
-               return C;
+               return lgls_pack_epi16(Clo, Chi);
             }
             else if constexpr (CT::Integer16<T>)
                return simde_mm_mullo_epi16(lhs, rhs);
@@ -83,25 +71,7 @@ namespace Langulus::SIMD
                simde__m256i Bhi = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(_mm_halfflip(rhs)));
                simde__m256i Clo = simde_mm256_mullo_epi16(Alo, Blo);
                simde__m256i Chi = simde_mm256_mullo_epi16(Ahi, Bhi);
-               
-               simde__m128i maskLo = simde_mm_set_epi8(
-                  0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-                  14, 12, 10, 8, 6, 4, 2, 0
-               );
-               simde__m128i maskHi = simde_mm_set_epi8(
-                  14, 12, 10, 8, 6, 4, 2, 0,
-                  0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-               );
-               simde__m128i C1 = simde_mm_or_si128(
-                  simde_mm_shuffle_epi8(_mm256_castsi256_si128(Clo), maskLo),
-                  simde_mm_shuffle_epi8(_mm256_castsi256_si128(_mm_halfflip(Clo)), maskHi)
-               );
-               simde__m128i C2 = simde_mm_or_si128(
-                  simde_mm_shuffle_epi8(_mm256_castsi256_si128(Chi), maskLo),
-                  simde_mm_shuffle_epi8(_mm256_castsi256_si128(_mm_halfflip(Chi)), maskHi)
-               );
-               simde__m256i C = simde_mm256_inserti128_si256(zero, C1, 0);
-               return simde_mm256_inserti128_si256(C, C2, 1);
+               return lgls_pack_epi16(Clo, Chi);
             }
             else if constexpr (CT::Integer16<T>)
                return simde_mm256_mullo_epi16(lhs, rhs);
@@ -160,8 +130,7 @@ namespace Langulus::SIMD
          }
          else
       #endif
-
-      LANGULUS_ERROR("Unsupported type for SIMD::MultiplyInner");
+         LANGULUS_ERROR("Unsupported type for SIMD::MultiplyInner");
    }
 
    ///                                                                        

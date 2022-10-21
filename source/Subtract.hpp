@@ -81,12 +81,12 @@ namespace Langulus::SIMD
                return simde_mm512_sub_ps(lhs, rhs);
             else if constexpr (CT::Double<T>)
                return simde_mm512_sub_pd(lhs, rhs);
-            else LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner of 64-byte package");
+            else
+               LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner of 64-byte package");
          }
          else
       #endif
-
-      LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner");
+         LANGULUS_ERROR("Unsupported type for SIMD::SubtractInner");
    }
 
    ///                                                                        

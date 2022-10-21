@@ -25,11 +25,27 @@ using namespace Langulus;
 	Byte PTR, \
 	char8_t PTR, char16_t PTR, char32_t PTR, wchar_t PTR
 
+#define NUMBERS_INT(PTR) \
+	::std::int8_t PTR, \
+	::std::int16_t PTR, \
+	::std::int32_t PTR, \
+	::std::int64_t PTR, \
+	::std::uint8_t PTR, \
+	::std::uint16_t PTR, \
+	::std::uint32_t PTR, \
+	::std::uint64_t PTR, \
+	Byte PTR, \
+	char8_t PTR, char16_t PTR, char32_t PTR, wchar_t PTR
+
 #define NUMBERS_ALL() \
 	NUMBERS_SIGNED( ), \
 	NUMBERS_UNSIGNED( ), \
 	NUMBERS_SIGNED(*), \
 	NUMBERS_UNSIGNED(*)
+
+#define NUMBERS_ALL_INT() \
+	NUMBERS_INT( ), \
+	NUMBERS_INT(*)
 
 #define VECTORS_SIGNED(PTR,S) \
 	(Vector<::std::int8_t PTR, S>), \
@@ -50,11 +66,30 @@ using namespace Langulus;
 	(Vector<char32_t PTR, S>), \
 	(Vector<wchar_t PTR, S>)
 
+#define VECTORS_INT(PTR,S) \
+	(Vector<::std::int8_t PTR, S>), \
+	(Vector<::std::int16_t PTR, S>), \
+	(Vector<::std::int32_t PTR, S>), \
+	(Vector<::std::int64_t PTR, S>), \
+	(Vector<::std::uint8_t PTR, S>), \
+	(Vector<::std::uint16_t PTR, S>), \
+	(Vector<::std::uint32_t PTR, S>), \
+	(Vector<::std::uint64_t PTR, S>), \
+	(Vector<Byte PTR, S>), \
+	(Vector<char8_t PTR, S>), \
+	(Vector<char16_t PTR, S>), \
+	(Vector<char32_t PTR, S>), \
+	(Vector<wchar_t PTR, S>)
+
 #define VECTORS_ALL(S) \
 	VECTORS_SIGNED(*,S), \
 	VECTORS_UNSIGNED(*,S), \
 	VECTORS_SIGNED( ,S), \
 	VECTORS_UNSIGNED( ,S)
+
+#define VECTORS_ALL_INT(S) \
+	VECTORS_INT(*,S), \
+	VECTORS_INT( ,S)
 
 using uint = unsigned int;
 template<class T>
@@ -77,6 +112,43 @@ struct alignas(Langulus::Alignment) Vector {
 	using MemberType = T;
 
 	T mArray[C];
+
+	struct iterator {
+		const T* marker;
+
+		iterator() = delete;
+		iterator(const T* a) : marker{a}{}
+
+		bool operator == (const iterator& it) const noexcept {
+			return marker == it.marker;
+		}
+
+		// Prefix operator                                                
+		iterator& operator ++ () noexcept {
+			++marker;
+			return *this;
+		}
+
+		// Suffix operator                                                
+		iterator operator ++ (int) noexcept {
+			const auto backup = *this;
+			operator ++ ();
+			return backup;
+		}
+
+		decltype(auto) operator * () const noexcept {
+			return DenseCast(*marker);
+		}
+
+	};
+
+	auto begin() const noexcept {
+		return iterator {mArray};
+	}
+
+	auto end() const noexcept {
+		return iterator {mArray + C};
+	}
 
 	Vector() {
 		static std::random_device rd;

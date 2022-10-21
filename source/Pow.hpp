@@ -13,7 +13,7 @@
 namespace Langulus::SIMD
 {
 
-   template<class T, Count S>
+   template<class, Count>
    LANGULUS(ALWAYSINLINE) constexpr auto PowerInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
       return CT::Inner::NotSupported{};
    }
