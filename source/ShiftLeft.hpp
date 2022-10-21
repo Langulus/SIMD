@@ -114,10 +114,10 @@ namespace Langulus::SIMD
          if constexpr (CT::SIMD256<REGISTER>) {
             if constexpr (CT::Integer8<T>) {
                const auto zero = simde_mm256_setzero_si256();
-               auto lhs1 = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(lhs)); //simde_mm256_unpacklo_epi8(lhs, zero);
-               auto rhs1 = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(rhs)); // simde_mm256_unpacklo_epi8(rhs, zero);
-               auto lhs2 = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(_mm_halfflip(lhs))); //simde_mm256_unpackhi_epi8(lhs, zero);
-               auto rhs2 = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(_mm_halfflip(rhs))); // simde_mm256_unpackhi_epi8(rhs, zero);
+               auto lhs1 = simde_mm256_cvtepu8_epi16(simde_mm256_extracti128_si256(lhs, 0));
+               auto lhs2 = simde_mm256_cvtepu8_epi16(simde_mm256_extracti128_si256(lhs, 1));
+               auto rhs1 = simde_mm256_cvtepu8_epi16(simde_mm256_extracti128_si256(rhs, 0));
+               auto rhs2 = simde_mm256_cvtepu8_epi16(simde_mm256_extracti128_si256(rhs, 1));
                #if LANGULUS_SIMD(512BIT)
                   // Optimal                                            
                   lhs1 = simde_mm256_sllv_epi16(lhs1, rhs1);
@@ -125,19 +125,19 @@ namespace Langulus::SIMD
                   return lgls_pack_epi16(lhs1, lhs2);
                #else
                   // Not optimal, must be unpacked once more for AVX2   
-                  auto lhs32_1 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(lhs1)); // simde_mm256_unpacklo_epi16(lhs1, zero);
-                  auto rhs32_1 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(rhs1)); // simde_mm256_unpacklo_epi16(rhs1, zero);
-                  auto lhs32_2 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(_mm_halfflip(lhs1))); //simde_mm256_unpackhi_epi16(lhs1, zero);
-                  auto rhs32_2 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(_mm_halfflip(rhs1))); //simde_mm256_unpackhi_epi16(rhs1, zero);
+                  auto lhs32_1 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(lhs1, 0));
+                  auto lhs32_2 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(lhs1, 1));
+                  auto rhs32_1 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(rhs1, 0));
+                  auto rhs32_2 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(rhs1, 1));
 
                   lhs32_1 = simde_mm256_sllv_epi32(lhs32_1, rhs32_1);
                   lhs32_2 = simde_mm256_sllv_epi32(lhs32_2, rhs32_2);
                   lhs1 = lgls_pack_epi32(lhs32_1, lhs32_2);
 
-                  lhs32_1 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(lhs2)); //simde_mm256_unpacklo_epi16(lhs2, zero);
-                  rhs32_1 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(rhs2)); //simde_mm256_unpacklo_epi16(rhs2, zero);
-                  lhs32_2 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(_mm_halfflip(lhs2))); //simde_mm256_unpackhi_epi16(lhs2, zero);
-                  rhs32_2 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(_mm_halfflip(rhs2))); //simde_mm256_unpackhi_epi16(rhs2, zero);
+                  lhs32_1 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(lhs2, 0));
+                  lhs32_2 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(lhs2, 1));
+                  rhs32_1 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(rhs2, 0));
+                  rhs32_2 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(rhs2, 1));
 
                   lhs32_1 = simde_mm256_sllv_epi32(lhs32_1, rhs32_1);
                   lhs32_2 = simde_mm256_sllv_epi32(lhs32_2, rhs32_2);
@@ -153,10 +153,10 @@ namespace Langulus::SIMD
                   return simde_mm256_sllv_epi16(lhs, rhs);
                #else
                   // Not optimal, must be unpacked for AVX2             
-                  auto lhs32_1 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(lhs)); // simde_mm256_unpacklo_epi16(lhs, zero);
-                  auto rhs32_1 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(rhs)); // simde_mm256_unpacklo_epi16(rhs, zero);
-                  auto lhs32_2 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(_mm_halfflip(lhs))); //simde_mm256_unpackhi_epi16(lhs, zero);
-                  auto rhs32_2 = simde_mm256_cvtepu16_epi32(_mm256_castsi256_si128(_mm_halfflip(rhs))); //simde_mm256_unpackhi_epi16(rhs, zero);
+                  auto lhs32_1 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(lhs, 0));
+                  auto lhs32_2 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(lhs, 1));
+                  auto rhs32_1 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(rhs, 0));
+                  auto rhs32_2 = simde_mm256_cvtepu16_epi32(simde_mm256_extracti128_si256(rhs, 1));
 
                   lhs32_1 = simde_mm256_sllv_epi32(lhs32_1, rhs32_1);
                   lhs32_2 = simde_mm256_sllv_epi32(lhs32_2, rhs32_2);

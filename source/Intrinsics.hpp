@@ -537,12 +537,12 @@ namespace Langulus::SIMD
             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
          );
          const simde__m128i C1 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(_mm256_castsi256_si128(low), maskLo),
-            simde_mm_shuffle_epi8(_mm256_castsi256_si128(_mm_halfflip(low)), maskHi)
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 0), maskLo),
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 1), maskHi)
          );
          const simde__m128i C2 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(_mm256_castsi256_si128(high), maskLo),
-            simde_mm_shuffle_epi8(_mm256_castsi256_si128(_mm_halfflip(high)), maskHi)
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 0), maskLo),
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 1), maskHi)
          );
          simde__m256i C = simde_mm256_inserti128_si256(simde_mm256_setzero_si256(), C1, 0);
          return simde_mm256_inserti128_si256(C, C2, 1);
@@ -609,12 +609,12 @@ namespace Langulus::SIMD
          );
 
          const simde__m128i C1 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(_mm256_castsi256_si128(low), maskLo),
-            simde_mm_shuffle_epi8(_mm256_castsi256_si128(_mm_halfflip(low)), maskHi)
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 0), maskLo),
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 1), maskHi)
          );
          const simde__m128i C2 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(_mm256_castsi256_si128(high), maskLo),
-            simde_mm_shuffle_epi8(_mm256_castsi256_si128(_mm_halfflip(high)), maskHi)
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 0), maskLo),
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 1), maskHi)
          );
          simde__m256i C = simde_mm256_inserti128_si256(simde_mm256_setzero_si256(), C1, 0);
          return simde_mm256_inserti128_si256(C, C2, 1);
