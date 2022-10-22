@@ -220,8 +220,7 @@ namespace Langulus::SIMD
          },
          [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
             // Well defined condition in SIMD calls, that is otherwise  
-            // undefined behavior by C++ standard. Practically errorsome
-            // only on clang, but still, better safe than sorry			
+            // undefined behavior by C++ standard                       
             return rhs < LOSSLESS {sizeof(LOSSLESS) * 8} && rhs >= 0
                ? lhs << rhs : 0;
          }
