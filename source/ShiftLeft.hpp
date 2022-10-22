@@ -31,7 +31,7 @@ namespace Langulus::SIMD
    ///   @param rhs - the right-hand-side array                               
    ///   @return the shifted elements as a register                           
    template<class T, Count S, CT::TSIMD REGISTER>
-   /*LANGULUS(ALWAYSINLINE)*/ auto ShiftLeftInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+   LANGULUS(ALWAYSINLINE) auto ShiftLeftInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
       static_assert(CT::IntegerX<Decay<T>>, "Can only shift integers");
 
       #if LANGULUS_SIMD(128BIT)
@@ -220,8 +220,9 @@ namespace Langulus::SIMD
          },
          [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
             // Well defined condition in SIMD calls, that is otherwise  
-            // undefined behavior by C++ standard                       
-            return rhs < LOSSLESS {sizeof(LOSSLESS) * 8}
+            // undefined behavior by C++ standard. Practically errorsome
+            // only on clang, but still, better safe than sorry			
+            return rhs < LOSSLESS {sizeof(LOSSLESS) * 8} && rhs >= 0
                ? lhs << rhs : 0;
          }
       );

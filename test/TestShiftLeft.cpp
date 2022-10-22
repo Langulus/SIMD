@@ -40,8 +40,9 @@ template<class LHS, class RHS, class OUT>
 LANGULUS(ALWAYSINLINE) void ControlSL(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
 	static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
 	// Well defined condition in SIMD calls, that is otherwise				
-	// undefined behavior by C++ standard											
-	DenseCast(out) = DenseCast(rhs) < Decay<RHS> {sizeof(Decay<RHS>) * 8}
+	// undefined behavior by C++ standard. Practically errorsome only		
+	// on clang, but still, better safe than sorry								
+	DenseCast(out) = DenseCast(rhs) < Decay<RHS> {sizeof(Decay<RHS>) * 8} && DenseCast(rhs) >= 0
 		? DenseCast(lhs) << DenseCast(rhs) : 0;
 }
 
