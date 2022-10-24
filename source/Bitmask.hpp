@@ -83,9 +83,9 @@ namespace Langulus::SIMD
          return iterator {C, mValue};
       }
 
-      /// Explicit bool operator                                              
+      /// Implicit bool operator                                              
       ///   @return true if all bits in Mask are set                          
-      constexpr explicit operator bool() const noexcept {
+      constexpr operator bool() const noexcept {
          return mValue == Mask;
       }
 
