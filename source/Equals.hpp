@@ -12,8 +12,8 @@
 namespace Langulus::SIMD
 {
 
-   template<class T, Count S>
-   LANGULUS(ALWAYSINLINE) constexpr auto EqualsInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+   template<class, Count>
+   LANGULUS(ALWAYSINLINE) constexpr auto EqualsInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
       return CT::Inner::NotSupported{};
    }
       
@@ -23,73 +23,136 @@ namespace Langulus::SIMD
    ///   @tparam REGISTER - type of register we're operating with             
    ///   @param lhs - the left-hand-side array                                
    ///   @param rhs - the right-hand-side array                               
-   ///   @return true if lhs is equal to rhs                                  
+   ///   @return a bitmask with the results, or Inner::NotSupported           
+   /// https://giannitedesco.github.io/2019/03/08/simd-cmp-bitmasks.html      
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto EqualsInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+   /*LANGULUS(ALWAYSINLINE)*/ auto EqualsInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
    #if LANGULUS_SIMD(128BIT)
       if constexpr (CT::SIMD128<REGISTER>) {
          if constexpr (CT::SignedInteger8<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm_cmpeq_epi8_mask(lhs, rhs) == 0xFFFF;   // AVX512BW + AVX512VL
+               return Bitmask<S> {
+                  simde_mm_cmpeq_epi8_mask(lhs, rhs)
+               };
             #else
-               return simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(lhs, rhs)) == 0xFFFF; // SSE2
+               return Bitmask<S> {
+                  simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(lhs, rhs))
+               };
             #endif
          }
          else if constexpr (CT::UnsignedInteger8<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm_cmpeq_epu8_mask(lhs, rhs) == 0xFFFF;   // AVX512BW + AVX512VL
+               return Bitmask<S> {
+                  simde_mm_cmpeq_epu8_mask(lhs, rhs)
+               };
             #else
-               return simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(lhs, rhs)) == 0xFFFF; // SSE2
+               return Bitmask<S> {
+                  simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(lhs, rhs))
+               };
             #endif
          }
          else if constexpr (CT::SignedInteger16<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm_cmpeq_epi16_mask(lhs, rhs) == 0xFF;   // AVX512BW + AVX512VL
+               return Bitmask<S> {
+                  simde_mm_cmpeq_epi16_mask(lhs, rhs)
+               };
             #else
-               return simde_mm_movemask_epi8(simde_mm_cmpeq_epi16(lhs, rhs)) == 0xFFFF; // SSE2
+               return Bitmask<S> {
+                  simde_mm_movemask_epi8(
+                     simde_mm_packs_epi16(
+                        simde_mm_cmpeq_epi16(lhs, rhs), 
+                        simde_mm_setzero_si128()
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::UnsignedInteger16<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm_cmpeq_epu16_mask(lhs, rhs) == 0xFF;   // AVX512BW + AVX512VL
+               return Bitmask<S> {
+                  simde_mm_cmpeq_epu16_mask(lhs, rhs)
+               };
             #else
-               return simde_mm_movemask_epi8(simde_mm_cmpeq_epi16(lhs, rhs)) == 0xFFFF; // SSE2
+               return Bitmask<S> {
+                  simde_mm_movemask_epi8(
+                     simde_mm_packs_epi16(
+                        simde_mm_cmpeq_epi16(lhs, rhs), 
+                        simde_mm_setzero_si128()
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::SignedInteger32<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm_cmpeq_epi32_mask(lhs, rhs) == 0xFF;   // AVX512F + AVX512VL
+               return Bitmask<S> {
+                  simde_mm_cmpeq_epi32_mask(lhs, rhs)
+               };
             #else
-               return simde_mm_movemask_epi8(simde_mm_cmpeq_epi32(lhs, rhs)) == 0xFFFF; // SSE2
+               return Bitmask<S> {
+                  simde_mm_movemask_ps(
+                     simde_mm_castsi128_ps(
+                        simde_mm_cmpeq_epi32(lhs, rhs)
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::UnsignedInteger32<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm_cmpeq_epu32_mask(lhs, rhs) == 0xFF;   // AVX512F + AVX512VL
+               return Bitmask<S> {
+                  simde_mm_cmpeq_epu32_mask(lhs, rhs)
+               };
             #else
-               return simde_mm_movemask_epi8(simde_mm_cmpeq_epi32(lhs, rhs)) == 0xFFFF; // SSE2
+               return Bitmask<S> {
+                  simde_mm_movemask_ps(
+                     simde_mm_castsi128_ps(
+                        simde_mm_cmpeq_epi32(lhs, rhs)
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::SignedInteger64<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm_cmpeq_epi64_mask(lhs, rhs) == 0x7;   // AVX512F + AVX512VL
+               return Bitmask<S> {
+                  simde_mm_cmpeq_epi64_mask(lhs, rhs)
+               };
             #else
-               return simde_mm_movemask_epi8(simde_mm_cmpeq_epi64(lhs, rhs)) == 0xFFFF; // SSE4.1
+               return Bitmask<S> {
+                  simde_mm_movemask_pd(
+                     simde_mm_castsi128_pd(
+                        simde_mm_cmpeq_epi64(lhs, rhs)
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::UnsignedInteger64<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm_cmpeq_epu64_mask(lhs, rhs) == 0x7;   // AVX512F + AVX512VL
+               return Bitmask<S> {
+                  simde_mm_cmpeq_epu64_mask(lhs, rhs)
+               };
             #else
-               return simde_mm_movemask_epi8(simde_mm_cmpeq_epi64(lhs, rhs)) == 0xFFFF; // SSE4.1
+               return Bitmask<S> {
+                  simde_mm_movemask_pd(
+                     simde_mm_castsi128_pd(
+                        simde_mm_cmpeq_epi64(lhs, rhs)
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::Float<T>)
-            return simde_mm_movemask_ps(simde_mm_cmpeq_ps(lhs, rhs)) == 0xF;   // SSE
+            return Bitmask<S> {
+               simde_mm_movemask_ps(simde_mm_cmpeq_ps(lhs, rhs))
+            };
          else if constexpr (CT::Double<T>)
-            return simde_mm_movemask_pd(simde_mm_cmpeq_pd(lhs, rhs)) == 0x3;   // SSE2
+            return Bitmask<S> {
+               simde_mm_movemask_pd(simde_mm_cmpeq_pd(lhs, rhs))
+            };
          else
-            LANGULUS_ERROR("Unsupported type for SIMD::InnerEquals of 16-byte package");
+            LANGULUS_ERROR("Unsupported type for SIMD::EqualsInner of 16-byte package");
       }
       else
    #endif
@@ -98,142 +161,222 @@ namespace Langulus::SIMD
       if constexpr (CT::SIMD256<REGISTER>) {
          if constexpr (CT::SignedInteger8<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm256_cmpeq_epi8_mask(lhs, rhs) == 0xFFFFFFFF;   // AVX512BW + AVX512VL
+               return Bitmask<S> {
+                  simde_mm256_cmpeq_epi8_mask(lhs, rhs)
+               };
             #else
-               return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(lhs, rhs)) == 0xFFFFFFFF; // AVX2
+               return Bitmask<S> {
+                  simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(lhs, rhs))
+               };
             #endif
          }
          else if constexpr (CT::UnsignedInteger8<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm256_cmpeq_epu8_mask(lhs, rhs) == 0xFFFFFFFF;   // AVX512BW + AVX512VL
+               return Bitmask<S> {
+                  simde_mm256_cmpeq_epu8_mask(lhs, rhs)
+               };
             #else
-               return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(lhs, rhs)) == 0xFFFFFFFF; // AVX2
+               return Bitmask<S> {
+                  simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(lhs, rhs))
+               };
             #endif
          }
          else if constexpr (CT::SignedInteger16<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm256_cmpeq_epi16_mask(lhs, rhs) == 0xFFFFFFFF;   // AVX512BW + AVX512VL
+               return Bitmask<S> {
+                  simde_mm256_cmpeq_epi16_mask(lhs, rhs)
+               };
             #else
-               return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi16(lhs, rhs)) == 0xFFFFFFFF; // AVX2
+               return Bitmask<S> {
+                  simde_mm256_movemask_epi8(
+                     lgls_pack_epi16(
+                        simde_mm256_cmpeq_epi16(lhs, rhs), 
+                        simde_mm256_setzero_si256()
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::UnsignedInteger16<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm256_cmpeq_epu16_mask(lhs, rhs) == 0xFFFFFFFF;   // AVX512BW + AVX512VL
+               return Bitmask<S> {
+                  simde_mm256_cmpeq_epu16_mask(lhs, rhs)
+               };
             #else
-               return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi16(lhs, rhs)) == 0xFFFFFFFF; // AVX2
+               return Bitmask<S> {
+                  simde_mm256_movemask_epi8(
+                     lgls_pack_epi16(
+                        simde_mm256_cmpeq_epi16(lhs, rhs), 
+                        simde_mm256_setzero_si256()
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::SignedInteger32<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm256_cmpeq_epi32_mask(lhs, rhs) == 0xFFFFFFFF;   // AVX512F + AVX512VL
+               return Bitmask<S> {
+                  simde_mm256_cmpeq_epi32_mask(lhs, rhs)
+               };
             #else
-               return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi32(lhs, rhs)) == 0xFFFFFFFF; // AVX2
+               return Bitmask<S> {
+                  simde_mm256_movemask_ps(
+                     simde_mm256_castsi256_ps(
+                        simde_mm256_cmpeq_epi32(lhs, rhs)
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::UnsignedInteger32<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm256_cmpeq_epu32_mask(lhs, rhs) == 0xFFFFFFFF;   // AVX512F + AVX512VL
+               return Bitmask<S> {
+                  simde_mm256_cmpeq_epu32_mask(lhs, rhs)
+               };
             #else
-               return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi32(lhs, rhs)) == 0xFFFFFFFF; // AVX2
+               return Bitmask<S> {
+                  simde_mm256_movemask_ps(
+                     simde_mm256_castsi256_ps(
+                        simde_mm256_cmpeq_epi32(lhs, rhs)
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::SignedInteger64<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm256_cmpeq_epi64_mask(lhs, rhs) == 0xFFFFFFFF;   // AVX512F + AVX512VL
+               return Bitmask<S> {
+                  simde_mm256_cmpeq_epi64_mask(lhs, rhs)
+               };
             #else
-               return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi64(lhs, rhs)) == 0xFFFFFFFF; // AVX2
+               return Bitmask<S> {
+                  simde_mm256_movemask_pd(
+                     simde_mm256_castsi256_pd(
+                        simde_mm256_cmpeq_epi64(lhs, rhs)
+                     )
+                  )
+               };
             #endif
          }
          else if constexpr (CT::UnsignedInteger64<T>) {
             #if LANGULUS_SIMD(AVX512)
-               return _mm256_cmpeq_epu64_mask(lhs, rhs) == 0xFFFFFFFF;   // AVX512F + AVX512VL
+               return Bitmask<S> {
+                  simde_mm256_cmpeq_epu64_mask(lhs, rhs)
+               };
             #else
-               return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi64(lhs, rhs)) == 0xFFFFFFFF; // AVX2
+               return Bitmask<S> {
+                  simde_mm256_movemask_pd(
+                     simde_mm256_castsi256_pd(
+                        simde_mm256_cmpeq_epi64(lhs, rhs)
+                     )
+                  )
+               };
             #endif
          }
-         else if constexpr (CT::Float<T>)
-            return simde_mm256_movemask_ps(simde_mm256_cmp_ps(lhs, rhs, _CMP_EQ_OQ)) == 0xFF;   // AVX
-         else if constexpr (CT::Double<T>)
-            return simde_mm256_movemask_pd(simde_mm256_cmp_pd(lhs, rhs, _CMP_EQ_OQ)) == 0xF;   // AVX
-         else LANGULUS_ERROR("Unsupported type for SIMD::InnerEquals of 32-byte package");
+         else if constexpr (CT::Float<T>) {
+            return Bitmask<S> {
+               simde_mm256_movemask_ps(simde_mm256_cmp_ps(lhs, rhs, _CMP_EQ_OQ))
+            };
+         }
+         else if constexpr (CT::Double<T>) {
+            return Bitmask<S> {
+               simde_mm256_movemask_pd(simde_mm256_cmp_pd(lhs, rhs, _CMP_EQ_OQ))
+            };
+         }
+         else LANGULUS_ERROR("Unsupported type for SIMD::EqualsInner of 32-byte package");
       }
       else
    #endif
 
    #if LANGULUS_SIMD(512BIT)
       if constexpr (CT::SIMD512<REGISTER>) {
-         if constexpr (CT::SignedInteger8<T>)
-            return simde_mm512_cmpeq_epi8_mask(lhs, rhs) == 0xFFFFFFFFFFFFFFFF;
-         else if constexpr (CT::UnsignedInteger8<T>)
-            return simde_mm512_cmpeq_epu8_mask(lhs, rhs) == 0xFFFFFFFFFFFFFFFF;
-         else if constexpr (CT::SignedInteger16<T>)
-            return simde_mm512_cmpeq_epi16_mask(lhs, rhs) == 0xFFFFFFFF;
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return simde_mm512_cmpeq_epu16_mask(lhs, rhs) == 0xFFFFFFFF;
-         else if constexpr (CT::SignedInteger32<T>)
-            return simde_mm512_cmpeq_epi32_mask(lhs, rhs) == 0xFFFF;
-         else if constexpr (CT::UnsignedInteger32<T>)
-            return simde_mm512_cmpeq_epu32_mask(lhs, rhs) == 0xFFFF;
-         else if constexpr (CT::SignedInteger64<T>)
-            return simde_mm512_cmpeq_epi64_mask(lhs, rhs) == 0xFF;
-         else if constexpr (CT::UnsignedInteger64<T>)
-            return simde_mm512_cmpeq_epu64_mask(lhs, rhs) == 0xFF;
-         else if constexpr (CT::Float<T>)
-            return simde_mm512_cmp_ps_mask(lhs, rhs, _CMP_EQ_OQ) == 0xFFFF;
-         else if constexpr (CT::Double<T>)
-            return simde_mm512_cmp_pd_mask(lhs, rhs, _CMP_EQ_OQ) == 0xFF;
-         else LANGULUS_ERROR("Unsupported type for SIMD::InnerEquals of 64-byte package");
+         if constexpr (CT::SignedInteger8<T>) {
+            return Bitmask<S> {
+               simde_mm512_cmpeq_epi8_mask(lhs, rhs)
+            };
+         }
+         else if constexpr (CT::UnsignedInteger8<T>) {
+            return Bitmask<S> {
+               simde_mm512_cmpeq_epu8_mask(lhs, rhs)
+            };
+         }
+         else if constexpr (CT::SignedInteger16<T>) {
+            return Bitmask<S> {
+               simde_mm512_cmpeq_epi16_mask(lhs, rhs)
+            };
+         }
+         else if constexpr (CT::UnsignedInteger16<T>) {
+            return Bitmask<S> {
+               simde_mm512_cmpeq_epu16_mask(lhs, rhs)
+            };
+         }
+         else if constexpr (CT::SignedInteger32<T>) {
+            return Bitmask<S> {
+               simde_mm512_cmpeq_epi32_mask(lhs, rhs)
+            };
+         }
+         else if constexpr (CT::UnsignedInteger32<T>) {
+            return Bitmask<S> {
+               simde_mm512_cmpeq_epu32_mask(lhs, rhs)
+            };
+         }
+         else if constexpr (CT::SignedInteger64<T>) {
+            return Bitmask<S> {
+               simde_mm512_cmpeq_epi64_mask(lhs, rhs)
+            };
+         }
+         else if constexpr (CT::UnsignedInteger64<T>) {
+            return Bitmask<S> {
+               simde_mm512_cmpeq_epu64_mask(lhs, rhs)
+            };
+         }
+         else if constexpr (CT::Float<T>) {
+            return Bitmask<S> {
+               simde_mm512_cmp_ps_mask(lhs, rhs, _CMP_EQ_OQ)
+            };
+         }
+         else if constexpr (CT::Double<T>) {
+            return Bitmask<S> {
+               simde_mm512_cmp_pd_mask(lhs, rhs, _CMP_EQ_OQ)
+            };
+         }
+         else LANGULUS_ERROR("Unsupported type for SIMD::EqualsInner of 64-byte package");
       }
       else
    #endif
-
-      LANGULUS_ERROR("Unsupported type for SIMD::InnerEquals");
+      LANGULUS_ERROR("Unsupported type for SIMD::EqualsInner");
    }
 
-   /// Compare any lhs and rhs numbers, arrays or not, sparse or dense        
-   ///   @tparam LHS - left type (deducible)                                  
-   ///   @tparam RHS - right type (deducible)                                 
-   ///   @param lhsOrig - the left array or number                            
-   ///   @param rhsOrig - the right array or number                           
-   ///   @return true if all elements match                                   
+   ///                                                                        
    template<class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) bool Equals(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-      using REGISTER = CT::Register<LHS, RHS>;
+   NOD() LANGULUS(ALWAYSINLINE) auto Equals(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using LOSSLESS = Lossless<LHS, RHS>;
+      using REGISTER = CT::Register<LHS, RHS, LOSSLESS>;
       constexpr auto S = OverlapCount<LHS, RHS>();
 
-      if constexpr (S < 2 || CT::NotSupported<REGISTER>) {
-         // Call the fallback routine if unsupported or size 1          
-         return Fallback<LOSSLESS>(lhsOrig, rhsOrig,
-            [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept {
-               return lhs == rhs;
-            }
-         );
-      }
-      else {
-         const auto result = AttemptSIMD<0, REGISTER, LOSSLESS>(
-            lhsOrig, rhsOrig,
-            [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-               return EqualsInner<LOSSLESS, S>(lhs, rhs);
-            },
-            [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept {
-               return lhs == rhs;
-            }
-         );
+      return AttemptSIMD<0, REGISTER, LOSSLESS>(
+         lhsOrig, rhsOrig,
+         [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+            return EqualsInner<LOSSLESS, S>(lhs, rhs);
+         },
+         [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> bool {
+            return lhs == rhs;
+         }
+      );
+   }
 
-         if constexpr (CT::Bool<decltype(result)>) {
-            // EqualsInner was called successfully, just return         
-            return result;
-         }
-         else if constexpr (CT::Same<decltype(result), ::std::array<bool, S>>) {
-            // Fallback as std::array<bool> - combine                   
-            for (auto& i : result)
-               if (!i) return false;
-            return true;
-         }
-         else LANGULUS_ERROR("Bad return from AttemptSIMD with EqualsInner");
-      }
+   ///                                                                        
+   template<class LHS, class RHS, class OUT>
+   LANGULUS(ALWAYSINLINE) void Equals(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
+      GeneralStore(Equals<LHS, RHS>(lhs, rhs), output);
+   }
+
+   ///                                                                        
+   template<CT::Vector WRAPPER, class LHS, class RHS>
+   NOD() LANGULUS(ALWAYSINLINE) WRAPPER EqualsWrap(const LHS& lhs, const RHS& rhs) noexcept {
+      WRAPPER result;
+      Equals<LHS, RHS>(lhs, rhs, result.mArray);
+      return result;
    }
 
 } // namespace Langulus::SIMD

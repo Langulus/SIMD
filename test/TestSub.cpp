@@ -55,6 +55,7 @@ TEMPLATE_TEST_CASE("Subtract", "[subtract]"
 
 		WHEN("Subtracted") {
 			ControlSub(x, y, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::Subtract(x.mArray, y.mArray, r.mArray);
 			else
@@ -110,6 +111,7 @@ TEMPLATE_TEST_CASE("Subtract", "[subtract]"
 
 		WHEN("Subtracted in reverse") {
 			ControlSub(y, x, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::Subtract(y.mArray, x.mArray, r.mArray);
 			else

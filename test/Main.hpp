@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <random>
+#include <bitset>
 
 using namespace Langulus;
 
@@ -110,6 +111,7 @@ template<class T, Count C>
 struct alignas(Langulus::Alignment) Vector {
 	// This makes the type CT::Typed
 	using MemberType = T;
+	static constexpr Count MemberCount = C;
 
 	T mArray[C];
 
@@ -139,7 +141,6 @@ struct alignas(Langulus::Alignment) Vector {
 		decltype(auto) operator * () const noexcept {
 			return DenseCast(*marker);
 		}
-
 	};
 
 	auto begin() const noexcept {
@@ -181,5 +182,11 @@ struct alignas(Langulus::Alignment) Vector {
 			if (DenseCast(mArray[i]) != DenseCast(e.mArray[i]))
 				return false;
 		return true;
+	}
+
+	Vector& operator = (const Vector& b) noexcept {
+		for (int i = 0; i < C; ++i)
+			DenseCast(mArray[i]) = DenseCast(b.mArray[i]);
+		return *this;
 	}
 };

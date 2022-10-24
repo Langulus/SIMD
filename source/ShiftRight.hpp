@@ -206,22 +206,22 @@ namespace Langulus::SIMD
    ///      defaulting to zero. It is our responsibility to keep this         
    ///      behavior consistent across C++ and SIMD, so the fallback routine  
    ///      has additional overhead for checking the rhs range and zeroing.   
-   template<class LHS, class RHS>
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(ALWAYSINLINE) auto ShiftRight(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
-      using REGISTER = CT::Register<LHS, RHS>;
-      using LOSSLESS = Lossless<LHS, RHS>;
+      using DOUT = Decay<OUT>;
+      using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
 
-      return AttemptSIMD<0, REGISTER, LOSSLESS>(
+      return AttemptSIMD<0, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return ShiftRightInner<LOSSLESS, S>(lhs, rhs);
+            return ShiftRightInner<DOUT, S>(lhs, rhs);
          },
-         [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             // Well defined condition in SIMD calls, that is otherwise  
             // undefined behavior by C++ standard                       
-            return rhs < LOSSLESS {sizeof(LOSSLESS) * 8} && rhs >= 0
+            return rhs < DOUT {sizeof(DOUT) * 8} && rhs >= 0
                ? lhs >> rhs : 0;
          }
       );
@@ -236,7 +236,7 @@ namespace Langulus::SIMD
    template<class LHS, class RHS, class OUT>
    LANGULUS(ALWAYSINLINE) void ShiftRight(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
       static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
-      GeneralStore(ShiftRight<LHS, RHS>(lhs, rhs), output);
+      GeneralStore(ShiftRight<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///   @attention this differs from C++'s undefined behavior when shifting  

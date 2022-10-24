@@ -7,7 +7,6 @@
 ///                                                                           
 #pragma once
 #include "Load.hpp"
-
 #include "IgnoreWarningsPush.inl"
 
 #if LANGULUS_SIMD(128BIT)
@@ -95,7 +94,7 @@ namespace Langulus::SIMD
       constexpr auto S = OverlapCount<LHS, RHS>();
 
       if constexpr (S < 2 || CT::NotSupported<REGISTER> || CT::NotSupported<OUTSIMD>) {
-         // Call the fallback routine if unsupported or size 1          
+         // Call the fallback routine if unsupported, or size 1         
          return Fallback<LOSSLESS>(lhs, rhs, Move(opFALL));
       }
       else if constexpr (CT::Array<LHS> && CT::Array<RHS>) {

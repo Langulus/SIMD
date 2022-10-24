@@ -284,6 +284,9 @@ namespace Langulus::CT
    template<class... T>
    concept IntegerX = ((Integer8<T> || Integer16<T> || Integer32<T> || Integer64<T>) && ...);
 
+   template<class... T>
+   concept Bitmask = ((Decay<T>::IsBitmask) && ...);
+
 } // namespace Langulus::CT
 
 namespace Langulus::SIMD

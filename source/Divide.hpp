@@ -203,18 +203,19 @@ namespace Langulus::SIMD
    }
 
    ///                                                                        
-   template<class LHS, class RHS>
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(ALWAYSINLINE) auto Divide(const LHS& lhsOrig, const RHS& rhsOrig) {
-      using REGISTER = CT::Register<LHS, RHS>;
-      using LOSSLESS = Lossless<LHS, RHS>;
+      using DOUT = Decay<OUT>;
+      using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
-      return AttemptSIMD<1, REGISTER, LOSSLESS>(
+
+      return AttemptSIMD<1, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) {
-            return DivideInner<LOSSLESS, S>(lhs, rhs);
+            return DivideInner<DOUT, S>(lhs, rhs);
          },
-         [](const LOSSLESS& lhs, const LOSSLESS& rhs) -> LOSSLESS {
-            if (rhs == LOSSLESS {0})
+         [](const DOUT& lhs, const DOUT& rhs) -> DOUT {
+            if (rhs == DOUT {0})
                LANGULUS_THROW(DivisionByZero, "Division by zero");
             return lhs / rhs;
          }
@@ -224,7 +225,7 @@ namespace Langulus::SIMD
    ///                                                                        
    template<class LHS, class RHS, class OUT>
    LANGULUS(ALWAYSINLINE) void Divide(const LHS& lhs, const RHS& rhs, OUT& output) {
-      GeneralStore(Divide<LHS, RHS>(lhs, rhs), output);
+      GeneralStore(Divide<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///                                                                        

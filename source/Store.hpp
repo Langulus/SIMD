@@ -6,7 +6,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Intrinsics.hpp"
+#include "Common.hpp"
 #include "IgnoreWarningsPush.inl"
 
 namespace Langulus::SIMD
@@ -25,10 +25,10 @@ namespace Langulus::SIMD
          "- avoid SIMD operations on such arrays as a whole");
       constexpr Size toSize = sizeof(Decay<T>) * S;
 
-   //                                                                   
-   // __m128*                                                           
-   //                                                                   
    #if LANGULUS_SIMD(128BIT)
+      //                                                                
+      // __m128*                                                        
+      //                                                                
       if constexpr (CT::Same<FROM, simde__m128>) {
          if constexpr (CT::Dense<T> && toSize == 16) {
             // Save to a dense array                                    
@@ -244,12 +244,12 @@ namespace Langulus::SIMD
       }
       else
    #endif
-         LANGULUS_ERROR("Unsupported FROM register for SIMD::Store");
+      LANGULUS_ERROR("Unsupported FROM register for SIMD::Store");
    }
-
    
    /// Generalized store routine                                              
-   ///   @tparam FROM - any source type, SIMD register, std::array or scalar  
+   ///   @tparam FROM - any source type, SIMD register, std::array,           
+   ///                  boolvector, or scalar                                 
    ///   @tparam TO - any destination type, array or scalar                   
    ///   @param from - what to store                                          
    ///   @param to - where to store it                                        
@@ -259,9 +259,31 @@ namespace Langulus::SIMD
          // Extract from SIMD register (produced from SIMD routine)     
          Store(from, to);
       }
+      else if constexpr (CT::Bitmask<FROM>) {
+         // Extract from bitmask (produced from SIMD compare routine)   
+         if constexpr (CT::Bitmask<TO>) {
+            // Store in another bitmask                                 
+            DenseCast(to) = from;
+         }
+         else if constexpr (CT::Bool<TO> && CT::Array<TO>) {
+            if constexpr (ExtentOf<TO> == 1) {
+               // Do logic-and on all bits, and write the one bool      
+               DenseCast(to[0]) = static_cast<bool>(from);
+            }
+            else {
+               // Convert each bit to a boolean inside an array         
+               for (Offset i = 0; i < ExtentOf<TO>; ++i)
+                  DenseCast(to[i]) = from[i];
+            }
+         }
+         else if constexpr (CT::Bool<TO>) {
+            // Do logic-and on all bits, and write the one bool         
+            DenseCast(to) = static_cast<bool>(from);
+         }
+         else LANGULUS_ERROR("Bad output to store a bitmask");
+      }
       else if constexpr (!CT::Array<TO>) {
          // Extract from a single number (produced from fallback)       
-         // Or, alternatively, when doing compare SIMDs                 
          DenseCast(to) = from;
       }
       else if constexpr (ExtentOf<TO> == 1) {
@@ -278,6 +300,7 @@ namespace Langulus::SIMD
       else {
          // Extract from std::array (produced from fallback routine)    
          // Write results to a dense output array (fastest)             
+         static_assert(sizeof(from) == sizeof(to), "Bad memcpy");
          ::std::memcpy(to, from.data(), sizeof(to));
       }
    }

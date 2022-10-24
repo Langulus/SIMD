@@ -90,6 +90,7 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
 
 		WHEN("Shifted right") {
 			ControlSR(x, y, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::ShiftRight(x.mArray, y.mArray, r.mArray);
 			else
@@ -145,6 +146,7 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
 
 		WHEN("Shifted right in reverse") {
 			ControlSR(y, x, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::ShiftRight(y.mArray, x.mArray, r.mArray);
 			else

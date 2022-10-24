@@ -53,6 +53,7 @@ TEMPLATE_TEST_CASE("Divide", "[divide]"
 
 		WHEN("Divided") {
 			ControlDiv(x, y, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::Divide(x.mArray, y.mArray, r.mArray);
 			else
@@ -108,6 +109,7 @@ TEMPLATE_TEST_CASE("Divide", "[divide]"
 
 		WHEN("Divided in reverse") {
 			ControlDiv(y, x, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::Divide(y.mArray, x.mArray, r.mArray);
 			else
@@ -125,6 +127,7 @@ TEMPLATE_TEST_CASE("Divide", "[divide]"
 				DenseCast(x.mArray[0]) = {};
 
 			REQUIRE_THROWS(ControlDiv(y, x, rCheck));
+
 			if constexpr (CT::Typed<T>)
 				REQUIRE_THROWS(SIMD::Divide(y.mArray, x.mArray, r.mArray));
 			else

@@ -55,6 +55,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 
 		WHEN("Added") {
 			ControlAdd(x, y, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::Add(x.mArray, y.mArray, r.mArray);
 			else
@@ -110,6 +111,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 
 		WHEN("Added in reverse") {
 			ControlAdd(y, x, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::Add(y.mArray, x.mArray, r.mArray);
 			else

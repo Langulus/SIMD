@@ -103,17 +103,18 @@ namespace Langulus::SIMD
    }
 
    ///                                                                        
-   template<class LHS, class RHS>
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(ALWAYSINLINE) auto Add(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using REGISTER = CT::Register<LHS, RHS>;
-      using LOSSLESS = Lossless<LHS, RHS>;
+      using DOUT = Decay<OUT>;
+      using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
-      return AttemptSIMD<0, REGISTER, LOSSLESS>(
+
+      return AttemptSIMD<0, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return AddInner<LOSSLESS, S>(lhs, rhs);
+            return AddInner<DOUT, S>(lhs, rhs);
          },
-         [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             return lhs + rhs;
          }
       );
@@ -122,7 +123,7 @@ namespace Langulus::SIMD
    ///                                                                        
    template<class LHS, class RHS, class OUT>
    LANGULUS(ALWAYSINLINE) void Add(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
-      GeneralStore(Add<LHS, RHS>(lhs, rhs), output);
+      GeneralStore(Add<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///                                                                        

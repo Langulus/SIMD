@@ -50,6 +50,7 @@ TEMPLATE_TEST_CASE("Multiply", "[multiply]"
 
 		WHEN("Multiplied") {
 			ControlMul(x, y, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::Multiply(x.mArray, y.mArray, r.mArray);
 			else
@@ -105,8 +106,9 @@ TEMPLATE_TEST_CASE("Multiply", "[multiply]"
 
 		WHEN("Multiplied in reverse") {
 			ControlMul(y, x, rCheck);
+
 			if constexpr (CT::Typed<T>)
-				SIMD::Multiply(x.mArray, y.mArray, r.mArray);
+				SIMD::Multiply(y.mArray, x.mArray, r.mArray);
 			else
 				SIMD::Multiply(y, x, r);
 

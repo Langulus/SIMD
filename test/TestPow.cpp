@@ -82,6 +82,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
 
 		WHEN("Raised to a power") {
 			ControlPow(x, y, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::Power(x.mArray, y.mArray, r.mArray);
 			else
@@ -137,6 +138,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
 
 		WHEN("Raise to a power in reverse") {
 			ControlPow(y, x, rCheck);
+
 			if constexpr (CT::Typed<T>)
 				SIMD::Power(y.mArray, x.mArray, r.mArray);
 			else

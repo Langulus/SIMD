@@ -6,7 +6,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Intrinsics.hpp"
+#include "Common.hpp"
 #include "IgnoreWarningsPush.inl"
 
 namespace Langulus::SIMD

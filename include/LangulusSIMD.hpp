@@ -6,6 +6,8 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
+#include "../source/Common.hpp"
+#include "../source/Bitmask.hpp"
 #include "../source/Abs.hpp"
 #include "../source/Add.hpp"
 #include "../source/Ceil.hpp"
@@ -18,7 +20,6 @@
 #include "../source/Fill.hpp"
 #include "../source/Floor.hpp"
 #include "../source/Greater.hpp"
-#include "../source/Intrinsics.hpp"
 #include "../source/Lesser.hpp"
 #include "../source/Load.hpp"
 #include "../source/Log.hpp"

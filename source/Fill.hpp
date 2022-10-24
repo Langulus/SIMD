@@ -6,7 +6,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Intrinsics.hpp"
+#include "Common.hpp"
 #include "IgnoreWarningsPush.inl"
 
 namespace Langulus::SIMD
@@ -24,66 +24,75 @@ namespace Langulus::SIMD
          return value;
       else if constexpr (CT::Same<REGISTER,simde__m128i>) {
          if constexpr (CT::Integer8<T>)
-            return simde_mm_set1_epi8(value);
+            return simde_mm_set1_epi8(reinterpret_cast<const ::std::int8_t&>(value));
          else if constexpr (CT::Integer16<T>)
             return simde_mm_set1_epi16(value);
          else if constexpr (CT::Integer32<T>)
             return simde_mm_set1_epi32(value);
          else if constexpr (CT::Integer64<T>)
             return simde_mm_set1_epi64x(value);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128i");
+         else
+            LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128i");
       }
       else if constexpr (CT::Same<REGISTER,simde__m128>) {
          if constexpr (CT::Float<T>)
             return simde_mm_broadcast_ss(&value);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128");
+         else
+            LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128");
       }
       else if constexpr (CT::Same<REGISTER,simde__m128d>) {
          if constexpr (CT::Double<T>)
             return simde_mm_set1_pd(value);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128d");
+         else
+            LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128d");
       }
       else if constexpr (CT::Same<REGISTER,simde__m256i>) {
          if constexpr (CT::Integer8<T>)
-            return simde_mm256_set1_epi8(value);
+            return simde_mm256_set1_epi8(reinterpret_cast<const ::std::int8_t&>(value));
          else if constexpr (CT::Integer16<T>)
             return simde_mm256_set1_epi16(value);
          else if constexpr (CT::Integer32<T>)
             return simde_mm256_set1_epi32(value);
          else if constexpr (CT::Integer64<T>)
             return simde_mm256_set1_epi64x(value);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256i");
+         else
+            LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256i");
       }
       else if constexpr (CT::Same<REGISTER,simde__m256>) {
          if constexpr (CT::Float<T>)
             return simde_mm256_broadcast_ss(&value);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Fill __m256");
+         else
+            LANGULUS_ERROR("Unsupported type for SIMD::Fill __m256");
       }
       else if constexpr (CT::Same<REGISTER,simde__m256d>) {
          if constexpr (CT::Double<T>)
             return simde_mm256_broadcast_sd(&value);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256d");
+         else
+            LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256d");
       }
       else if constexpr (CT::Same<REGISTER,simde__m512i>) {
          if constexpr (CT::Integer8<T>)
-            return simde_mm512_set1_epi8(value);
+            return simde_mm512_set1_epi8(reinterpret_cast<const ::std::int8_t&>(value));
          else if constexpr (CT::Integer16<T>)
             return simde_mm512_set1_epi16(value);
          else if constexpr (CT::Integer32<T>)
             return simde_mm512_set1_epi32(value);
          else if constexpr (CT::Integer64<T>)
             return simde_mm512_set1_epi64(value);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m512i");
+         else
+            LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m512i");
       }
       else if constexpr (CT::Same<REGISTER,simde__m512>) {
          if constexpr (CT::Float<T>)
             return simde_mm512_set1_ps(value);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Fill __m512");
+         else
+            LANGULUS_ERROR("Unsupported type for SIMD::Fill __m512");
       }
       else if constexpr (CT::Same<REGISTER,simde__m512d>) {
          if constexpr (CT::Double<T>)
             return simde_mm512_set1_pd(&value);
-         else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m512d");
+         else
+            LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m512d");
       }
       else LANGULUS_ERROR("Bad REGISTER type for SIMD::Fill");
    }

@@ -86,11 +86,11 @@ namespace Langulus::CT
 {
 
    /// Determine a SIMD register type that can wrap LHS and RHS               
-   template<class LHS, class RHS>
+   template<class LHS, class RHS, class OUT>
    using Register = Conditional<
       (ExtentOf<LHS> > ExtentOf<RHS>),
-      decltype(SIMD::Load<0>(Uneval<Lossless<LHS, RHS>[ExtentOf<LHS>]>())),
-      decltype(SIMD::Load<0>(Uneval<Lossless<LHS, RHS>[ExtentOf<RHS>]>()))
+      decltype(SIMD::Load<0>(Uneval<OUT[ExtentOf<LHS>]>())),
+      decltype(SIMD::Load<0>(Uneval<OUT[ExtentOf<RHS>]>()))
    >;
 
 } // namespace Langulus::CT

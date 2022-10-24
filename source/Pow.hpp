@@ -139,42 +139,43 @@ namespace Langulus::SIMD
    }
 
    ///                                                                        
-   template<class LHS, class RHS>
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(ALWAYSINLINE) auto Power(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using REGISTER = CT::Register<LHS, RHS>;
-      using LOSSLESS = Lossless<LHS, RHS>;
+      using DOUT = Decay<OUT>;
+      using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
-      return AttemptSIMD<1, REGISTER, LOSSLESS>(
+
+      return AttemptSIMD<1, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return PowerInner<LOSSLESS, S>(lhs, rhs);
+            return PowerInner<DOUT, S>(lhs, rhs);
          },
-         [](LOSSLESS lhs, LOSSLESS rhs) noexcept -> LOSSLESS {
-            if (lhs == LOSSLESS {1})
-               return LOSSLESS {1};
+         [](DOUT lhs, DOUT rhs) noexcept -> DOUT {
+            if (lhs == DOUT {1})
+               return DOUT {1};
 
-            if constexpr (CT::IntegerX<LOSSLESS>) {
-               if constexpr (CT::Unsigned<LOSSLESS>) {
-                  LOSSLESS result {1};
-                  while (rhs != LOSSLESS {0}) {
-                     if ((rhs & LOSSLESS {1}) != LOSSLESS {0})
+            if constexpr (CT::IntegerX<DOUT>) {
+               if constexpr (CT::Unsigned<DOUT>) {
+                  DOUT result {1};
+                  while (rhs != DOUT {0}) {
+                     if ((rhs & DOUT {1}) != DOUT {0})
                         result *= lhs;
-                     rhs >>= LOSSLESS {1};
+                     rhs >>= DOUT {1};
                      lhs *= lhs;
                   }
                   return result;
                }
                else if (rhs > 0) {
-                  LOSSLESS result {1};
-                  while (rhs != LOSSLESS {0}) {
+                  DOUT result {1};
+                  while (rhs != DOUT {0}) {
                      result *= lhs;
                      --rhs;
                   }
                   return result;
                }
-               else return LOSSLESS {0};
+               else return DOUT {0};
             }
-            else if constexpr (CT::Real<LOSSLESS>)
+            else if constexpr (CT::Real<DOUT>)
                return ::std::pow(lhs, rhs);
             else
                LANGULUS_ERROR("T must be a number");
@@ -185,7 +186,7 @@ namespace Langulus::SIMD
    ///                                                                        
    template<class LHS, class RHS, class OUT>
    LANGULUS(ALWAYSINLINE) void Power(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
-      GeneralStore(Power<LHS, RHS>(lhs, rhs), output);
+      GeneralStore(Power<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///                                                                        
