@@ -287,7 +287,7 @@ namespace Langulus::SIMD
          // Extract from std::array, returned by fallback routines      
          if constexpr (CT::Bitmask<TO>) {
             // Store as bitmask                                         
-            using T = Decay<TO>::Type;
+            using T = typename Decay<TO>::Type;
             for (T i = 0; i < from.size(); ++i)
                DenseCast(to) |= (static_cast<T>(from[i]) << i);
          }
