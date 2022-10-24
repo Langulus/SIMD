@@ -8,6 +8,7 @@
 #pragma once
 #include "Common.hpp"
 #include "IgnoreWarningsPush.inl"
+#include <ranges>
 
 namespace Langulus::SIMD
 {
@@ -282,26 +283,56 @@ namespace Langulus::SIMD
          }
          else LANGULUS_ERROR("Bad output to store a bitmask");
       }
-      else if constexpr (!CT::Array<TO>) {
-         // Extract from a single number (produced from fallback)       
-         DenseCast(to) = from;
-      }
-      else if constexpr (ExtentOf<TO> == 1) {
-         // Extract from a scalar (produced from fallback routine)      
-         // But write results to an output array of size 1              
-         DenseCast(to[0]) = from;
-      }
-      else if constexpr (CT::Sparse<Deext<TO>>) {
-         // Extract from std::array (produced from fallback routine)    
-         // But write results in a sparse output array                  
-         for (int i = 0; i < ExtentOf<TO>; ++i)
-            *to[i] = from[i];
+      else if constexpr (::std::ranges::range<FROM>) {
+         // Extract from std::array, returned by fallback routines      
+         if constexpr (!CT::Array<TO>) {
+            // Store as a single number (produced from fallback)        
+            if constexpr (CT::Bool<TO>) {
+               // A boolean FROM will be collapsed                      
+               for (auto& it : from) {
+                  if (!it) {
+                     to = false;
+                     return;
+                  }
+               }
+
+               to = true;
+            }
+            else {
+               // Otherwise just copy first element                     
+               DenseCast(to) = from[0];
+            }
+         }
+         else if constexpr (ExtentOf<TO> == 1) {
+            // Store to an output array of size 1                       
+            DenseCast(to[0]) = from[0];
+         }
+         else if constexpr (CT::Sparse<Deext<TO>>) {
+            // Store to a sparse output array                           
+            for (int i = 0; i < ExtentOf<TO>; ++i)
+               *to[i] = from[i];
+         }
+         else {
+            // Store as a dense output array (fastest)                  
+            static_assert(sizeof(from) == sizeof(to), "Bad memcpy");
+            ::std::memcpy(to, from.data(), sizeof(to));
+         }
       }
       else {
-         // Extract from std::array (produced from fallback routine)    
-         // Write results to a dense output array (fastest)             
-         static_assert(sizeof(from) == sizeof(to), "Bad memcpy");
-         ::std::memcpy(to, from.data(), sizeof(to));
+         // Extract from a scalar                                       
+         if constexpr (!CT::Array<TO>) {
+            // Store as a single number (produced from fallback)        
+            DenseCast(to) = from;
+         }
+         else if constexpr (ExtentOf<TO> == 1) {
+            // Store to an output array of size 1                       
+            DenseCast(to[0]) = from;
+         }
+         else {
+            // Multicast only result to an output array                 
+            for (int i = 0; i < ExtentOf<TO>; ++i)
+               DenseCast(to[i]) = from;
+         }
       }
    }
 
