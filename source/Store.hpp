@@ -285,7 +285,13 @@ namespace Langulus::SIMD
       }
       else if constexpr (::std::ranges::range<FROM>) {
          // Extract from std::array, returned by fallback routines      
-         if constexpr (!CT::Array<TO>) {
+         if constexpr (CT::Bitmask<TO>) {
+            // Store as bitmask                                         
+            using T = Decay<TO>::Type;
+            for (T i = 0; i < from.size(); ++i)
+               DenseCast(to) |= (static_cast<T>(from[i]) << i);
+         }
+         else if constexpr (!CT::Array<TO>) {
             // Store as a single number (produced from fallback)        
             if constexpr (CT::Bool<TO>) {
                // A boolean FROM will be collapsed                      
