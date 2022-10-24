@@ -16,7 +16,7 @@
 #include "../source/Divide.hpp"
 #include "../source/Equals.hpp"
 #include "../source/EqualsOrGreater.hpp"
-#include "../source/EqualsOrLower.hpp"
+#include "../source/EqualsOrLesser.hpp"
 #include "../source/Fill.hpp"
 #include "../source/Floor.hpp"
 #include "../source/Greater.hpp"

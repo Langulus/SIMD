@@ -1,9 +1,9 @@
 ///                                                                           
 /// Langulus::SIMD                                                            
-/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>                     
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>                    
 ///                                                                           
-/// Distributed under GNU General Public License v3+                           
-/// See LICENSE file, or https://www.gnu.org/licenses                           
+/// Distributed under GNU General Public License v3+                          
+/// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
 #include "Fill.hpp"
@@ -18,12 +18,12 @@ namespace Langulus::SIMD
       return CT::Inner::NotSupported{};
    }
 
-   /// XOr two arrays left using SIMD (shifting in zeroes)                     
-   ///   @tparam T - the type of the array element                              
+   /// XOr two arrays left using SIMD (shifting in zeroes)                    
+   ///   @tparam T - the type of the array element                            
    ///   @tparam S - the size of the array                                    
-   ///   @param lhs - the left-hand-side array                                  
+   ///   @param lhs - the left-hand-side array                                
    ///   @param rhs - the right-hand-side array                               
-   ///   @return the xor'd elements as a register                              
+   ///   @return the xor'd elements as a register                             
    template<class T, Count S, class REGISTER>
    LANGULUS(ALWAYSINLINE) auto XOrInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
       if constexpr (CT::Same<REGISTER,simde__m128i>)
@@ -49,18 +49,18 @@ namespace Langulus::SIMD
    }
 
    ///                                                                        
-   template<class LHS, class RHS>
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(ALWAYSINLINE) auto XOr(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-      using REGISTER = CT::Register<LHS, RHS>;
-      using LOSSLESS = Lossless<LHS, RHS>;
+      using DOUT = Decay<OUT>;
+      using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
 
-      return AttemptSIMD<0, REGISTER, LOSSLESS>(
+      return AttemptSIMD<0, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return XOrInner<LOSSLESS, S>(lhs, rhs);
+            return XOrInner<DOUT, S>(lhs, rhs);
          },
-         [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             return lhs ^ rhs;
          }
       );
@@ -69,19 +69,7 @@ namespace Langulus::SIMD
    ///                                                                        
    template<class LHS, class RHS, class OUT>
    LANGULUS(ALWAYSINLINE) void XOr(LHS& lhs, RHS& rhs, OUT& output) noexcept {
-      const auto result = XOr<LHS, RHS>(lhs, rhs);
-      if constexpr (CT::TSIMD<decltype(result)>) {
-         // Extract from register                                       
-         Store(result, output);
-      }
-      else if constexpr (!CT::Array<OUT>) {
-         // Extract from number                                          
-         output = result;
-      }
-      else {
-         // Extract from std::array                                       
-         std::memcpy(output, result.data(), sizeof(output));
-      }
+      GeneralStore(XOr<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///                                                                        

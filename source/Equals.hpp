@@ -26,7 +26,7 @@ namespace Langulus::SIMD
    ///   @return a bitmask with the results, or Inner::NotSupported           
    /// https://giannitedesco.github.io/2019/03/08/simd-cmp-bitmasks.html      
    template<class T, Count S, CT::TSIMD REGISTER>
-   /*LANGULUS(ALWAYSINLINE)*/ auto EqualsInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+   LANGULUS(ALWAYSINLINE) auto EqualsInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
    #if LANGULUS_SIMD(128BIT)
       if constexpr (CT::SIMD128<REGISTER>) {
          if constexpr (CT::SignedInteger8<T>) {

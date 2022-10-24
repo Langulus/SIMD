@@ -120,18 +120,18 @@ namespace Langulus::SIMD
    }
 
    ///                                                                        
-   template<class LHS, class RHS>
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(ALWAYSINLINE) auto Max(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-      using REGISTER = CT::Register<LHS, RHS>;
-      using LOSSLESS = Lossless<LHS, RHS>;
+      using DOUT = Decay<OUT>;
+      using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
 
-      return AttemptSIMD<0, REGISTER, LOSSLESS>(
+      return AttemptSIMD<0, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return MaxInner<LOSSLESS, S>(lhs, rhs);
+            return MaxInner<DOUT, S>(lhs, rhs);
          },
-         [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             return ::std::max(lhs, rhs);
          }
       );
@@ -140,19 +140,7 @@ namespace Langulus::SIMD
    ///                                                                        
    template<class LHS, class RHS, class OUT>
    LANGULUS(ALWAYSINLINE) void Max(LHS& lhs, RHS& rhs, OUT& output) noexcept {
-      const auto result = Max<LHS, RHS>(lhs, rhs);
-      if constexpr (CT::TSIMD<decltype(result)>) {
-         // Extract from register                                       
-         Store(result, output);
-      }
-      else if constexpr (!CT::Array<OUT>) {
-         // Extract from number                                         
-         output = result;
-      }
-      else {
-         // Extract from std::array                                     
-         std::memcpy(output, result.data(), sizeof(output));
-      }
+      GeneralStore(Max<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///                                                                        
