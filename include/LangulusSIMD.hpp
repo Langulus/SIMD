@@ -35,3 +35,5 @@
 #include "../source/Store.hpp"
 #include "../source/Subtract.hpp"
 #include "../source/XOr.hpp"
+
+#define LANGULUS_LIBRARY_SIMD() 1

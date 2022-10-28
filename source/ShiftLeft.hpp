@@ -73,12 +73,12 @@ namespace Langulus::SIMD
                #endif
             }
             else if constexpr (CT::Integer16<T>) {
-               const auto zero = simde_mm_setzero_si128();
                #if LANGULUS_SIMD(512BIT)
                   // Optimal                                            
                   return simde_mm_sllv_epi16(lhs, rhs);
                #elif LANGULUS_SIMD(256BIT)
                   // Not optimal, must be unpacked for AVX2             
+                  const auto zero = simde_mm_setzero_si128();
                   auto lhs32_1 = simde_mm_unpacklo_epi16(lhs, zero);
                   auto rhs32_1 = simde_mm_unpacklo_epi16(rhs, zero);
                   auto lhs32_2 = simde_mm_unpackhi_epi16(lhs, zero);

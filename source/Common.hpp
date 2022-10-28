@@ -21,6 +21,12 @@
 #include <simde/x86/sse.h>
 #include <simde/x86/svml.h>
 
+#if defined(LANGULUS_EXPORT_ALL) || defined(LANGULUS_EXPORT_SIMD)
+   #define LANGULUS_API_SIMD() LANGULUS_EXPORT()
+#else
+   #define LANGULUS_API_SIMD() LANGULUS_IMPORT()
+#endif
+
 LANGULUS_EXCEPTION(DivisionByZero);
 
 #define LANGULUS_SIMD(a) LANGULUS_SIMD_##a()
@@ -369,7 +375,7 @@ namespace Langulus::SIMD
    }
 
    LANGULUS(ALWAYSINLINE) simde__m128i _mm_halfflip(const simde__m128i& what) noexcept {
-      constexpr int8_t imm8 = Shuffle(0, 1, 2, 3);
+      constexpr int8_t imm8 = static_cast<int8_t>(Shuffle(0, 1, 2, 3));
       return simde_mm_shuffle_epi32(what, imm8);
    }
 
