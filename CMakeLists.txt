@@ -40,15 +40,13 @@ download_project(
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source SOURCE_FILES)
 add_library(Langulus.SIMD INTERFACE)
 
-if (MSVC)
-    target_compile_options(Langulus.SIMD INTERFACE /utf-8)
-endif()
-
 target_include_directories(Langulus.SIMD
-	INTERFACE include
-	INTERFACE ${SIMDe_SOURCE_DIR}
+	INTERFACE   include
+	            ${SIMDe_SOURCE_DIR}
 )
 
 target_link_libraries(Langulus.SIMD
-    INTERFACE Langulus.Core Langulus.Logger Langulus.RTTI
+    INTERFACE   Langulus.Core
+                Langulus.Logger
+                Langulus.RTTI
 )
