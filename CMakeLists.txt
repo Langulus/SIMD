@@ -4,9 +4,9 @@ project(Langulus.SIMD)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Check if this project is built as standalone, or a part of something else
+# Check if this project is built as standalone, or a part of something else 
 if(PROJECT_IS_TOP_LEVEL)
-find_package(Git REQUIRED)
+    find_package(Git REQUIRED)
     execute_process(
         COMMAND ${GIT_EXECUTABLE} submodule update --init -- cmake 
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -27,7 +27,7 @@ find_package(Git REQUIRED)
 	add_subdirectory(test)
 endif()
 
-# Configure SIMDe library
+# Configure SIMDe library                                                   
 message(STATUS "Configuring external project: SIMDe...")
 download_project(
 	PROJ                SIMDe
@@ -36,8 +36,7 @@ download_project(
 	UPDATE_DISCONNECTED 1
 )
 
-# Build and install SIMD library
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source SOURCE_FILES)
+# Build and install SIMD library                                            
 add_library(Langulus.SIMD INTERFACE)
 
 target_include_directories(Langulus.SIMD
@@ -46,7 +45,5 @@ target_include_directories(Langulus.SIMD
 )
 
 target_link_libraries(Langulus.SIMD
-    INTERFACE   Langulus.Core
-                Langulus.Logger
-                Langulus.RTTI
+    INTERFACE   Langulus.RTTI
 )
