@@ -64,7 +64,6 @@ namespace Langulus::SIMD
       #if LANGULUS_SIMD(256BIT)
          if constexpr (CT::SIMD256<REGISTER>) {
             if constexpr (CT::Integer8<T>) {
-               simde__m256i zero = simde_mm256_setzero_si256();
                simde__m256i Alo = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(lhs));
                simde__m256i Ahi = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(_mm_halfflip(lhs)));
                simde__m256i Blo = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(rhs));

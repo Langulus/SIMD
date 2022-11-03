@@ -113,7 +113,6 @@ namespace Langulus::SIMD
       #if LANGULUS_SIMD(256BIT)
          if constexpr (CT::SIMD256<REGISTER>) {
             if constexpr (CT::Integer8<T>) {
-               const auto zero = simde_mm256_setzero_si256();
                auto lhs1 = simde_mm256_cvtepu8_epi16(simde_mm256_extracti128_si256(lhs, 0));
                auto lhs2 = simde_mm256_cvtepu8_epi16(simde_mm256_extracti128_si256(lhs, 1));
                auto rhs1 = simde_mm256_cvtepu8_epi16(simde_mm256_extracti128_si256(rhs, 0));
@@ -147,7 +146,6 @@ namespace Langulus::SIMD
                #endif
             }
             else if constexpr (CT::Integer16<T>) {
-               const auto zero = simde_mm256_setzero_si256();
                #if LANGULUS_SIMD(512BIT)
                   // Optimal                                            
                   return simde_mm256_srlv_epi16(lhs, rhs);

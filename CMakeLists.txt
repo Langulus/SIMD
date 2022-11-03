@@ -41,9 +41,11 @@ add_library(Langulus.SIMD INTERFACE)
 
 target_include_directories(Langulus.SIMD
 	INTERFACE   include
-	            ${SIMDe_SOURCE_DIR}
+                ${SIMDe_SOURCE_DIR}
 )
 
 target_link_libraries(Langulus.SIMD
-    INTERFACE   Langulus.RTTI
+    INTERFACE   Langulus.Core
+                Langulus.Logger
+                Langulus.RTTI
 )
