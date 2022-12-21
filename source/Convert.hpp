@@ -95,7 +95,7 @@ namespace Langulus::SIMD
 
       if constexpr (S < 2 || CT::NotSupported<REGISTER> || CT::NotSupported<OUTSIMD>) {
          // Call the fallback routine if unsupported, or size 1         
-         return Fallback<LOSSLESS>(lhs, rhs, Move(opFALL));
+         return Fallback<LOSSLESS>(lhs, rhs, ::std::move(opFALL));
       }
       else if constexpr (CT::Array<LHS> && CT::Array<RHS>) {
          // Both LHS and RHS are arrays, so wrap in registers           
@@ -120,7 +120,7 @@ namespace Langulus::SIMD
       }
       else {
          // Both LHS and RHS are scalars                                
-         return Fallback<LOSSLESS>(lhs, rhs, Move(opFALL));
+         return Fallback<LOSSLESS>(lhs, rhs, ::std::move(opFALL));
       }
    }
    

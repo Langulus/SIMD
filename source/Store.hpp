@@ -288,8 +288,8 @@ namespace Langulus::SIMD
          if constexpr (CT::Bitmask<TO>) {
             // Store as bitmask                                         
             using T = typename Decay<TO>::Type;
-            for (T i = 0; i < from.size(); ++i)
-               DenseCast(to) |= (static_cast<T>(from[i]) << i);
+            for (decltype(from.size()) i = 0; i < from.size(); ++i)
+               DenseCast(to) |= (static_cast<T>(from[i]) << static_cast<T>(i));
          }
          else if constexpr (!CT::Array<TO>) {
             // Store as a single number (produced from fallback)        
@@ -315,7 +315,7 @@ namespace Langulus::SIMD
          }
          else if constexpr (CT::Sparse<Deext<TO>>) {
             // Store to a sparse output array                           
-            for (int i = 0; i < ExtentOf<TO>; ++i)
+            for (Count i = 0; i < ExtentOf<TO>; ++i)
                *to[i] = from[i];
          }
          else {
@@ -336,7 +336,7 @@ namespace Langulus::SIMD
          }
          else {
             // Multicast only result to an output array                 
-            for (int i = 0; i < ExtentOf<TO>; ++i)
+            for (Count i = 0; i < ExtentOf<TO>; ++i)
                DenseCast(to[i]) = from;
          }
       }

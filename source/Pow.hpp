@@ -76,7 +76,7 @@ namespace Langulus::SIMD
 
                auto result = one;
                auto mask = simde_mm256_cmpeq_epi32(rhs, zero);
-               while (simde_mm256_movemask_epi8(mask) != 0xFFFFFFFF) {
+               while (static_cast<uint32_t>(simde_mm256_movemask_epi8(mask)) != 0xFFFFFFFF) {
                   const auto onesmask = simde_mm256_cmpeq_epi32(simde_mm256_and_si256(rhs, one), one);
                  // if (simde_mm256_movemask_epi8(onesmask)) { //TODO check performance with the branch
                      const auto tempr = simde_mm256_mullo_epi32(result, lhs);
@@ -107,26 +107,8 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)
                return simde_mm512_pow_pd(lhs, rhs);
             else if constexpr (CT::UnsignedInteger32<T>) {
-               const auto one = simde_mm512_set1_epi32(1);
-               const auto zero = simde_mm512_setzero_si512();
-
-               auto result = one;
-               auto mask = simde_mm512_cmpeq_epi32(rhs, zero);
-               while (simde_mm512_movemask_epi8(mask) != 0xFFFFFFFF) {
-                  const auto onesmask = simde_mm512_cmpeq_epi32(simde_mm512_and_si128(rhs, one), one);
-                  //if (simde_mm512_movemask_epi8(onesmask)) { //TODO check performance with the branch
-                     const auto tempr = simde_mm512_mullo_epi32(result, lhs);
-                     const auto mixer = simde_mm512_andnot_si512(mask, onesmask);
-                     result = lgls_blendv_epi32(result, tempr, mixer);
-                  //}
-                  const auto temprhs = simde_mm512_srli_epi32(rhs, 1);
-                  rhs = lgls_blendv_epi32(temprhs, rhs, mask);
-                  const auto templhs = simde_mm512_mullo_epi32(lhs, lhs);
-                  lhs = lgls_blendv_epi32(templhs, lhs, mask);
-
-                  mask = simde_mm512_cmpeq_epi32(rhs, zero);
-               }
-               return result;
+               TODO();
+               //https://stackoverflow.com/questions/42964882/test-if-a-big-integer-is-a-power-of-two
             }
             else if constexpr (CT::IntegerX<T>)
                return CT::Inner::NotSupported {};

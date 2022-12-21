@@ -676,7 +676,8 @@ namespace Langulus::SIMD
    ///   @param op - the fallback function to invoke                          
    ///   @return the resulting number or std::array                           
    template<class LOSSLESS, class LHS, class RHS, class FFALL>
-   NOD() LANGULUS(ALWAYSINLINE) auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) requires Invocable<FFALL, LOSSLESS> {
+   NOD() LANGULUS(ALWAYSINLINE)
+   auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) requires Invocable<FFALL, LOSSLESS> {
       using OUT = InvocableResult<FFALL, LOSSLESS>;
 
       if constexpr (CT::Array<LHS> && CT::Array<RHS>) {
@@ -685,10 +686,10 @@ namespace Langulus::SIMD
          if constexpr (S > 1) {
             ::std::array<OUT, S> output;
             for (Count i = 0; i < S; ++i)
-               output[i] = Fallback<LOSSLESS>(lhs[i], rhs[i], Move(op));
+               output[i] = Fallback<LOSSLESS>(lhs[i], rhs[i], ::std::move(op));
             return output;
          }
-         else return Fallback<LOSSLESS>(lhs[0], rhs[0], Move(op));
+         else return Fallback<LOSSLESS>(lhs[0], rhs[0], ::std::move(op));
       }
       else if constexpr (CT::Array<LHS>) {
          // Array OP Scalar                                             
@@ -698,23 +699,23 @@ namespace Langulus::SIMD
             if constexpr (CT::Bool<OUT>) {
                auto& same_rhs = DenseCast(rhs);
                for (Count i = 0; i < S; ++i)
-                  output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Move(op));
+                  output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, ::std::move(op));
             }
             else {
                const auto same_rhs = static_cast<LOSSLESS>(DenseCast(rhs));
                for (Count i = 0; i < S; ++i)
-                  output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Move(op));
+                  output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, ::std::move(op));
             }
             return output;
          }
          else {
             if constexpr (CT::Bool<OUT>) {
                auto& same_rhs = DenseCast(rhs);
-               return Fallback<LOSSLESS>(lhs[0], same_rhs, Move(op));
+               return Fallback<LOSSLESS>(lhs[0], same_rhs, ::std::move(op));
             }
             else {
                const auto same_rhs = static_cast<LOSSLESS>(DenseCast(rhs));
-               return Fallback<LOSSLESS>(lhs[0], same_rhs, Move(op));
+               return Fallback<LOSSLESS>(lhs[0], same_rhs, ::std::move(op));
             }
          }
       }
@@ -726,23 +727,23 @@ namespace Langulus::SIMD
             if constexpr (CT::Bool<OUT>) {
                auto& same_lhs = DenseCast(lhs);
                for (Count i = 0; i < S; ++i)
-                  output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Move(op));
+                  output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], ::std::move(op));
             }
             else {
                const auto same_lhs = static_cast<LOSSLESS>(DenseCast(lhs));
                for (Count i = 0; i < S; ++i)
-                  output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Move(op));
+                  output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], ::std::move(op));
             }
             return output;
          }
          else {
             if constexpr (CT::Bool<OUT>) {
                auto& same_lhs = DenseCast(lhs);
-               return Fallback<LOSSLESS>(same_lhs, rhs[0], Move(op));
+               return Fallback<LOSSLESS>(same_lhs, rhs[0], ::std::move(op));
             }
             else {
                const auto same_lhs = static_cast<LOSSLESS>(DenseCast(lhs));
-               return Fallback<LOSSLESS>(same_lhs, rhs[0], Move(op));
+               return Fallback<LOSSLESS>(same_lhs, rhs[0], ::std::move(op));
             }
          }
       }

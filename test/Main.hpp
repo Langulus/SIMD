@@ -178,14 +178,14 @@ struct alignas(Langulus::Alignment) Vector {
 	}
 
 	bool operator == (const Vector& e) const noexcept {
-		for (int i = 0; i < C; ++i)
+		for (Count i = 0; i < C; ++i)
 			if (DenseCast(mArray[i]) != DenseCast(e.mArray[i]))
 				return false;
 		return true;
 	}
 
 	Vector& operator = (const Vector& b) noexcept {
-		for (int i = 0; i < C; ++i)
+		for (Count i = 0; i < C; ++i)
 			DenseCast(mArray[i]) = DenseCast(b.mArray[i]);
 		return *this;
 	}
