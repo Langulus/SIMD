@@ -6,12 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Check if this project is built as standalone, or a part of something else 
 if(PROJECT_IS_TOP_LEVEL)
-    find_package(Git REQUIRED)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} submodule update --init -- cmake 
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND_ERROR_IS_FATAL ANY
-    )
+    include(LangulusUtilities.cmake)
+    langulus_init_git_submodule(cmake)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
     include(FetchLangulusModule)
     include(HandleLangulusFeatures)
@@ -28,7 +24,6 @@ if(PROJECT_IS_TOP_LEVEL)
 endif()
 
 # Configure SIMDe library                                                   
-message(STATUS "Configuring external project: SIMDe...")
 download_project(
 	PROJ                SIMDe
 	GIT_REPOSITORY      https://github.com/simd-everywhere/simde.git
@@ -37,6 +32,7 @@ download_project(
 )
 
 # Build and install SIMD library                                            
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source LANGULUS_SIMD_SOURCES)
 add_library(Langulus.SIMD INTERFACE)
 
 target_include_directories(Langulus.SIMD
