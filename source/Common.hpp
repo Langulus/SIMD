@@ -202,16 +202,16 @@ namespace Langulus::CT
 
 
    /// Vector concept                                                         
-   /// Any dense type that has MemberType type that is a dense number, has    
-   /// MemberCount that is at least 2, and T's size is exactly the same as    
-   /// sizeof(MemberType) * MemberCount                                       
+   /// Any dense type that is LANGULUS(TYPED) as a dense number,              
+   /// has MemberCount that is at least 2, and T's size is exactly the same   
+   /// as sizeof(CTTI_InnerType) * MemberCount                                
    template<class... T>
    concept Vector = (Inner::Vector<T> && ...);
 
    /// Scalar concept                                                         
-   /// Any number, or a dense type that has MemberType type that is a dense   
-   /// number, has MemberCount of exactly 1, and its size is exactly the same 
-   /// as sizeof(MemberType)                                                  
+   /// Any dense type that is LANGULUS(TYPED) as a dense number,              
+   /// has MemberCount of exactly 1, and its size is exactly the same         
+   /// as sizeof(CTTI_InnerType)                                              
    /// Alternatively, a bounded array of extent 1 is also considered scalar   
    template<class... T>
    concept Scalar = (Inner::Scalar<T> && ...);

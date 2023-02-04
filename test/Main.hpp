@@ -109,8 +109,7 @@ void InitOne(T& a, A&& b) noexcept {
 
 template<class T, Count C>
 struct alignas(Langulus::Alignment) Vector {
-	// This makes the type CT::Typed
-	using MemberType = T;
+	LANGULUS(TYPED) T;
 	static constexpr Count MemberCount = C;
 
 	T mArray[C];
