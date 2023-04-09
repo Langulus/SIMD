@@ -35,13 +35,13 @@ using MaskEquivalentTo = decltype(MaskEquivalent<T>());
 
 /// Compare two scalars and put result in a bit											
 template<class LHS, class RHS>
-LANGULUS(ALWAYSINLINE) void ControlEqualM(const LHS& lhs, const RHS& rhs, SIMD::Bitmask<1>& out) noexcept requires (!CT::Typed<LHS, RHS>) {
+LANGULUS(INLINED) void ControlEqualM(const LHS& lhs, const RHS& rhs, SIMD::Bitmask<1>& out) noexcept requires (!CT::Typed<LHS, RHS>) {
 	out = (DenseCast(lhs) == DenseCast(rhs));
 }
 
 /// Compare two vectors and put the result in a bitmask vector						
 template<class LHS, class RHS, Count C>
-LANGULUS(ALWAYSINLINE) void ControlEqualM(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, SIMD::Bitmask<C>& out) noexcept {
+LANGULUS(INLINED) void ControlEqualM(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, SIMD::Bitmask<C>& out) noexcept {
 	using T = typename SIMD::Bitmask<C>::Type;
 	auto lhs = lhsArray.mArray;
 	auto rhs = rhsArray.mArray;
@@ -51,13 +51,13 @@ LANGULUS(ALWAYSINLINE) void ControlEqualM(const Vector<LHS, C>& lhsArray, const 
 
 /// Compare two scalars and put result in a boolean									
 template<class LHS, class RHS, CT::Bool OUT>
-LANGULUS(ALWAYSINLINE) void ControlEqualV(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+LANGULUS(INLINED) void ControlEqualV(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
 	DenseCast(out) = (DenseCast(lhs) == DenseCast(rhs));
 }
 
 /// Compare two vectors and put the result in a vector of bools					
 template<class LHS, class RHS, Count C, CT::Bool OUT>
-LANGULUS(ALWAYSINLINE) void ControlEqualV(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+LANGULUS(INLINED) void ControlEqualV(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
 	auto r = out.mArray;
 	auto lhs = lhsArray.mArray;
 	auto rhs = rhsArray.mArray;

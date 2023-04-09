@@ -14,7 +14,7 @@ namespace Langulus::SIMD
 {
 
    template<class T, Count S>
-   LANGULUS(ALWAYSINLINE) constexpr auto MinInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+   LANGULUS(INLINED) constexpr auto MinInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
       return CT::Inner::NotSupported{};
    }
 
@@ -26,7 +26,7 @@ namespace Langulus::SIMD
    ///   @param rhs - the right-hand-side array                               
    ///   @return the maxed values                                             
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto MinInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+   LANGULUS(INLINED) auto MinInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
       if constexpr (CT::SIMD128<REGISTER>) {
          if constexpr (CT::SignedInteger8<T>)
             return simde_mm_min_epi8(lhs, rhs);
@@ -121,7 +121,7 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(ALWAYSINLINE) auto Min(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+   NOD() LANGULUS(INLINED) auto Min(LHS& lhsOrig, RHS& rhsOrig) noexcept {
       using DOUT = Decay<OUT>;
       using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
@@ -139,13 +139,13 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT>
-   LANGULUS(ALWAYSINLINE) void Min(LHS& lhs, RHS& rhs, OUT& output) noexcept {
+   LANGULUS(INLINED) void Min(LHS& lhs, RHS& rhs, OUT& output) noexcept {
       GeneralStore(Min<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///                                                                        
    template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) WRAPPER MinWrap(LHS& lhs, RHS& rhs) noexcept {
+   NOD() LANGULUS(INLINED) WRAPPER MinWrap(LHS& lhs, RHS& rhs) noexcept {
       WRAPPER result;
       Min<LHS, RHS>(lhs, rhs, result.mArray);
       return result;

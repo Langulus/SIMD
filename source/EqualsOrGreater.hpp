@@ -13,7 +13,7 @@ namespace Langulus::SIMD
 {
 
    template<class, Count>
-   LANGULUS(ALWAYSINLINE) constexpr auto EqualsOrGreaterInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
+   LANGULUS(INLINED) constexpr auto EqualsOrGreaterInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
       return CT::Inner::NotSupported{};
    }
       
@@ -26,7 +26,7 @@ namespace Langulus::SIMD
    ///   @return a bitmask with the results, or Inner::NotSupported           
    /// https://giannitedesco.github.io/2019/03/08/simd-cmp-bitmasks.html      
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto EqualsOrGreaterInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+   LANGULUS(INLINED) auto EqualsOrGreaterInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
    #if LANGULUS_SIMD(128BIT)
       if constexpr (CT::SIMD128<REGISTER>) {
          if constexpr (CT::SignedInteger8<T>) {
@@ -349,7 +349,7 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) auto EqualsOrGreater(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+   NOD() LANGULUS(INLINED) auto EqualsOrGreater(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using LOSSLESS = Lossless<LHS, RHS>;
       using REGISTER = CT::Register<LHS, RHS, LOSSLESS>;
       constexpr auto S = OverlapCount<LHS, RHS>();
@@ -367,13 +367,13 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT>
-   LANGULUS(ALWAYSINLINE) void EqualsOrGreater(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
+   LANGULUS(INLINED) void EqualsOrGreater(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
       GeneralStore(EqualsOrGreater<LHS, RHS>(lhs, rhs), output);
    }
 
    ///                                                                        
    template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) WRAPPER EqualsOrGreaterWrap(const LHS& lhs, const RHS& rhs) noexcept {
+   NOD() LANGULUS(INLINED) WRAPPER EqualsOrGreaterWrap(const LHS& lhs, const RHS& rhs) noexcept {
       WRAPPER result;
       EqualsOrGreater<LHS, RHS>(lhs, rhs, result.mArray);
       return result;

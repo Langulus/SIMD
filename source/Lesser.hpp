@@ -13,7 +13,7 @@ namespace Langulus::SIMD
 {
 
    template<class, Count>
-   LANGULUS(ALWAYSINLINE) constexpr auto LesserInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
+   LANGULUS(INLINED) constexpr auto LesserInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
       return CT::Inner::NotSupported{};
    }
       
@@ -26,7 +26,7 @@ namespace Langulus::SIMD
    ///   @return a bitmask with the results, or Inner::NotSupported           
    /// https://giannitedesco.github.io/2019/03/08/simd-cmp-bitmasks.html      
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto LesserInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+   LANGULUS(INLINED) auto LesserInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
    #if LANGULUS_SIMD(128BIT)
       if constexpr (CT::SIMD128<REGISTER>) {
          if constexpr (CT::SignedInteger8<T>) {
@@ -349,7 +349,7 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) auto Lesser(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+   NOD() LANGULUS(INLINED) auto Lesser(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using LOSSLESS = Lossless<LHS, RHS>;
       using REGISTER = CT::Register<LHS, RHS, LOSSLESS>;
       constexpr auto S = OverlapCount<LHS, RHS>();
@@ -367,13 +367,13 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT>
-   LANGULUS(ALWAYSINLINE) void Lesser(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
+   LANGULUS(INLINED) void Lesser(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
       GeneralStore(Lesser<LHS, RHS>(lhs, rhs), output);
    }
 
    ///                                                                        
    template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) WRAPPER LesserWrap(const LHS& lhs, const RHS& rhs) noexcept {
+   NOD() LANGULUS(INLINED) WRAPPER LesserWrap(const LHS& lhs, const RHS& rhs) noexcept {
       WRAPPER result;
       Lesser<LHS, RHS>(lhs, rhs, result.mArray);
       return result;

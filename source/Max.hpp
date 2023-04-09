@@ -14,7 +14,7 @@ namespace Langulus::SIMD
 {
       
    template<class T, Count S>
-   LANGULUS(ALWAYSINLINE) constexpr auto MaxInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+   LANGULUS(INLINED) constexpr auto MaxInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
       return CT::Inner::NotSupported{};
    }
 
@@ -26,7 +26,7 @@ namespace Langulus::SIMD
    ///   @param rhs - the right-hand-side array                               
    ///   @return the maxed values                                             
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto MaxInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+   LANGULUS(INLINED) auto MaxInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
       if constexpr (CT::SIMD128<REGISTER>) {
          if constexpr (CT::SignedInteger8<T>)
             return simde_mm_max_epi8(lhs, rhs);
@@ -121,7 +121,7 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(ALWAYSINLINE) auto Max(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+   NOD() LANGULUS(INLINED) auto Max(LHS& lhsOrig, RHS& rhsOrig) noexcept {
       using DOUT = Decay<OUT>;
       using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
@@ -139,13 +139,13 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT>
-   LANGULUS(ALWAYSINLINE) void Max(LHS& lhs, RHS& rhs, OUT& output) noexcept {
+   LANGULUS(INLINED) void Max(LHS& lhs, RHS& rhs, OUT& output) noexcept {
       GeneralStore(Max<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///                                                                        
    template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) WRAPPER MaxWrap(LHS& lhs, RHS& rhs) noexcept {
+   NOD() LANGULUS(INLINED) WRAPPER MaxWrap(LHS& lhs, RHS& rhs) noexcept {
       WRAPPER result;
       Max<LHS, RHS>(lhs, rhs, result.mArray);
       return result;

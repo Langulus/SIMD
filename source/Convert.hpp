@@ -32,7 +32,7 @@ namespace Langulus::SIMD
    ///   @param in - the input data                                           
    ///   @return the resulting register                                       
    template<int DEF, class TT, Count S, class FT>
-   LANGULUS(ALWAYSINLINE) auto Convert(const FT(&in)[S]) noexcept {
+   LANGULUS(INLINED) auto Convert(const FT(&in)[S]) noexcept {
       using FROM = decltype(Load<DEF>(Uneval<Decay<FT>[S]>()));
       using TO = decltype(Load<DEF>(Uneval<Decay<TT>[S]>()));
       const FROM loaded = Load<DEF>(in);
@@ -89,7 +89,7 @@ namespace Langulus::SIMD
    ///   @param opFALL - the function to invoke                               
    ///   @return the result (either std::array, number, or register)          
    template<int DEF, class REGISTER, class LOSSLESS, class LHS, class RHS, class FSIMD, class FFALL>
-   NOD() LANGULUS(ALWAYSINLINE) auto AttemptSIMD(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) requires (Invocable<FSIMD, REGISTER> && Invocable<FFALL, LOSSLESS>) {
+   NOD() LANGULUS(INLINED) auto AttemptSIMD(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) requires (Invocable<FSIMD, REGISTER> && Invocable<FFALL, LOSSLESS>) {
       using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
       constexpr auto S = OverlapCount<LHS, RHS>();
 

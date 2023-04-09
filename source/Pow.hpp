@@ -14,7 +14,7 @@ namespace Langulus::SIMD
 {
 
    template<class, Count>
-   LANGULUS(ALWAYSINLINE) constexpr auto PowerInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
+   LANGULUS(INLINED) constexpr auto PowerInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
       return CT::Inner::NotSupported{};
    }
 
@@ -26,7 +26,7 @@ namespace Langulus::SIMD
    ///   @param rhs - the right-hand-side array                               
    ///   @return the raised values                                            
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto PowerInner(REGISTER lhs, REGISTER rhs) noexcept {
+   LANGULUS(INLINED) auto PowerInner(REGISTER lhs, REGISTER rhs) noexcept {
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::Float<T>)
@@ -122,7 +122,7 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(ALWAYSINLINE) auto Power(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+   NOD() LANGULUS(INLINED) auto Power(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using DOUT = Decay<OUT>;
       using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
@@ -167,13 +167,13 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT>
-   LANGULUS(ALWAYSINLINE) void Power(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
+   LANGULUS(INLINED) void Power(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
       GeneralStore(Power<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///                                                                        
    template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) WRAPPER PowerWrap(const LHS& lhs, const RHS& rhs) noexcept {
+   NOD() LANGULUS(INLINED) WRAPPER PowerWrap(const LHS& lhs, const RHS& rhs) noexcept {
       WRAPPER result;
       Power<LHS, RHS>(lhs, rhs, result.mArray);
       return result;

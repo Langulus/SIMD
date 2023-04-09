@@ -19,7 +19,7 @@ namespace Langulus::SIMD
    ///   @param v - the array                                                 
    ///   @return the absolute values                                          
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto InnerAbs(const REGISTER& v) noexcept {
+   LANGULUS(INLINED) auto InnerAbs(const REGISTER& v) noexcept {
       static_assert(CT::Signed<T>, 
          "SIMD::InnerAbs is suboptimal and pointless for unsigned values, avoid calling it on such");
 
@@ -84,7 +84,7 @@ namespace Langulus::SIMD
    }
 
    template<class T, Count S>
-   LANGULUS(ALWAYSINLINE) auto Abs(const T(&value)[S]) noexcept {
+   LANGULUS(INLINED) auto Abs(const T(&value)[S]) noexcept {
       return InnerAbs<T, S>(Load<0>(value));
    }
 

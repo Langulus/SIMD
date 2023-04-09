@@ -22,7 +22,7 @@ namespace Langulus::SIMD
    ///   @param values - the array to access                                  
    ///   @return a reference to the element, or DEF if out of range           
    template<class R, int DEF, Offset IDX, Count MAXS, bool REVERSE = false, class T, Count S>
-   LANGULUS(ALWAYSINLINE) const R& InnerGet(const T(&values)[S]) {
+   LANGULUS(INLINED) const R& InnerGet(const T(&values)[S]) {
       static_assert(S <= MAXS, "S must be in MAXS limit");
       static_assert(IDX < MAXS, "IDX must be in MAXS limit");
       static constinit auto fallback = static_cast<R>(DEF);
@@ -49,7 +49,7 @@ namespace Langulus::SIMD
    ///   @param values - the array to access                                  
    ///   @return the register                                                 
    template<int DEF, Size CHUNK, class T, Count S, Offset... INDICES>
-   LANGULUS(ALWAYSINLINE) auto InnerSet(std::integer_sequence<Offset, INDICES...>, const T(&values)[S]) {
+   LANGULUS(INLINED) auto InnerSet(std::integer_sequence<Offset, INDICES...>, const T(&values)[S]) {
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CHUNK == 16) {
             if constexpr (CT::SignedInteger8<T>)
@@ -144,7 +144,7 @@ namespace Langulus::SIMD
    ///   @param values - the array to wrap                                    
    ///   @return the register                                                 
    template<int DEF, Size CHUNK, class T, Count S>
-   LANGULUS(ALWAYSINLINE) auto Set(const T(&values)[S]) noexcept {
+   LANGULUS(INLINED) auto Set(const T(&values)[S]) noexcept {
       if constexpr (S < 2) {
          // No point in storing a single value in a large register      
          // If this is reached, then the library did not choose the     

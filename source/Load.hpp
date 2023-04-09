@@ -19,7 +19,7 @@ namespace Langulus::SIMD
    ///   @param v - the array to load inside a register                       
    ///   @return the register                                                 
    template<int DEF, class T, Count S>
-   LANGULUS(ALWAYSINLINE) auto Load(const T(&v)[S]) noexcept {
+   LANGULUS(INLINED) auto Load(const T(&v)[S]) noexcept {
       constexpr auto denseSize = sizeof(Decay<T>) * S;
 
       #if LANGULUS_SIMD(128BIT)

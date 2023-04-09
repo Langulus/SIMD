@@ -19,7 +19,7 @@ namespace Langulus::SIMD
    ///   @param value - the array                                             
    ///   @return the floored values                                           
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto InnerFloor(const REGISTER& value) noexcept {
+   LANGULUS(INLINED) auto InnerFloor(const REGISTER& value) noexcept {
       static_assert(CT::Real<T>,
          "SIMD::InnerFloor is suboptimal and pointless for whole numbers, avoid calling it on such");
 
@@ -51,7 +51,7 @@ namespace Langulus::SIMD
    }
 
    template<class T, Count S>
-   LANGULUS(ALWAYSINLINE) auto Floor(const T(&value)[S]) noexcept {
+   LANGULUS(INLINED) auto Floor(const T(&value)[S]) noexcept {
       return InnerFloor<T, S>(Load<0>(value));
    }
 

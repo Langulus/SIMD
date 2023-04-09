@@ -18,7 +18,7 @@ namespace Langulus::SIMD
    ///   @param value - the value to use for filling                          
    ///   @return the filled register                                          
    template<CT::TSIMD REGISTER, class T>
-   NOD() LANGULUS(ALWAYSINLINE) decltype(auto) Fill(const T& valueOrig) noexcept {
+   NOD() LANGULUS(INLINED) decltype(auto) Fill(const T& valueOrig) noexcept {
       auto& value = DenseCast(valueOrig);
       if constexpr (CT::Same<REGISTER,T>)
          return value;

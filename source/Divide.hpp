@@ -14,7 +14,7 @@ namespace Langulus::SIMD
 {
 
    template<class, Count>
-   LANGULUS(ALWAYSINLINE) constexpr auto DivideInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
+   LANGULUS(INLINED) constexpr auto DivideInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
       return CT::Inner::NotSupported{};
    }
 
@@ -26,7 +26,7 @@ namespace Langulus::SIMD
    ///   @param rhs - the right-hand-side array                               
    ///   @return the divided elements as a register                           
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto DivideInner(const REGISTER& lhs, const REGISTER& rhs) {
+   LANGULUS(INLINED) auto DivideInner(const REGISTER& lhs, const REGISTER& rhs) {
    #if LANGULUS_SIMD(128BIT)
       if constexpr (CT::SIMD128<REGISTER>) {
          if constexpr (CT::UnsignedInteger8<T>) {
@@ -204,7 +204,7 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(ALWAYSINLINE) auto Divide(const LHS& lhsOrig, const RHS& rhsOrig) {
+   NOD() LANGULUS(INLINED) auto Divide(const LHS& lhsOrig, const RHS& rhsOrig) {
       using DOUT = Decay<OUT>;
       using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
@@ -224,13 +224,13 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT>
-   LANGULUS(ALWAYSINLINE) void Divide(const LHS& lhs, const RHS& rhs, OUT& output) {
+   LANGULUS(INLINED) void Divide(const LHS& lhs, const RHS& rhs, OUT& output) {
       GeneralStore(Divide<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///                                                                        
    template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) WRAPPER DivideWrap(const LHS& lhs, const RHS& rhs) {
+   NOD() LANGULUS(INLINED) WRAPPER DivideWrap(const LHS& lhs, const RHS& rhs) {
       WRAPPER result;
       Divide<LHS, RHS>(lhs, rhs, result.mArray);
       return result;

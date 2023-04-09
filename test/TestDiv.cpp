@@ -2,7 +2,7 @@
 #include <catch2/catch.hpp>
 
 template<class LHS, class RHS, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlDiv(const LHS& lhs, const RHS& rhs, OUT& out) {
+LANGULUS(INLINED) void ControlDiv(const LHS& lhs, const RHS& rhs, OUT& out) {
 	if (DenseCast(rhs) == Decay<RHS> {0})
 		LANGULUS_THROW(DivisionByZero, "Division by zero");
 
@@ -10,7 +10,7 @@ LANGULUS(ALWAYSINLINE) void ControlDiv(const LHS& lhs, const RHS& rhs, OUT& out)
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlDiv(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) {
+LANGULUS(INLINED) void ControlDiv(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) {
 	auto r = out.mArray;
 	auto lhs = lhsArray.mArray;
 	auto rhs = rhsArray.mArray;

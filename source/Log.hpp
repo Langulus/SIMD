@@ -28,7 +28,7 @@ namespace Langulus::SIMD
    ///   @param value - the array                                             
    ///   @return the logarithm values                                         
    template<LogStyle STYLE = LogStyle::Base10, class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) REGISTER InnerLog(const REGISTER& value) noexcept {
+   LANGULUS(INLINED) REGISTER InnerLog(const REGISTER& value) noexcept {
       static_assert(CT::Real<T>, "SIMD::InnerLog doesn't work for whole numbers");
 
       if constexpr (CT::SIMD128<REGISTER>) {
@@ -122,7 +122,7 @@ namespace Langulus::SIMD
    }
 
    template<LogStyle STYLE, class T, Count S>
-   LANGULUS(ALWAYSINLINE) auto Log(const T(&value)[S]) noexcept {
+   LANGULUS(INLINED) auto Log(const T(&value)[S]) noexcept {
       return InnerLog<STYLE, T, S>(Load<0>(value));
    }
 

@@ -7,12 +7,12 @@ template<class T>
 using uninitialized = Catch::Benchmark::storage_for<T>;
 
 template<class LHS, class RHS, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlSub(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+LANGULUS(INLINED) void ControlSub(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
 	DenseCast(out) = DenseCast(lhs) - DenseCast(rhs);
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlSub(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+LANGULUS(INLINED) void ControlSub(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
 	auto r = out.mArray;
 	auto lhs = lhsArray.mArray;
 	auto rhs = rhsArray.mArray;

@@ -37,7 +37,7 @@ template<class T>
 using uninitialized = Catch::Benchmark::storage_for<T>;
 
 template<class LHS, class RHS, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlSL(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+LANGULUS(INLINED) void ControlSL(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
 	static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
 	// Well defined condition in SIMD calls, that is otherwise				
 	// undefined behavior by C++ standard											
@@ -46,7 +46,7 @@ LANGULUS(ALWAYSINLINE) void ControlSL(const LHS& lhs, const RHS& rhs, OUT& out) 
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlSL(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+LANGULUS(INLINED) void ControlSL(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
 	static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
 	auto r = out.mArray;
 	auto lhs = lhsArray.mArray;

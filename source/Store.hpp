@@ -21,7 +21,7 @@ namespace Langulus::SIMD
    ///   @param from - the source register                                    
    ///   @param to - the destination array                                    
    template<CT::TSIMD FROM, bool ALIGNED = false, class T, Count S>
-   LANGULUS(ALWAYSINLINE) void Store(const FROM& from, T(&to)[S]) noexcept {
+   LANGULUS(INLINED) void Store(const FROM& from, T(&to)[S]) noexcept {
       static_assert(S > 1, "Storing less than two elements is suboptimal "
          "- avoid SIMD operations on such arrays as a whole");
       constexpr Size toSize = sizeof(Decay<T>) * S;
@@ -255,7 +255,7 @@ namespace Langulus::SIMD
    ///   @param from - what to store                                          
    ///   @param to - where to store it                                        
    template<class FROM, class TO>
-   LANGULUS(ALWAYSINLINE) void GeneralStore(const FROM& from, TO& to) noexcept {
+   LANGULUS(INLINED) void GeneralStore(const FROM& from, TO& to) noexcept {
       if constexpr (CT::TSIMD<FROM>) {
          // Extract from SIMD register (produced from SIMD routine)     
          Store(from, to);

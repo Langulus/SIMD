@@ -13,7 +13,7 @@ namespace Langulus::SIMD
 {
 
    template<class, Count>
-   LANGULUS(ALWAYSINLINE) constexpr auto ShiftRightInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
+   LANGULUS(INLINED) constexpr auto ShiftRightInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
       return CT::Inner::NotSupported{};
    }
 
@@ -31,7 +31,7 @@ namespace Langulus::SIMD
    ///   @param rhs - the right-hand-side array                               
    ///   @return the shifted elements as a register                           
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto ShiftRightInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+   LANGULUS(INLINED) auto ShiftRightInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
       static_assert(CT::IntegerX<Decay<T>>, "Can only shift integers");
 
       #if LANGULUS_SIMD(128BIT)
@@ -205,7 +205,7 @@ namespace Langulus::SIMD
    ///      behavior consistent across C++ and SIMD, so the fallback routine  
    ///      has additional overhead for checking the rhs range and zeroing.   
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(ALWAYSINLINE) auto ShiftRight(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+   NOD() LANGULUS(INLINED) auto ShiftRight(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
       using DOUT = Decay<OUT>;
       using REGISTER = CT::Register<LHS, RHS, DOUT>;
@@ -232,7 +232,7 @@ namespace Langulus::SIMD
    ///      behavior consistent across C++ and SIMD, so the fallback routine  
    ///      has additional overhead for checking the rhs range and zeroing.   
    template<class LHS, class RHS, class OUT>
-   LANGULUS(ALWAYSINLINE) void ShiftRight(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
+   LANGULUS(INLINED) void ShiftRight(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
       static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
       GeneralStore(ShiftRight<LHS, RHS, OUT>(lhs, rhs), output);
    }
@@ -244,7 +244,7 @@ namespace Langulus::SIMD
    ///      behavior consistent across C++ and SIMD, so the fallback routine  
    ///      has additional overhead for checking the rhs range and zeroing.   
    template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) WRAPPER ShiftRightWrap(const LHS& lhs, const RHS& rhs) noexcept {
+   NOD() LANGULUS(INLINED) WRAPPER ShiftRightWrap(const LHS& lhs, const RHS& rhs) noexcept {
       static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
       WRAPPER result;
       ShiftRight<LHS, RHS>(lhs, rhs, result.mComponents);

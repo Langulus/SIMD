@@ -2,12 +2,12 @@
 #include <catch2/catch.hpp>
 
 template<class LHS, class RHS, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlMul(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+LANGULUS(INLINED) void ControlMul(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
 	DenseCast(out) = DenseCast(lhs) * DenseCast(rhs);
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlMul(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+LANGULUS(INLINED) void ControlMul(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
 	auto r = out.mArray;
 	auto lhs = lhsArray.mArray;
 	auto rhs = rhsArray.mArray;

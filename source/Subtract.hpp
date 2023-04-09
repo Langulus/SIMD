@@ -14,7 +14,7 @@ namespace Langulus::SIMD
 {
 
    template<class, Count>
-   LANGULUS(ALWAYSINLINE) constexpr auto SubtractInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
+   LANGULUS(INLINED) constexpr auto SubtractInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
       return CT::Inner::NotSupported{};
    }
 
@@ -26,7 +26,7 @@ namespace Langulus::SIMD
    ///   @param rhs - the right-hand-side array                               
    ///   @return the subtracted elements as a register                        
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto SubtractInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+   LANGULUS(INLINED) auto SubtractInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::Integer8<T>)
@@ -91,7 +91,7 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(ALWAYSINLINE) auto Subtract(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+   NOD() LANGULUS(INLINED) auto Subtract(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using DOUT = Decay<OUT>;
       using REGISTER = CT::Register<LHS, RHS, DOUT>;
       constexpr auto S = OverlapCount<LHS, RHS>();
@@ -109,13 +109,13 @@ namespace Langulus::SIMD
 
    ///                                                                        
    template<class LHS, class RHS, class OUT>
-   LANGULUS(ALWAYSINLINE) void Subtract(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
+   LANGULUS(INLINED) void Subtract(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
       GeneralStore(Subtract<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
    ///                                                                        
    template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(ALWAYSINLINE) WRAPPER SubtractWrap(const LHS& lhs, const RHS& rhs) noexcept {
+   NOD() LANGULUS(INLINED) WRAPPER SubtractWrap(const LHS& lhs, const RHS& rhs) noexcept {
       WRAPPER result;
       Subtract<LHS, RHS>(lhs, rhs, result.mArray);
       return result;

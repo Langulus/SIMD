@@ -19,7 +19,7 @@ namespace Langulus::SIMD
    ///   @param value - the array                                             
    ///   @return the floored values                                           
    template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(ALWAYSINLINE) auto InnerRound(const REGISTER& value) noexcept {
+   LANGULUS(INLINED) auto InnerRound(const REGISTER& value) noexcept {
       static_assert(CT::Real<T>,
          "SIMD::InnerFloor is suboptimal for unreal numbers, avoid calling it on such");
 
@@ -48,7 +48,7 @@ namespace Langulus::SIMD
    }
 
    template<class T, Count S>
-   LANGULUS(ALWAYSINLINE) auto Round(const T(&value)[S]) noexcept {
+   LANGULUS(INLINED) auto Round(const T(&value)[S]) noexcept {
       return InnerRound<T, S>(Load<0>(value));
    }
 

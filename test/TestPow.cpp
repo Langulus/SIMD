@@ -2,7 +2,7 @@
 #include <catch2/catch.hpp>
 
 template<CT::Dense B, CT::Dense E>
-NOD() LANGULUS(ALWAYSINLINE) constexpr auto Pow(B base, E exponent) noexcept {
+NOD() LANGULUS(INLINED) constexpr auto Pow(B base, E exponent) noexcept {
 	if (base == B {1})
 		return B {1};
 
@@ -34,12 +34,12 @@ NOD() LANGULUS(ALWAYSINLINE) constexpr auto Pow(B base, E exponent) noexcept {
 }
 
 template<class LHS, class RHS, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlPow(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+LANGULUS(INLINED) void ControlPow(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
 	DenseCast(out) = Pow(DenseCast(lhs), DenseCast(rhs));
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(ALWAYSINLINE) void ControlPow(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+LANGULUS(INLINED) void ControlPow(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
 	auto r = out.mArray;
 	auto lhs = lhsArray.mArray;
 	auto rhs = rhsArray.mArray;
