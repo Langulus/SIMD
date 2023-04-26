@@ -6,8 +6,8 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
+#include <RTTI/MetaData.hpp>
 #include <immintrin.h>
-#include <RTTI/Reflect.hpp>
 #include <array>
 
 #include <simde/x86/avx2.h>

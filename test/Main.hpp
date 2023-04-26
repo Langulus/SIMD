@@ -1,5 +1,5 @@
 #pragma once
-#include <LangulusSIMD.hpp>
+#include <SIMD/SIMD.hpp>
 #include <cstdint>
 #include <cstddef>
 #include <random>
