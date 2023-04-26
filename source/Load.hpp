@@ -76,7 +76,7 @@ namespace Langulus::SIMD
          else
       #endif
 
-      return CT::Inner::NotSupported {};
+      return Unsupported {};
    }
 
 } // namespace Langulus::SIMD
@@ -89,8 +89,8 @@ namespace Langulus::CT
    template<class LHS, class RHS, class OUT>
    using Register = Conditional<
       (ExtentOf<LHS> > ExtentOf<RHS>),
-      decltype(SIMD::Load<0>(Uneval<OUT[ExtentOf<LHS>]>())),
-      decltype(SIMD::Load<0>(Uneval<OUT[ExtentOf<RHS>]>()))
+      decltype(SIMD::Load<0>(Fake<OUT[ExtentOf<LHS>]>())),
+      decltype(SIMD::Load<0>(Fake<OUT[ExtentOf<RHS>]>()))
    >;
 
 } // namespace Langulus::CT

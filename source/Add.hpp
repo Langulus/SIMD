@@ -15,8 +15,8 @@ namespace Langulus::SIMD
 {
       
    template<class, Count>
-   LANGULUS(INLINED) constexpr auto AddInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
-      return CT::Inner::NotSupported{};
+   LANGULUS(INLINED) constexpr auto AddInner(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      return Unsupported{};
    }
 
    /// Add two arrays using SIMD                                              

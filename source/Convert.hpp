@@ -33,12 +33,12 @@ namespace Langulus::SIMD
    ///   @return the resulting register                                       
    template<int DEF, class TT, Count S, class FT>
    LANGULUS(INLINED) auto Convert(const FT(&in)[S]) noexcept {
-      using FROM = decltype(Load<DEF>(Uneval<Decay<FT>[S]>()));
-      using TO = decltype(Load<DEF>(Uneval<Decay<TT>[S]>()));
+      using FROM = decltype(Load<DEF>(Fake<Decay<FT>[S]>()));
+      using TO = decltype(Load<DEF>(Fake<Decay<TT>[S]>()));
       const FROM loaded = Load<DEF>(in);
 
-      if constexpr (CT::NotSupported<FROM> || CT::NotSupported<TO>)
-         return CT::Inner::NotSupported{};
+      if constexpr (CT::Unsupported<FROM> || CT::Unsupported<TO>)
+         return Unsupported{};
       else if constexpr (CT::Same<TT, FT>)
          return loaded;
 
@@ -93,7 +93,7 @@ namespace Langulus::SIMD
       using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
       constexpr auto S = OverlapCount<LHS, RHS>();
 
-      if constexpr (S < 2 || CT::NotSupported<REGISTER> || CT::NotSupported<OUTSIMD>) {
+      if constexpr (S < 2 || CT::Unsupported<REGISTER> || CT::Unsupported<OUTSIMD>) {
          // Call the fallback routine if unsupported, or size 1         
          return Fallback<LOSSLESS>(lhs, rhs, ::std::move(opFALL));
       }

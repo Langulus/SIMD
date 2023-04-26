@@ -7,8 +7,7 @@
 ///                                                                           
 #pragma once
 #include <immintrin.h>
-#include <LangulusCore.hpp>
-#include <LangulusRTTI.hpp>
+#include <RTTI/Reflect.hpp>
 #include <array>
 
 #include <simde/x86/avx2.h>
@@ -176,50 +175,6 @@ LANGULUS_EXCEPTION(DivisionByZero);
 namespace Langulus::CT
 {
 
-   namespace Inner
-   {
-
-      /// Placeholder type for returning from unimplemented SIMD routines     
-      class NotSupported {};
-
-      template<class T>
-      concept Vector = Typed<T> && DenseNumber<TypeOf<T>> && requires {
-            {Decay<T>::MemberCount} -> UnsignedInteger;
-         }
-         && sizeof(T) == sizeof(TypeOf<T>) * Decay<T>::MemberCount
-         && Decay<T>::MemberCount > 1;
-
-      template<class T>
-      concept Scalar = DenseNumber<T> 
-         || (Typed<T> && DenseNumber<TypeOf<T>> && requires {
-               {Decay<T>::MemberCount} -> UnsignedInteger;
-            }
-            && sizeof(T) == sizeof(TypeOf<T>)
-            && Decay<T>::MemberCount == 1)
-         || (CT::Number<T> && CT::Array<T> && ExtentOf<T> == 1);
-
-   } // namespace Langulus::CT::Inner
-
-
-   /// Vector concept                                                         
-   /// Any dense type that is LANGULUS(TYPED) as a dense number,              
-   /// has MemberCount that is at least 2, and T's size is exactly the same   
-   /// as sizeof(CTTI_InnerType) * MemberCount                                
-   template<class... T>
-   concept Vector = (Inner::Vector<T> && ...);
-
-   /// Scalar concept                                                         
-   /// Any dense type that is LANGULUS(TYPED) as a dense number,              
-   /// has MemberCount of exactly 1, and its size is exactly the same         
-   /// as sizeof(CTTI_InnerType)                                              
-   /// Alternatively, a bounded array of extent 1 is also considered scalar   
-   template<class... T>
-   concept Scalar = (Inner::Scalar<T> && ...);
-
-   /// Scalar-or-vector concept                                               
-   template<class... T>
-   concept ScalarOrVector = ((Vector<T> || Scalar<T>) && ...);
-
    /// Concept for 128bit SIMD registers                                      
    template<class... T>
    concept SIMD128 = (SameAsOneOf<T, simde__m128, simde__m128d, simde__m128i> && ...);
@@ -235,9 +190,6 @@ namespace Langulus::CT
    /// Concept for SIMD registers                                             
    template<class... T>
    concept TSIMD = ((SIMD128<T> || SIMD256<T> || SIMD512<T>) && ...);
-
-   template<class... T>
-   concept NotSupported = (Same<T, Inner::NotSupported> && ...);
 
    /// Byte concept                                                           
    template<class... T>
@@ -297,6 +249,8 @@ namespace Langulus::CT
 
 namespace Langulus::SIMD
 {
+
+   using ::Langulus::Inner::Unsupported;
 
    /// Got these from:                                                        
    /// https://stackoverflow.com/questions/41144668                           
@@ -760,3 +714,6 @@ namespace Langulus::SIMD
 } // namespace Langulus::SIMD
 
 #include "IgnoreWarningsPop.inl"
+
+/// Make the rest of the code aware, that Langulus::SIMD has been included    
+#define LANGULUS_LIBRARY_SIMD() 1

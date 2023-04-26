@@ -14,8 +14,8 @@ namespace Langulus::SIMD
 {
 
    template<class, Count>
-   LANGULUS(INLINED) constexpr auto PowerInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
-      return CT::Inner::NotSupported{};
+   LANGULUS(INLINED) constexpr auto PowerInner(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      return Unsupported{};
    }
 
    /// Raise by a power using SIMD                                            
@@ -57,7 +57,7 @@ namespace Langulus::SIMD
                return result;
             }
             else if constexpr (CT::IntegerX<T>)
-               return CT::Inner::NotSupported {};
+               return Unsupported {};
             else
                LANGULUS_ERROR("Unsupported type for SIMD::PowerInner of 16-byte package");
          }
@@ -93,7 +93,7 @@ namespace Langulus::SIMD
                return result;
             }
             else if constexpr (CT::IntegerX<T>)
-               return CT::Inner::NotSupported {};
+               return Unsupported {};
             else
                LANGULUS_ERROR("Unsupported type for SIMD::PowerInner of 32-byte package");
          }
@@ -111,7 +111,7 @@ namespace Langulus::SIMD
                //https://stackoverflow.com/questions/42964882/test-if-a-big-integer-is-a-power-of-two
             }
             else if constexpr (CT::IntegerX<T>)
-               return CT::Inner::NotSupported {};
+               return Unsupported {};
             else
                LANGULUS_ERROR("Unsupported type for SIMD::PowerInner of 64-byte package");
          }

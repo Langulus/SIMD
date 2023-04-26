@@ -14,8 +14,8 @@ namespace Langulus::SIMD
 {
 
    template<class, Count>
-   LANGULUS(INLINED) constexpr auto MultiplyInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
-      return CT::Inner::NotSupported{};
+   LANGULUS(INLINED) constexpr auto MultiplyInner(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      return Unsupported{};
    }
 
    /// Multiply two arrays using SIMD                                         
@@ -48,7 +48,7 @@ namespace Langulus::SIMD
                #if LANGULUS_SIMD(AVX512)
                   return _mm_mullo_epi64(lhs, rhs);
                #else
-                  return CT::Inner::NotSupported{};
+                  return Unsupported{};
                #endif
             }
             else if constexpr (CT::Float<T>)
@@ -80,7 +80,7 @@ namespace Langulus::SIMD
                #if LANGULUS_SIMD(AVX512)
                   return _mm256_mullo_epi64(lhs, rhs);
                #else
-                  return CT::Inner::NotSupported{};
+                  return Unsupported{};
                #endif
             }
             else if constexpr (CT::Float<T>)
@@ -117,7 +117,7 @@ namespace Langulus::SIMD
                #if LANGULUS_SIMD(AVX512)
                   return _mm512_mullo_epi64(lhs, rhs);
                #else
-                  return CT::Inner::NotSupported{};
+                  return Unsupported{};
                #endif
             }
             else if constexpr (CT::Float<T>)

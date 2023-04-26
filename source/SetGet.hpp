@@ -149,7 +149,7 @@ namespace Langulus::SIMD
          // No point in storing a single value in a large register      
          // If this is reached, then the library did not choose the     
          // optimal route for your operation at compile time            
-         return CT::Inner::NotSupported {};
+         return Unsupported {};
       }
       else {
          constexpr auto MaxS = CHUNK / sizeof(Decay<T>);

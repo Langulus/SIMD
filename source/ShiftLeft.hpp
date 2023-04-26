@@ -13,8 +13,8 @@ namespace Langulus::SIMD
 {
    
    template<class, Count>
-   LANGULUS(INLINED) constexpr auto ShiftLeftInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
-      return CT::Inner::NotSupported{};
+   LANGULUS(INLINED) constexpr auto ShiftLeftInner(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      return Unsupported{};
    }
 
    /// Shift two arrays left using SIMD (shifting in zeroes)                  
@@ -69,7 +69,7 @@ namespace Langulus::SIMD
 
                   return lgls_pack_epi16(lhs1, lhs2);
                #else
-                  return CT::Inner::NotSupported{}; //TODO
+                  return Unsupported{}; //TODO
                #endif
             }
             else if constexpr (CT::Integer16<T>) {
@@ -88,21 +88,21 @@ namespace Langulus::SIMD
                   lhs32_2 = simde_mm_sllv_epi32(lhs32_2, rhs32_2);
                   return lgls_pack_epi32(lhs32_1, lhs32_2);
                #else
-                  return CT::Inner::NotSupported{}; //TODO
+                  return Unsupported{}; //TODO
                #endif
             }
             else if constexpr (CT::Integer32<T>) {
                #if LANGULUS_SIMD(256BIT)
                   return simde_mm_sllv_epi32(lhs, rhs);
                #else
-                  return CT::Inner::NotSupported {}; //TODO
+                  return Unsupported {}; //TODO
                #endif
             }
             else if constexpr (CT::Integer64<T>) {
                #if LANGULUS_SIMD(256BIT)
                   return simde_mm_sllv_epi64(lhs, rhs);
                #else
-                  return CT::Inner::NotSupported {}; //TODO
+                  return Unsupported {}; //TODO
                #endif
             }
             else LANGULUS_ERROR("Unsupported type for SIMD::ShiftLeftInner of 16-byte package");

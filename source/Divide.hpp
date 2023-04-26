@@ -14,8 +14,8 @@ namespace Langulus::SIMD
 {
 
    template<class, Count>
-   LANGULUS(INLINED) constexpr auto DivideInner(CT::NotSupported auto, CT::NotSupported auto) noexcept {
-      return CT::Inner::NotSupported{};
+   LANGULUS(INLINED) constexpr auto DivideInner(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      return Unsupported{};
    }
 
    /// Divide two arrays using SIMD                                           

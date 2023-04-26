@@ -14,8 +14,8 @@ namespace Langulus::SIMD
 {
       
    template<class T, Count S>
-   LANGULUS(INLINED) constexpr auto XOrInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
-      return CT::Inner::NotSupported{};
+   LANGULUS(INLINED) constexpr auto XOrInner(const Unsupported&, const Unsupported&) noexcept {
+      return Unsupported{};
    }
 
    /// XOr two arrays left using SIMD (shifting in zeroes)                    

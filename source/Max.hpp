@@ -14,8 +14,8 @@ namespace Langulus::SIMD
 {
       
    template<class T, Count S>
-   LANGULUS(INLINED) constexpr auto MaxInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
-      return CT::Inner::NotSupported{};
+   LANGULUS(INLINED) constexpr auto MaxInner(const Unsupported&, const Unsupported&) noexcept {
+      return Unsupported{};
    }
 
    /// Select the bigger values via SIMD                                      
@@ -44,14 +44,14 @@ namespace Langulus::SIMD
             #if LANGULUS_SIMD(AVX512)
                return _mm_max_epi64(lhs, rhs);
             #else
-               return CT::Inner::NotSupported{};
+               return Unsupported{};
             #endif
          }
          else if constexpr (CT::UnsignedInteger64<T>) {
             #if LANGULUS_SIMD(AVX512)
                return simde_mm_max_epu64(lhs, rhs);
             #else
-               return CT::Inner::NotSupported{};
+               return Unsupported{};
             #endif
          }
          else if constexpr (CT::Float<T>)
@@ -77,14 +77,14 @@ namespace Langulus::SIMD
             #if LANGULUS_SIMD(AVX512)
                return _mm_max_epi64(lhs, rhs);
             #else
-               return CT::Inner::NotSupported{};
+               return Unsupported{};
             #endif
          }
          else if constexpr (CT::UnsignedInteger64<T>) {
             #if LANGULUS_SIMD(AVX512)
                return _mm_max_epu64(lhs, rhs);
             #else
-               return CT::Inner::NotSupported{};
+               return Unsupported{};
             #endif
          }
          else if constexpr (CT::Float<T>)
