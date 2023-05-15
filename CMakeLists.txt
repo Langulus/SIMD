@@ -1,47 +1,53 @@
-cmake_minimum_required(VERSION 3.22)
-project(Langulus.SIMD)
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+cmake_minimum_required(VERSION 3.24)
+project(LangulusSIMD)
 
 # Check if this project is built as standalone, or a part of something else 
-if(PROJECT_IS_TOP_LEVEL)
+if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
+    # Populate the cmake directory											
     include(LangulusUtilities.cmake)
-    langulus_init_git_submodule(cmake)
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-    include(FetchLangulusModule)
-    include(HandleLangulusFeatures)
+    langulus_fetch_cmake()
 
+    # Handle feature flags and global definitions/requirements				
+    include(HandleLangulusFeatures)
     handle_langulus_features()
 
+    # Add Langulus::Core/Logger/RTTI libraries                              
+    include(FetchLangulusModule)
     fetch_langulus_module(Core)
     fetch_langulus_module(Logger)
     fetch_langulus_module(RTTI)
-
-    add_compile_definitions(LANGULUS_ENABLE_TESTING)
-    enable_testing()
-	add_subdirectory(test)
 endif()
 
 # Configure SIMDe library                                                   
-download_project(
-	PROJ                SIMDe
-	GIT_REPOSITORY      https://github.com/simd-everywhere/simde.git
-	GIT_TAG             master
-	UPDATE_DISCONNECTED 1
+fetch_external_module(
+    SIMDe
+    GIT_REPOSITORY  https://github.com/simd-everywhere/simde.git
+    GIT_TAG         fefc785 # master branch
 )
 
 # Build and install SIMD library                                            
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source LANGULUS_SIMD_SOURCES)
-add_library(Langulus.SIMD INTERFACE)
+add_library(LangulusSIMD ${LANGULUS_LIBRARY_TYPE}
+    $<TARGET_OBJECTS:LangulusLogger>
+    $<TARGET_OBJECTS:LangulusRTTI>
+)
 
-target_include_directories(Langulus.SIMD
-	INTERFACE   include
+target_include_directories(LangulusSIMD
+	PUBLIC      include
+                $<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>
+                $<TARGET_PROPERTY:LangulusRTTI,INTERFACE_INCLUDE_DIRECTORIES>
                 ${SIMDe_SOURCE_DIR}
 )
 
-target_link_libraries(Langulus.SIMD
-    INTERFACE   Langulus.Core
-                Langulus.Logger
-                Langulus.RTTI
+target_link_libraries(LangulusSIMD
+    PUBLIC      LangulusCore
+                fmt
 )
+
+target_compile_definitions(LangulusSIMD
+    PRIVATE     LANGULUS_EXPORT_ALL
+)
+
+if(LANGULUS_ENABLE_TESTING)
+	add_subdirectory(test)
+    langulus_copy_dlls(LangulusSIMDTest ON LangulusSIMD)
+endif()

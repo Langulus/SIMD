@@ -333,6 +333,7 @@ namespace Langulus::SIMD
       return simde_mm_shuffle_epi32(what, imm8);
    }
 
+#if LANGULUS_SIMD(256BIT)
    LANGULUS(INLINED) simde__m256 _mm_halfflip(const simde__m256& what) noexcept {
       return simde_mm256_permute2f128_ps(what, what, 0x20);   // AVX
    }
@@ -344,6 +345,7 @@ namespace Langulus::SIMD
    LANGULUS(INLINED) simde__m256i _mm_halfflip(const simde__m256i& what) noexcept {
       return simde_mm256_permute2x128_si256(what, what, 1);   // AVX2
    }
+#endif
 
    /*inline simde__m512 _mm_halfflip(const simde__m512& what) noexcept {
       return _mm512_shuffle_f32x4(what, what, _MM_SHUFFLE(2, 3, 0, 1));   // AVX512F
@@ -446,6 +448,7 @@ namespace Langulus::SIMD
       ));
    }
 
+#if LANGULUS_SIMD(256BIT)
    LANGULUS(INLINED) simde__m256i lgls_blendv_epi32(const simde__m256i& a, const simde__m256i& b, const simde__m256i& mask) {
       return simde_mm256_castps_si256(simde_mm256_blendv_ps(
          simde_mm256_castsi256_ps(a),
@@ -453,6 +456,7 @@ namespace Langulus::SIMD
          simde_mm256_castsi256_ps(mask)
       ));
    }
+#endif
 
    /// Pack 16bit integers (signed or not) to 8bit integers with truncation   
    ///   @param low - lower eight 16bit integers                              
@@ -481,6 +485,7 @@ namespace Langulus::SIMD
       #endif
    }
 
+#if LANGULUS_SIMD(256BIT)
    /// Pack 16bit integers (signed or not) to 8bit integers with truncation   
    ///   @param low - lower sixteen 16bit integers                            
    ///   @param high - higher sixteen 16bit integers                          
@@ -514,7 +519,8 @@ namespace Langulus::SIMD
          return simde_mm256_inserti128_si256(C, C2, 1);
       #endif
    }
-   
+#endif
+
    /*inline simde__m512i lgls_blendv_epi32(const simde__m512i& a, const simde__m512i& b, const simde__m512i& mask) {
       use _mm512_mask_blend_ instead
       return simde_mm512_castps_si512(simde_mm512_blendv_ps(
@@ -549,6 +555,7 @@ namespace Langulus::SIMD
       #endif
    }
 
+#if LANGULUS_SIMD(256BIT)
    /// Pack 32bit integers (signed or not) to 16bit integers with truncation  
    ///   @param low - lower eight 32bit integers                              
    ///   @param high - higher eight 32bit integers                            
@@ -582,7 +589,8 @@ namespace Langulus::SIMD
          return simde_mm256_inserti128_si256(C, C2, 1);
       #endif
    }
-   
+#endif
+
    /*inline simde__m512i lgls_pack_epi32(const simde__m512i& a, const simde__m512i& b, const simde__m512i& mask) {
       use _mm512_mask_blend_ instead
       return simde_mm512_castps_si512(simde_mm512_blendv_ps(

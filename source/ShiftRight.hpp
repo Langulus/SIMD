@@ -37,18 +37,23 @@ namespace Langulus::SIMD
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::Integer8<T>) {
-               const auto zero = simde_mm_setzero_si128();
-               auto lhs1 = simde_mm_unpacklo_epi8(lhs, zero);
-               auto rhs1 = simde_mm_unpacklo_epi8(rhs, zero);
-               auto lhs2 = simde_mm_unpackhi_epi8(lhs, zero);
-               auto rhs2 = simde_mm_unpackhi_epi8(rhs, zero);
                #if LANGULUS_SIMD(512BIT)
                   // Optimal                                            
+                  const auto zero = simde_mm_setzero_si128();
+                  auto lhs1 = simde_mm_unpacklo_epi8(lhs, zero);
+                  auto rhs1 = simde_mm_unpacklo_epi8(rhs, zero);
+                  auto lhs2 = simde_mm_unpackhi_epi8(lhs, zero);
+                  auto rhs2 = simde_mm_unpackhi_epi8(rhs, zero);
                   lhs1 = simde_mm_srlv_epi16(lhs1, rhs1);
                   lhs2 = simde_mm_srlv_epi16(lhs2, rhs2);
                   return lgls_pack_epi16(lhs1, lhs2);
                #elif LANGULUS_SIMD(256BIT)
                   // Not optimal, must be unpacked once more for AVX2   
+                  const auto zero = simde_mm_setzero_si128();
+                  auto lhs1 = simde_mm_unpacklo_epi8(lhs, zero);
+                  auto rhs1 = simde_mm_unpacklo_epi8(rhs, zero);
+                  auto lhs2 = simde_mm_unpackhi_epi8(lhs, zero);
+                  auto rhs2 = simde_mm_unpackhi_epi8(rhs, zero);
                   auto lhs32_1 = simde_mm_unpacklo_epi16(lhs1, zero);
                   auto rhs32_1 = simde_mm_unpacklo_epi16(rhs1, zero);
                   auto lhs32_2 = simde_mm_unpackhi_epi16(lhs1, zero);
@@ -69,6 +74,8 @@ namespace Langulus::SIMD
 
                   return lgls_pack_epi16(lhs1, lhs2);
                #else
+                  (void)lhs;
+                  (void)rhs;
                   return Unsupported{}; //TODO
                #endif
             }
@@ -88,6 +95,8 @@ namespace Langulus::SIMD
                   lhs32_2 = simde_mm_srlv_epi32(lhs32_2, rhs32_2);
                   return lgls_pack_epi32(lhs32_1, lhs32_2);
                #else
+                  (void)lhs;
+                  (void)rhs;
                   return Unsupported{}; //TODO
                #endif
             }
@@ -95,6 +104,8 @@ namespace Langulus::SIMD
                #if LANGULUS_SIMD(256BIT)
                   return simde_mm_srlv_epi32(lhs, rhs);
                #else
+                  (void)lhs;
+                  (void)rhs;
                   return Unsupported {}; //TODO
                #endif
             }
@@ -102,6 +113,8 @@ namespace Langulus::SIMD
                #if LANGULUS_SIMD(256BIT)
                   return simde_mm_srlv_epi64(lhs, rhs);
                #else
+                  (void)lhs;
+                  (void)rhs;
                   return Unsupported {}; //TODO
                #endif
             }
