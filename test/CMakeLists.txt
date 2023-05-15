@@ -1,4 +1,4 @@
-project(Langulus::SIMD::Test)
+project(LangulusSIMDTest)
 
 add_executable(LangulusSIMDTest
 	Main.cpp
@@ -18,7 +18,7 @@ target_link_libraries(LangulusSIMDTest
 )
 
 add_test(
-	NAME		Langulus::SIMD::Test
+	NAME		LangulusSIMDTest
 	COMMAND		LangulusSIMDTest
 )
 
