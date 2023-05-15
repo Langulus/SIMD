@@ -48,6 +48,6 @@ target_compile_definitions(LangulusSIMD
 )
 
 if(LANGULUS_ENABLE_TESTING)
+    enable_testing()
 	add_subdirectory(test)
-    langulus_copy_dlls(LangulusSIMDTest ON LangulusSIMD)
 endif()
