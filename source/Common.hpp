@@ -30,6 +30,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 
 #define LANGULUS_SIMD(a) LANGULUS_SIMD_##a()
 
+
 ///                                                                           
 ///   Detect available SIMD                                                   
 ///                                                                           
@@ -360,31 +361,28 @@ namespace Langulus::SIMD
    }*/
 
    ///                                                                        
-   LANGULUS(INLINED) uint8_t _mm_hmax_epu8(const simde__m128i v) noexcept {
+   LANGULUS(INLINED) int _mm_hmax_epu8(const simde__m128i v) noexcept {
       simde__m128i vmax = v;
       vmax = simde_mm_max_epu8(vmax, simde_mm_alignr_epi8(vmax, vmax, 1)); // SSSE3 + SSE2
       vmax = simde_mm_max_epu8(vmax, simde_mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
       vmax = simde_mm_max_epu8(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
       vmax = simde_mm_max_epu8(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      const auto result = simde_mm_extract_epi8(vmax, 0); // SSE4.1
-      return reinterpret_cast<const uint8_t&>(result);
+      return simde_mm_extract_epi8(vmax, 0); // SSE4.1
    }
 
-   LANGULUS(INLINED) uint16_t _mm_hmax_epu16(const simde__m128i v) noexcept {
+   LANGULUS(INLINED) int _mm_hmax_epu16(const simde__m128i v) noexcept {
       simde__m128i vmax = v;
       vmax = simde_mm_max_epu16(vmax, simde_mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
       vmax = simde_mm_max_epu16(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
       vmax = simde_mm_max_epu16(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      const auto result = simde_mm_extract_epi16(vmax, 0); // SSE2
-      return reinterpret_cast<const uint16_t&>(result);
+      return simde_mm_extract_epi16(vmax, 0); // SSE2
    }
 
-   LANGULUS(INLINED) uint32_t _mm_hmax_epu32(const simde__m128i v) noexcept {
+   LANGULUS(INLINED) int _mm_hmax_epu32(const simde__m128i v) noexcept {
       simde__m128i vmax = v;
       vmax = simde_mm_max_epu32(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
       vmax = simde_mm_max_epu32(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      const auto result = simde_mm_extract_epi32(vmax, 0); // SSE4.1
-      return reinterpret_cast<const uint32_t&>(result);
+      return simde_mm_extract_epi32(vmax, 0); // SSE4.1
    }
 
    /*inline uint64_t _mm_hmax_epu64(const simde__m128i v) noexcept {
@@ -400,26 +398,24 @@ namespace Langulus::SIMD
       #endif
    }*/
 
-   LANGULUS(INLINED) int8_t _mm_hmax_epi8(const simde__m128i v) noexcept {
+   LANGULUS(INLINED) int _mm_hmax_epi8(const simde__m128i v) noexcept {
       simde__m128i vmax = v;
       vmax = simde_mm_max_epi8(vmax, simde_mm_alignr_epi8(vmax, vmax, 1)); // SSSE3 + SSE2
       vmax = simde_mm_max_epi8(vmax, simde_mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
       vmax = simde_mm_max_epi8(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
       vmax = simde_mm_max_epi8(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      const auto result = simde_mm_extract_epi8(vmax, 0); // SSE4.1
-      return reinterpret_cast<const int8_t&>(result);
+      return simde_mm_extract_epi8(vmax, 0); // SSE4.1
    }
 
-   LANGULUS(INLINED) int16_t _mm_hmax_epi16(const simde__m128i v) noexcept {
+   LANGULUS(INLINED) int _mm_hmax_epi16(const simde__m128i v) noexcept {
       simde__m128i vmax = v;
       vmax = simde_mm_max_epi16(vmax, simde_mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
       vmax = simde_mm_max_epi16(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
       vmax = simde_mm_max_epi16(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      const auto result = simde_mm_extract_epi16(vmax, 0); // SSE2
-      return reinterpret_cast<const int16_t&>(result);
+      return simde_mm_extract_epi16(vmax, 0); // SSE2
    }
 
-   LANGULUS(INLINED) int32_t _mm_hmax_epi32(const simde__m128i v) noexcept {
+   LANGULUS(INLINED) int _mm_hmax_epi32(const simde__m128i v) noexcept {
       simde__m128i vmax = v;
       vmax = simde_mm_max_epi32(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
       vmax = simde_mm_max_epi32(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
