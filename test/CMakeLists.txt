@@ -1,5 +1,3 @@
-project(LangulusSIMDTest)
-
 add_executable(LangulusSIMDTest
 	Main.cpp
 	TestAdd.cpp

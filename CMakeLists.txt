@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.24)
-project(LangulusSIMD)
+project(LangulusSIMD
+    VERSION         1.0.0
+    DESCRIPTION     "Langulus SIMD templates layer based on SIMDe library"
+    HOMEPAGE_URL    https://langulus.com
+    LANGUAGES       CXX
+)
 
 # Check if this project is built as standalone, or a part of something else 
 if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
