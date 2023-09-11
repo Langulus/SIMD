@@ -1,6 +1,7 @@
 ///                                                                           
 /// Langulus::SIMD                                                            
-/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>                    
+/// Copyright (c) 2019 Dimo Markov <team@langulus.com>                        
+/// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         

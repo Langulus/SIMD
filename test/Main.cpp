@@ -1,10 +1,11 @@
-///																									
-/// Langulus::SIMD																				
-/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
-///																									
-/// Distributed under GNU General Public License v3+									
-/// See LICENSE file, or https://www.gnu.org/licenses									
-///																									
+///                                                                           
+/// Langulus::SIMD                                                            
+/// Copyright (c) 2019 Dimo Markov <team@langulus.com>                        
+/// Part of the Langulus framework, see https://langulus.com                  
+///                                                                           
+/// Distributed under GNU General Public License v3+                          
+/// See LICENSE file, or https://www.gnu.org/licenses                         
+///                                                                           
 #include "Main.hpp"
 
 #define CATCH_CONFIG_RUNNER
@@ -13,6 +14,6 @@
 LANGULUS_RTTI_BOUNDARY("Test")
 
 int main(int argc, char* argv[]) {
-	Catch::Session session;
-	return session.run(argc, argv);
+   Catch::Session session;
+   return session.run(argc, argv);
 }

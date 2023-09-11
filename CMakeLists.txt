@@ -7,16 +7,9 @@ project(LangulusSIMD
 
 # Check if this project is built as standalone, or a part of something else 
 if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
-    # Populate the cmake directory											
     include(LangulusUtilities.cmake)
-    langulus_fetch_cmake()
-
-    # Handle feature flags and global definitions/requirements				
-    include(HandleLangulusFeatures)
-    handle_langulus_features()
 
     # Add Langulus::Core/Logger/RTTI libraries                              
-    include(FetchLangulusModule)
     fetch_langulus_module(Core)
     fetch_langulus_module(Logger)
     fetch_langulus_module(RTTI)
@@ -26,7 +19,7 @@ endif()
 fetch_external_module(
     SIMDe
     GIT_REPOSITORY  https://github.com/simd-everywhere/simde.git
-    GIT_TAG         fefc785 # master branch
+    GIT_TAG         4d55fc2 # master branch
 )
 
 # Build and install SIMD library                                            
@@ -51,7 +44,7 @@ target_compile_definitions(LangulusSIMD
     PRIVATE     LANGULUS_EXPORT_ALL
 )
 
-if(LANGULUS_ENABLE_TESTING)
+if(LANGULUS_TESTING)
     enable_testing()
 	add_subdirectory(test)
 endif()
