@@ -11,6 +11,7 @@
 #include "IgnoreWarningsPush.inl"
 #include <ranges>
 
+
 namespace Langulus::SIMD
 {
 
@@ -22,7 +23,8 @@ namespace Langulus::SIMD
    ///   @param from - the source register                                    
    ///   @param to - the destination array                                    
    template<CT::TSIMD FROM, bool ALIGNED = false, class T, Count S>
-   LANGULUS(INLINED) void Store(const FROM& from, T(&to)[S]) noexcept {
+   LANGULUS(INLINED)
+   void Store(const FROM& from, T(&to)[S]) noexcept {
       static_assert(S > 1, "Storing less than two elements is suboptimal "
          "- avoid SIMD operations on such arrays as a whole");
       constexpr Size toSize = sizeof(Decay<T>) * S;
@@ -32,7 +34,7 @@ namespace Langulus::SIMD
       // __m128*                                                        
       //                                                                
       if constexpr (CT::Same<FROM, simde__m128>) {
-         if constexpr (CT::Dense<T> && toSize == 16) {
+         if constexpr (CT::Dense<T> and toSize == 16) {
             // Save to a dense array                                    
             if constexpr (ALIGNED)
                simde_mm_store_ps(to, from);
@@ -55,7 +57,7 @@ namespace Langulus::SIMD
          }
       }
       else if constexpr (CT::Same<FROM, simde__m128d>) {
-         if constexpr (CT::Dense<T> && toSize == 16) {
+         if constexpr (CT::Dense<T> and toSize == 16) {
             // Save to a dense array                                    
             if constexpr (ALIGNED)
                simde_mm_store_pd(to, from);
@@ -70,7 +72,7 @@ namespace Langulus::SIMD
          }
       }
       else if constexpr (CT::Same<FROM, simde__m128i>) {
-         if constexpr (CT::Dense<T> && toSize == 16) {
+         if constexpr (CT::Dense<T> and toSize == 16) {
             // Save to a dense array                                    
             if constexpr (ALIGNED)
                simde_mm_store_si128(to, from);
@@ -100,7 +102,7 @@ namespace Langulus::SIMD
       // __m256*                                                        
       //                                                                
       if constexpr (CT::Same<FROM, simde__m256>) {
-         if constexpr (CT::Dense<T> && toSize == 32) {
+         if constexpr (CT::Dense<T> and toSize == 32) {
             // Save to a dense array                                    
             if constexpr (ALIGNED)
                simde_mm256_store_ps(to, from);
@@ -123,7 +125,7 @@ namespace Langulus::SIMD
          }
       }
       else if constexpr (CT::Same<FROM, simde__m256d>) {
-         if constexpr (CT::Dense<T> && toSize == 32) {
+         if constexpr (CT::Dense<T> and toSize == 32) {
             // Save to a dense array                                    
             if constexpr (ALIGNED)
                simde_mm256_store_pd(to, from);
@@ -146,7 +148,7 @@ namespace Langulus::SIMD
          }
       }
       else if constexpr (CT::Same<FROM, simde__m256i>) {
-         if constexpr (CT::Dense<T> && toSize == 32) {
+         if constexpr (CT::Dense<T> and toSize == 32) {
             // Save to a dense array                                    
             if constexpr (ALIGNED)
                simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(to), from);
@@ -176,7 +178,7 @@ namespace Langulus::SIMD
       // __m512*                                                        
       //                                                                
       if constexpr (CT::Same<FROM, simde__m512>) {
-         if constexpr (CT::Dense<T> && toSize == 64) {
+         if constexpr (CT::Dense<T> and toSize == 64) {
             // Save to a dense array                                    
             if constexpr (ALIGNED)
                simde_mm512_store_ps(to, from);
@@ -199,7 +201,7 @@ namespace Langulus::SIMD
          }
       }
       else if constexpr (CT::Same<FROM, simde__m512d>) {
-         if constexpr (CT::Dense<T> && toSize == 64) {
+         if constexpr (CT::Dense<T> and toSize == 64) {
             // Save to a dense array                                    
             if constexpr (ALIGNED)
                simde_mm512_store_pd(to, from);
@@ -222,7 +224,7 @@ namespace Langulus::SIMD
          }
       }
       else if constexpr (CT::Same<FROM, simde__m512i>) {
-         if constexpr (CT::Dense<T> && toSize == 64) {
+         if constexpr (CT::Dense<T> and toSize == 64) {
             // Save to a dense array                                    
             if constexpr (ALIGNED)
                simde_mm512_store_si512(to, from);
@@ -256,7 +258,8 @@ namespace Langulus::SIMD
    ///   @param from - what to store                                          
    ///   @param to - where to store it                                        
    template<class FROM, class TO>
-   LANGULUS(INLINED) void GeneralStore(const FROM& from, TO& to) noexcept {
+   LANGULUS(INLINED)
+   void GeneralStore(const FROM& from, TO& to) noexcept {
       if constexpr (CT::TSIMD<FROM>) {
          // Extract from SIMD register (produced from SIMD routine)     
          Store(from, to);
@@ -267,7 +270,7 @@ namespace Langulus::SIMD
             // Store in another bitmask                                 
             DenseCast(to) = from;
          }
-         else if constexpr (CT::Bool<TO> && CT::Array<TO>) {
+         else if constexpr (CT::Bool<TO> and CT::Array<TO>) {
             if constexpr (ExtentOf<TO> == 1) {
                // Do logic-and on all bits, and write the one bool      
                DenseCast(to[0]) = static_cast<bool>(from);
@@ -292,7 +295,7 @@ namespace Langulus::SIMD
             for (decltype(from.size()) i = 0; i < from.size(); ++i)
                DenseCast(to) |= (static_cast<T>(from[i]) << static_cast<T>(i));
          }
-         else if constexpr (!CT::Array<TO>) {
+         else if constexpr (not CT::Array<TO>) {
             // Store as a single number (produced from fallback)        
             if constexpr (CT::Bool<TO>) {
                // A boolean FROM will be collapsed                      
@@ -327,7 +330,7 @@ namespace Langulus::SIMD
       }
       else {
          // Extract from a scalar                                       
-         if constexpr (!CT::Array<TO>) {
+         if constexpr (not CT::Array<TO>) {
             // Store as a single number (produced from fallback)        
             DenseCast(to) = from;
          }

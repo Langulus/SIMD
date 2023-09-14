@@ -9,6 +9,7 @@
 #pragma once
 #include "Load.hpp"
 
+
 namespace Langulus::SIMD
 {
 
@@ -20,7 +21,8 @@ namespace Langulus::SIMD
    ///   @param v - the input data                                            
    ///   @return the resulting register                                       
    template<class TT, Count S, class FT, class TO>
-   LANGULUS(INLINED) auto ConvertFrom128(const simde__m128& v) noexcept {
+   LANGULUS(INLINED)
+   auto ConvertFrom128(const simde__m128& v) noexcept {
       //                                                                
       // Converting FROM float[4]                                       
       //                                                                
@@ -116,7 +118,8 @@ namespace Langulus::SIMD
    ///   @param v - the input data                                            
    ///   @return the resulting register                                       
    template<class TT, Count S, class FT, class TO>
-   LANGULUS(INLINED) auto ConvertFrom128d(const simde__m128d& v) noexcept {
+   LANGULUS(INLINED)
+   auto ConvertFrom128d(const simde__m128d& v) noexcept {
       //                                                                
       // Converting FROM double[2]                                      
       //                                                                
@@ -187,7 +190,8 @@ namespace Langulus::SIMD
    ///   @param v - the input data                                            
    ///   @return the resulting register                                       
    template<class TT, Count S, class FT, class TO>
-   LANGULUS(INLINED) auto ConvertFrom128i(const simde__m128i& v) noexcept {
+   LANGULUS(INLINED)
+   auto ConvertFrom128i(const simde__m128i& v) noexcept {
       //                                                                
       // Converting FROM i/u8[16], i/u16[8], i/u32[4], i/u64[2]         
       //                                                                

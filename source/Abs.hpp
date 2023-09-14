@@ -10,83 +10,95 @@
 #include "Fill.hpp"
 #include "Convert.hpp"
 
+
 namespace Langulus::SIMD
 {
-      
-   /// Get absolute values via SIMD                                           
-   ///   @tparam T - the type of the array element                            
-   ///   @tparam S - the size of the array                                    
-   ///   @tparam REGISTER - the register type (deducible)                     
-   ///   @param v - the array                                                 
-   ///   @return the absolute values                                          
-   template<class T, Count S, CT::TSIMD REGISTER>
-   LANGULUS(INLINED) auto InnerAbs(const REGISTER& v) noexcept {
-      static_assert(CT::Signed<T>, 
-         "SIMD::InnerAbs is suboptimal and pointless for unsigned values, avoid calling it on such");
+   namespace Inner
+   {
 
-      #if LANGULUS_SIMD(128BIT)
-         if constexpr (CT::SIMD128<REGISTER>) {
-            if constexpr (CT::SignedInteger8<T>)
-               return simde_mm_abs_epi8(v);
-            else if constexpr (CT::SignedInteger16<T>)
-               return simde_mm_abs_epi16(v);
-            else if constexpr (CT::SignedInteger32<T>)
-               return simde_mm_abs_epi32(v);
-            else if constexpr (CT::SignedInteger64<T>)
-               return simde_mm_abs_epi64(v);
-            else if constexpr (CT::Float<T>)
-               return simde_mm_andnot_ps(simde_mm_set1_ps(-0.0F), v);
-            else if constexpr (CT::Double<T>)
-               return simde_mm_andnot_pd(simde_mm_set1_pd(-0.0F), v);
-            else LANGULUS_ERROR("Unsupported type for SIMD::InnerAbs of 16-byte package");
-         }
-         else
-      #endif
+      /// Get absolute values via SIMD                                        
+      ///   @tparam T - the type of the array element                         
+      ///   @tparam S - the size of the array                                 
+      ///   @tparam REGISTER - the register type (deducible)                  
+      ///   @param v - the array                                              
+      ///   @return the absolute values                                       
+      template<class T, Count S, CT::TSIMD REGISTER>
+      LANGULUS(INLINED)
+      auto Abs(const REGISTER& v) noexcept {
+         static_assert(CT::Signed<T>, "Suboptimal and pointless for unsigned values");
 
-      #if LANGULUS_SIMD(256BIT)
-         if constexpr (CT::SIMD256<REGISTER>) {
-            if constexpr (CT::SignedInteger8<T>)
-               return simde_mm256_abs_epi8(v);
-            else if constexpr (CT::SignedInteger16<T>)
-               return simde_mm256_abs_epi16(v);
-            else if constexpr (CT::SignedInteger32<T>)
-               return simde_mm256_abs_epi32(v);
-            else if constexpr (CT::SignedInteger64<T>)
-               return simde_mm256_abs_epi64(v);
-            else if constexpr (CT::Float<T>)
-               return simde_mm256_andnot_ps(simde_mm256_set1_ps(-0.0F), v);
-            else if constexpr (CT::Double<T>)
-               return simde_mm256_andnot_pd(simde_mm256_set1_pd(-0.0F), v);
-            else LANGULUS_ERROR("Unsupported type for SIMD::InnerAbs of 32-byte package");
-         }
-         else
-      #endif
+         #if LANGULUS_SIMD(128BIT)
+            if constexpr (CT::SIMD128<REGISTER>) {
+               if constexpr (CT::SignedInteger8<T>)
+                  return simde_mm_abs_epi8(v);
+               else if constexpr (CT::SignedInteger16<T>)
+                  return simde_mm_abs_epi16(v);
+               else if constexpr (CT::SignedInteger32<T>)
+                  return simde_mm_abs_epi32(v);
+               else if constexpr (CT::SignedInteger64<T>)
+                  return simde_mm_abs_epi64(v);
+               else if constexpr (CT::Float<T>)
+                  return simde_mm_andnot_ps(simde_mm_set1_ps(-0.0F), v);
+               else if constexpr (CT::Double<T>)
+                  return simde_mm_andnot_pd(simde_mm_set1_pd(-0.0F), v);
+               else LANGULUS_ERROR("Unsupported type for 16-byte package");
+            }
+            else
+         #endif
 
-      #if LANGULUS_SIMD(512BIT)
-         if constexpr (CT::SIMD512<REGISTER>) {
-            if constexpr (CT::SignedInteger8<T>)
-               return simde_mm512_abs_epi8(v);
-            else if constexpr (CT::SignedInteger16<T>)
-               return simde_mm512_abs_epi16(v);
-            else if constexpr (CT::SignedInteger32<T>)
-               return simde_mm512_abs_epi32(v);
-            else if constexpr (CT::SignedInteger64<T>)
-               return simde_mm512_abs_epi64(v);
-            else if constexpr (CT::Float<T>)
-               return simde_mm512_andnot_ps(simde_mm512_set1_ps(-0.0F), v);
-            else if constexpr (CT::Double<T>)
-               return simde_mm512_andnot_pd(simde_mm512_set1_pd(-0.0F), v);
-            else LANGULUS_ERROR("Unsupported type for SIMD::InnerAbs of 64-byte package");
-         }
-         else
-      #endif
+         #if LANGULUS_SIMD(256BIT)
+            if constexpr (CT::SIMD256<REGISTER>) {
+               if constexpr (CT::SignedInteger8<T>)
+                  return simde_mm256_abs_epi8(v);
+               else if constexpr (CT::SignedInteger16<T>)
+                  return simde_mm256_abs_epi16(v);
+               else if constexpr (CT::SignedInteger32<T>)
+                  return simde_mm256_abs_epi32(v);
+               else if constexpr (CT::SignedInteger64<T>)
+                  return simde_mm256_abs_epi64(v);
+               else if constexpr (CT::Float<T>)
+                  return simde_mm256_andnot_ps(simde_mm256_set1_ps(-0.0F), v);
+               else if constexpr (CT::Double<T>)
+                  return simde_mm256_andnot_pd(simde_mm256_set1_pd(-0.0F), v);
+               else LANGULUS_ERROR("Unsupported type for 32-byte package");
+            }
+            else
+         #endif
 
-      LANGULUS_ERROR("Unsupported type for SIMD::InnerAbs");
-   }
+         #if LANGULUS_SIMD(512BIT)
+            if constexpr (CT::SIMD512<REGISTER>) {
+               if constexpr (CT::SignedInteger8<T>)
+                  return simde_mm512_abs_epi8(v);
+               else if constexpr (CT::SignedInteger16<T>)
+                  return simde_mm512_abs_epi16(v);
+               else if constexpr (CT::SignedInteger32<T>)
+                  return simde_mm512_abs_epi32(v);
+               else if constexpr (CT::SignedInteger64<T>)
+                  return simde_mm512_abs_epi64(v);
+               else if constexpr (CT::Float<T>)
+                  return simde_mm512_andnot_ps(simde_mm512_set1_ps(-0.0F), v);
+               else if constexpr (CT::Double<T>)
+                  return simde_mm512_andnot_pd(simde_mm512_set1_pd(-0.0F), v);
+               else LANGULUS_ERROR("Unsupported type for 64-byte package");
+            }
+            else
+         #endif
 
+         LANGULUS_ERROR("Unsupported type");
+      }
+
+   } // namespace Langulus::SIMD::Inner
+
+
+   /// Get the absolute values                                                
+   ///   @param T - type of a single value                                    
+   ///   @param S - size of the array                                         
+   ///   @return a register, if viable SIMD routine exists                    
+   ///           or array/scalar if no viable SIMD routine exists             
    template<class T, Count S>
-   LANGULUS(INLINED) auto Abs(const T(&value)[S]) noexcept {
-      return InnerAbs<T, S>(Load<0>(value));
+   LANGULUS(INLINED)
+   auto Abs(const T(&value)[S]) noexcept {
+      return Inner::Abs<T, S>(Load<0>(value));
    }
 
 } // namespace Langulus::SIMD

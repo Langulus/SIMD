@@ -9,6 +9,7 @@
 #pragma once
 #include "Common.hpp"
 
+
 namespace Langulus::SIMD
 {
    /// The credit for these goes to this wonderful guy:                       

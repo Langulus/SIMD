@@ -9,6 +9,7 @@
 #pragma once
 #include "Common.hpp"
 
+
 namespace Langulus::SIMD
 {
 
@@ -20,7 +21,7 @@ namespace Langulus::SIMD
    ///   @tparam C - number of bits in the bitmask                            
    template<Count C>
    struct Bitmask {
-      static_assert(C <= 64 && C > 0, "C must be in the range (0:64]");
+      static_assert(C <= 64 and C > 0, "C must be in the range (0:64]");
 
       static constexpr Count MemberCount = C;
       static constexpr bool IsBitmask = true;

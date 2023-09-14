@@ -22,6 +22,7 @@
    #include "ConvertFrom512.hpp"
 #endif
 
+
 namespace Langulus::SIMD
 {
 
@@ -33,12 +34,13 @@ namespace Langulus::SIMD
    ///   @param in - the input data                                           
    ///   @return the resulting register                                       
    template<int DEF, class TT, Count S, class FT>
-   LANGULUS(INLINED) auto Convert(const FT(&in)[S]) noexcept {
+   LANGULUS(INLINED)
+   auto Convert(const FT(&in)[S]) noexcept {
       using FROM = decltype(Load<DEF>(Fake<Decay<FT>[S]>()));
       using TO = decltype(Load<DEF>(Fake<Decay<TT>[S]>()));
       const FROM loaded = Load<DEF>(in);
 
-      if constexpr (CT::Unsupported<FROM> || CT::Unsupported<TO>)
+      if constexpr (CT::Unsupported<FROM> or CT::Unsupported<TO>)
          return Unsupported{};
       else if constexpr (CT::Same<TT, FT>)
          return loaded;
@@ -73,58 +75,65 @@ namespace Langulus::SIMD
       else LANGULUS_ERROR("Can't convert from unsupported");
    }
    
-   /// Attempt register encapsulation of LHS and RHS arrays                   
-   /// Check if result of opSIMD is supported and return it, otherwise        
-   /// fallback to opFALL and calculate conventionally                        
-   ///   @tparam DEF - default value to fill empty register regions           
-   ///                 useful against division-by-zero cases                  
-   ///   @tparam REGISTER - the register to use for the SIMD operation        
-   ///   @tparam LOSSLESS - the type of data to use for the fallback          
-   ///   @tparam LHS - left number type (deducible)                           
-   ///   @tparam RHS - right number type (deducible)                          
-   ///   @tparam FSIMD - the SIMD operation to invoke (deducible)             
-   ///   @tparam FFALL - the fallback operation to invoke (deducible)         
-   ///   @param lhs - left argument                                           
-   ///   @param rhs - right argument                                          
-   ///   @param opSIMD - the function to invoke                               
-   ///   @param opFALL - the function to invoke                               
-   ///   @return the result (either std::array, number, or register)          
-   template<int DEF, class REGISTER, class LOSSLESS, class LHS, class RHS, class FSIMD, class FFALL>
-   NOD() LANGULUS(INLINED) auto AttemptSIMD(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) requires (Invocable<FSIMD, REGISTER> && Invocable<FFALL, LOSSLESS>) {
-      using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
-      constexpr auto S = OverlapCount<LHS, RHS>();
+   namespace Inner
+   {      
 
-      if constexpr (S < 2 || CT::Unsupported<REGISTER> || CT::Unsupported<OUTSIMD>) {
-         // Call the fallback routine if unsupported, or size 1         
-         return Fallback<LOSSLESS>(lhs, rhs, ::std::move(opFALL));
+      /// Attempt register encapsulation of LHS and RHS arrays                
+      /// Check if result of opSIMD is supported and return it, otherwise     
+      /// fallback to opFALL and calculate conventionally                     
+      ///   @tparam DEF - default value to fill empty register regions        
+      ///                 useful against division-by-zero cases               
+      ///   @tparam REGISTER - the register to use for the SIMD operation     
+      ///   @tparam LOSSLESS - the type of data to use for the fallback       
+      ///   @tparam LHS - left number type (deducible)                        
+      ///   @tparam RHS - right number type (deducible)                       
+      ///   @tparam FSIMD - the SIMD operation to invoke (deducible)          
+      ///   @tparam FFALL - the fallback operation to invoke (deducible)      
+      ///   @param lhs - left argument                                        
+      ///   @param rhs - right argument                                       
+      ///   @param opSIMD - the function to invoke                            
+      ///   @param opFALL - the function to invoke                            
+      ///   @return the result (either std::array, number, or register)       
+      template<int DEF, class REGISTER, class LOSSLESS, class LHS, class RHS, class FSIMD, class FFALL>
+      NOD() LANGULUS(INLINED)
+      auto Evaluate(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL)
+      requires (Invocable<FSIMD, REGISTER> and Invocable<FFALL, LOSSLESS>) {
+         using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
+         constexpr auto S = OverlapCount<LHS, RHS>();
+
+         if constexpr (S < 2 or CT::Unsupported<REGISTER> or CT::Unsupported<OUTSIMD>) {
+            // Call the fallback routine if unsupported, or size 1      
+            return Fallback<LOSSLESS>(lhs, rhs, ::std::move(opFALL));
+         }
+         else if constexpr (CT::Array<LHS> and CT::Array<RHS>) {
+            // Both LHS and RHS are arrays, so wrap in registers        
+            return opSIMD(
+               Convert<DEF, LOSSLESS, S>(lhs),
+               Convert<DEF, LOSSLESS, S>(rhs)
+            );
+         }
+         else if constexpr (CT::Array<LHS>) {
+            // LHS is array, RHS is scalar                              
+            return opSIMD(
+               Convert<DEF, LOSSLESS>(lhs),
+               Fill<REGISTER>(static_cast<LOSSLESS>(rhs))
+            );
+         }
+         else if constexpr (CT::Array<RHS>) {
+            // LHS is scalar, RHS is array                              
+            return opSIMD(
+               Fill<REGISTER>(static_cast<LOSSLESS>(lhs)),
+               Convert<DEF, LOSSLESS>(rhs)
+            );
+         }
+         else {
+            // Both LHS and RHS are scalars                             
+            return Fallback<LOSSLESS>(lhs, rhs, ::std::move(opFALL));
+         }
       }
-      else if constexpr (CT::Array<LHS> && CT::Array<RHS>) {
-         // Both LHS and RHS are arrays, so wrap in registers           
-         return opSIMD(
-            Convert<DEF, LOSSLESS, S>(lhs),
-            Convert<DEF, LOSSLESS, S>(rhs)
-         );
-      }
-      else if constexpr (CT::Array<LHS>) {
-         // LHS is array, RHS is scalar                                 
-         return opSIMD(
-            Convert<DEF, LOSSLESS>(lhs),
-            Fill<REGISTER>(static_cast<LOSSLESS>(rhs))
-         );
-      }
-      else if constexpr (CT::Array<RHS>) {
-         // LHS is scalar, RHS is array                                 
-         return opSIMD(
-            Fill<REGISTER>(static_cast<LOSSLESS>(lhs)),
-            Convert<DEF, LOSSLESS>(rhs)
-         );
-      }
-      else {
-         // Both LHS and RHS are scalars                                
-         return Fallback<LOSSLESS>(lhs, rhs, ::std::move(opFALL));
-      }
-   }
-   
+
+   } // namespace Langulus::SIMD::Inner
+
 } // namespace Langulus::SIMD
 
 #include "IgnoreWarningsPop.inl"

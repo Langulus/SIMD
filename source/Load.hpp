@@ -10,6 +10,7 @@
 #include "SetGet.hpp"
 #include "IgnoreWarningsPush.inl"
 
+
 namespace Langulus::SIMD
 {
 
@@ -20,7 +21,8 @@ namespace Langulus::SIMD
    ///   @param v - the array to load inside a register                       
    ///   @return the register                                                 
    template<int DEF, class T, Count S>
-   LANGULUS(INLINED) auto Load(const T(&v)[S]) noexcept {
+   LANGULUS(INLINED)
+   auto Load(const T(&v)[S]) noexcept {
       constexpr auto denseSize = sizeof(Decay<T>) * S;
 
       #if LANGULUS_SIMD(128BIT)
