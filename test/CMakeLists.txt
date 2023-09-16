@@ -3,6 +3,7 @@ add_executable(LangulusSIMDTest
 	TestAdd.cpp
 	TestDiv.cpp
 	TestEqual.cpp
+	TestEqual2.cpp
 	TestMul.cpp
 	TestPow.cpp
 	TestShiftLeft.cpp
