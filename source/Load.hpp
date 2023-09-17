@@ -22,8 +22,8 @@ namespace Langulus::SIMD
    ///   @return the register                                                 
    template<int DEF, class T, Count S>
    LANGULUS(INLINED)
-   auto Load(const T(&v)[S]) noexcept {
-      constexpr auto denseSize = sizeof(Decay<T>) * S;
+   auto Load(UNUSED() const T(&v)[S]) noexcept {
+      UNUSED() constexpr auto denseSize = sizeof(Decay<T>) * S;
 
       #if LANGULUS_SIMD(128BIT)
          if constexpr (denseSize <= 16) {
