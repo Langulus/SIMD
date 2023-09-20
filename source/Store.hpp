@@ -76,7 +76,12 @@ namespace Langulus::SIMD
                simde_mm_storeu_pd(to, from);
             }
          }
-         else LANGULUS_ERROR("Can't ever be reached, but just in case!");
+         else {
+            // Save to a sparse array, or a differently sized array     
+            LANGULUS_SIMD_VERBOSE("Stores by simde_mm_storel_pd and simde_mm_storeh_pd");
+            simde_mm_storel_pd(SparseCast(to[0]), from);
+            simde_mm_storeh_pd(SparseCast(to[1]), from);
+         }
       }
       else if constexpr (CT::Same<FROM, simde__m128i>) {
          if constexpr (CT::Dense<T> and toSize >= 16) {
