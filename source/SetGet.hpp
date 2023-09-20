@@ -59,6 +59,8 @@ namespace Langulus::SIMD
       auto Set(std::integer_sequence<Offset, INDICES...>, const T(&values)[S]) {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CHUNK == 16) {
+               LANGULUS_SIMD_VERBOSE("Setting 128bit register from ", S, " elements");
+
                if constexpr (CT::SignedInteger8<T>)
                   return simde_mm_setr_epi8(Get<int8_t, DEF, INDICES, 16>(values)...);
                else if constexpr (CT::UnsignedInteger8<T>)
@@ -87,6 +89,8 @@ namespace Langulus::SIMD
 
          #if LANGULUS_SIMD(256BIT)
             if constexpr (CHUNK == 32) {
+               LANGULUS_SIMD_VERBOSE("Setting 256bit register from ", S, " elements");
+
                if constexpr (CT::SignedInteger8<T>)
                   return simde_mm256_setr_epi8(Get<int8_t, DEF, INDICES, 32>(values)...);
                else if constexpr (CT::UnsignedInteger8<T>)
@@ -115,6 +119,8 @@ namespace Langulus::SIMD
 
          #if LANGULUS_SIMD(512BIT)
             if constexpr (CHUNK == 64) {
+               LANGULUS_SIMD_VERBOSE("Setting 512bit register from ", S, " elements");
+
                if constexpr (CT::SignedInteger8<T>)
                   return simde_mm512_setr_epi8(Get<int8_t, DEF, INDICES, 64>(values)...);
                else if constexpr (CT::UnsignedInteger8<T>)

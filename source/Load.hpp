@@ -27,6 +27,8 @@ namespace Langulus::SIMD
 
       #if LANGULUS_SIMD(128BIT)
          if constexpr (denseSize <= 16) {
+            LANGULUS_SIMD_VERBOSE("Loading 128bit register from ", S, " unaligned elements");
+
             // Load as a single 128bit register                         
             if constexpr (denseSize == 16 and CT::Dense<T>) {
                if constexpr (CT::Integer<T> or CT::Byte<T> or CT::Character<T>)
@@ -45,6 +47,8 @@ namespace Langulus::SIMD
 
       #if LANGULUS_SIMD(256BIT)
          if constexpr (denseSize <= 32) {
+            LANGULUS_SIMD_VERBOSE("Loading 256bit register from ", S, " unaligned elements");
+
             // Load as a single 256bit register                         
             if constexpr (denseSize == 32 and CT::Dense<T>) {
                if constexpr (CT::Integer<T> or CT::Byte<T> or CT::Character<T>)
@@ -63,6 +67,8 @@ namespace Langulus::SIMD
 
       #if LANGULUS_SIMD(512BIT)
          if constexpr (denseSize <= 64) {
+            LANGULUS_SIMD_VERBOSE("Loading 512bit register from ", S, " unaligned elements");
+
             // Load as a single 512bit register                         
             if constexpr (denseSize == 64 and CT::Dense<T>) {
                if constexpr (CT::Integer<T> or CT::Byte<T> or CT::Character<T>)
