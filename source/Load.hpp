@@ -28,8 +28,8 @@ namespace Langulus::SIMD
       #if LANGULUS_SIMD(128BIT)
          if constexpr (denseSize <= 16) {
             // Load as a single 128bit register                         
-            if constexpr (denseSize == 16 && CT::Dense<T>) {
-               if constexpr (CT::Integer<T> || CT::Byte<T> || CT::Character<T>)
+            if constexpr (denseSize == 16 and CT::Dense<T>) {
+               if constexpr (CT::Integer<T> or CT::Byte<T> or CT::Character<T>)
                   return simde_mm_loadu_si128(reinterpret_cast<const simde__m128i*>(v));
                else if constexpr (CT::Float<T>)
                   return simde_mm_loadu_ps(v);
@@ -46,8 +46,8 @@ namespace Langulus::SIMD
       #if LANGULUS_SIMD(256BIT)
          if constexpr (denseSize <= 32) {
             // Load as a single 256bit register                         
-            if constexpr (denseSize == 32 && CT::Dense<T>) {
-               if constexpr (CT::Integer<T> || CT::Byte<T> || CT::Character<T>)
+            if constexpr (denseSize == 32 and CT::Dense<T>) {
+               if constexpr (CT::Integer<T> or CT::Byte<T> or CT::Character<T>)
                   return simde_mm256_loadu_si256(reinterpret_cast<const simde__m256i*>(v));
                else if constexpr (CT::Float<T>)
                   return simde_mm256_loadu_ps(v);
@@ -64,8 +64,8 @@ namespace Langulus::SIMD
       #if LANGULUS_SIMD(512BIT)
          if constexpr (denseSize <= 64) {
             // Load as a single 512bit register                         
-            if constexpr (denseSize == 64 && CT::Dense<T>) {
-               if constexpr (CT::Integer<T> || CT::Byte<T> || CT::Character<T>)
+            if constexpr (denseSize == 64 and CT::Dense<T>) {
+               if constexpr (CT::Integer<T> or CT::Byte<T> or CT::Character<T>)
                   return simde_mm512_loadu_si512(v);
                else if constexpr (CT::Float<T>)
                   return simde_mm512_loadu_ps(v);

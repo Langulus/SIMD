@@ -31,6 +31,13 @@ LANGULUS_EXCEPTION(DivisionByZero);
 
 #define LANGULUS_SIMD(a) LANGULUS_SIMD_##a()
 
+#ifndef LANGULUS_SIMD_VERBOSE
+   #define LANGULUS_SIMD_VERBOSE(...)
+#else
+   #undef LANGULUS_SIMD_VERBOSE
+   #define LANGULUS_SIMD_VERBOSE(...) Logger::Verbose(__VA_ARGS__)
+#endif
+
 
 ///                                                                           
 ///   Detect available SIMD                                                   

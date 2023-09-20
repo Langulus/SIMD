@@ -158,9 +158,11 @@ namespace Langulus::SIMD
       return Inner::Evaluate<0, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+            LANGULUS_SIMD_VERBOSE("Multiplying (SIMD)");
             return Inner::Multiply<DOUT, S>(lhs, rhs);
          },
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+            LANGULUS_SIMD_VERBOSE("Multiplying (Fallback)");
             return lhs * rhs;
          }
       );
