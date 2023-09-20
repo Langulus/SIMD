@@ -38,8 +38,20 @@ namespace Langulus::SIMD
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128i");
       }
       else if constexpr (CT::Same<REGISTER,simde__m128>) {
-         if constexpr (CT::Float<T>)
-            return simde_mm_broadcast_ss(&value);
+         if constexpr (CT::Float<T>) {
+            #if defined(SIMDE_X86_AVX_NATIVE)
+               LANGULUS_SIMD_VERBOSE("Attempting _mm_broadcast_ss");
+               return _mm_broadcast_ss(&value);
+            #elif defined(SIMDE_WASM_SIMD128_NATIVE)
+               LANGULUS_SIMD_VERBOSE("Attempting simde__m128_from_wasm_v128");
+               return simde__m128_from_wasm_v128(wasm_v128_load32_splat(&value));
+            #else
+               LANGULUS_SIMD_VERBOSE("Attempting simde_mm_set1_ps");
+               return simde_mm_set1_ps(value);
+            #endif
+
+            //return simde_mm_broadcast_ss(&value); // causing segfault on clang x86 with -mavx ????
+         }
          else
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128");
       }
