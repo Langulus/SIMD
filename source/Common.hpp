@@ -35,7 +35,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
    #define LANGULUS_SIMD_VERBOSE(...)
 #else
    #undef LANGULUS_SIMD_VERBOSE
-   #define LANGULUS_SIMD_VERBOSE(...) Logger::Verbose(__VA_ARGS__)
+   #define LANGULUS_SIMD_VERBOSE(...) Logger::Info(__VA_ARGS__)
 #endif
 
 
