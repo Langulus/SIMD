@@ -45,7 +45,8 @@ template<class T>
 using uninitialized = Catch::Benchmark::storage_for<T>;
 
 template<class LHS, class RHS, class OUT>
-LANGULUS(INLINED) void ControlSL(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+LANGULUS(INLINED)
+void ControlSL(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
    static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
    // Well defined condition in SIMD calls, that is otherwise				
    // undefined behavior by C++ standard											
@@ -54,7 +55,8 @@ LANGULUS(INLINED) void ControlSL(const LHS& lhs, const RHS& rhs, OUT& out) noexc
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(INLINED) void ControlSL(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+LANGULUS(INLINED)
+void ControlSL(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
    static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
    auto r = out.mArray;
    auto lhs = lhsArray.mArray;
@@ -84,7 +86,7 @@ TEMPLATE_TEST_CASE("Shift left", "[shift]"
       T x, y;
       T r, rCheck;
 
-      if constexpr (!CT::Typed<T>) {
+      if constexpr (not CT::Vector<T>) {
          if constexpr (CT::Sparse<T>) {
             x = nullptr;
             y = nullptr;
@@ -99,7 +101,7 @@ TEMPLATE_TEST_CASE("Shift left", "[shift]"
       WHEN("Shifted left") {
          ControlSL(x, y, rCheck);
 
-         if constexpr (CT::Typed<T>)
+         if constexpr (CT::Vector<T>)
             SIMD::ShiftLeft(x.mArray, y.mArray, r.mArray);
          else
             SIMD::ShiftLeft(x, y, r);
@@ -111,13 +113,13 @@ TEMPLATE_TEST_CASE("Shift left", "[shift]"
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Shifted left (control)") (timer meter) {
                some<T> nx(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
                      InitOne(i, 1);
                }
 
                some<T> ny(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : ny)
                      InitOne(i, 1);
                }
@@ -130,20 +132,20 @@ TEMPLATE_TEST_CASE("Shift left", "[shift]"
 
             BENCHMARK_ADVANCED("Shifted left (SIMD)") (timer meter) {
                some<T> nx(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
                      InitOne(i, 1);
                }
 
                some<T> ny(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : ny)
                      InitOne(i, 1);
                }
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Typed<T>)
+                  if constexpr (CT::Vector<T>)
                      SIMD::ShiftLeft(nx[i].mArray, ny[i].mArray, nr[i].mArray);
                   else
                      SIMD::ShiftLeft(nx[i], ny[i], nr[i]);
@@ -155,7 +157,7 @@ TEMPLATE_TEST_CASE("Shift left", "[shift]"
       WHEN("Shifted left in reverse") {
          ControlSL(y, x, rCheck);
 
-         if constexpr (CT::Typed<T>)
+         if constexpr (CT::Vector<T>)
             SIMD::ShiftLeft(y.mArray, x.mArray, r.mArray);
          else
             SIMD::ShiftLeft(y, x, r);

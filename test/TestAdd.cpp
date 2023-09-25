@@ -15,12 +15,14 @@ template<class T>
 using uninitialized = Catch::Benchmark::storage_for<T>;
 
 template<class LHS, class RHS, class OUT>
-LANGULUS(INLINED) void ControlAdd(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+LANGULUS(INLINED)
+void ControlAdd(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
    DenseCast(out) = DenseCast(lhs) + DenseCast(rhs);
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(INLINED) void ControlAdd(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+LANGULUS(INLINED)
+void ControlAdd(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
    auto r = out.mArray;
    auto lhs = lhsArray.mArray;
    auto rhs = rhsArray.mArray;
@@ -49,7 +51,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
       T x, y;
       T r, rCheck;
 
-      if constexpr (!CT::Typed<T>) {
+      if constexpr (not CT::Vector<T>) {
          if constexpr (CT::Sparse<T>) {
             x = nullptr;
             y = nullptr;
@@ -64,7 +66,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
       WHEN("Added") {
          ControlAdd(x, y, rCheck);
 
-         if constexpr (CT::Typed<T>)
+         if constexpr (CT::Vector<T>)
             SIMD::Add(x.mArray, y.mArray, r.mArray);
          else
             SIMD::Add(x, y, r);
@@ -76,13 +78,13 @@ TEMPLATE_TEST_CASE("Add", "[add]"
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Add (control)") (timer meter) {
                some<T> nx(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
                      InitOne(i, 1);
                }
 
                some<T> ny(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : ny)
                      InitOne(i, 1);
                }
@@ -95,20 +97,20 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 
             BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
                some<T> nx(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
                      InitOne(i, 1);
                }
 
                some<T> ny(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : ny)
                      InitOne(i, 1);
                }
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Typed<T>)
+                  if constexpr (CT::Vector<T>)
                      SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
                   else
                      SIMD::Add(nx[i], ny[i], nr[i]);
@@ -120,7 +122,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
       WHEN("Added in reverse") {
          ControlAdd(y, x, rCheck);
 
-         if constexpr (CT::Typed<T>)
+         if constexpr (CT::Vector<T>)
             SIMD::Add(y.mArray, x.mArray, r.mArray);
          else
             SIMD::Add(y, x, r);

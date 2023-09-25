@@ -8,7 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Fill.hpp"
-#include "Convert.hpp"
+#include "Evaluate.hpp"
 
 
 namespace Langulus::SIMD
@@ -17,9 +17,9 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class, Count>
+      template<class, CT::NotSIMD T>
       LANGULUS(INLINED)
-      constexpr Unsupported ShiftLeft(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      constexpr Unsupported ShiftLeft(const T&, const T&) noexcept {
          return {};
       }
 
@@ -31,12 +31,11 @@ namespace Langulus::SIMD
       ///      behavior consistent across C++ and SIMD, so the fallback routine
       ///      has additional overhead for checking the rhs range and zeroing.
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
       ///   @tparam REGISTER - type of register we're operating with          
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the shifted elements as a register                        
-      template<class T, Count S, CT::TSIMD REGISTER>
+      template<class T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto ShiftLeft(const REGISTER& lhs, const REGISTER& rhs) noexcept {
          static_assert(CT::IntegerX<Decay<T>>, "Can only shift integers");
@@ -235,21 +234,53 @@ namespace Langulus::SIMD
    ///      has additional overhead for checking the rhs range and zeroing.   
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
+   constexpr auto ShiftLeftConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+      static_assert(CT::IntegerX<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>,
+         "Can only shift integers");
+
+      using DOUT = Decay<TypeOf<OUT>>;
+
+      return Inner::Evaluate<0, Unsupported, DOUT>(
+         lhsOrig, rhsOrig, nullptr,
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+            // Well defined condition in SIMD calls, that is otherwise  
+            // undefined behavior by C++ standard                       
+            return rhs < DOUT {sizeof(DOUT) * 8} and rhs >= 0
+               ? lhs << rhs : 0;
+         }
+      );
+   }
+   
+   /// Shift bits left                                                        
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired element type (lossless by default)         
+   ///   @return a register, if viable SIMD routine exists                    
+   ///           or array/scalar if no viable SIMD routine exists             
+   ///   @attention this differs from C++'s undefined behavior when shifting  
+   ///      by less than zero, or by a number larger than the bitcount.       
+   ///      the SIMD operations define this behavior very well, by just       
+   ///      defaulting to zero. It is our responsibility to keep this         
+   ///      behavior consistent across C++ and SIMD, so the fallback routine  
+   ///      has additional overhead for checking the rhs range and zeroing.   
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   NOD() LANGULUS(INLINED)
    auto ShiftLeft(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
-      using DOUT = Decay<OUT>;
-      using REGISTER = CT::Register<LHS, RHS, DOUT>;
-      constexpr auto S = OverlapCount<LHS, RHS>();
+      static_assert(CT::IntegerX<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>,
+         "Can only shift integers");
+
+      using DOUT = Decay<TypeOf<OUT>>;
+      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
 
       return Inner::Evaluate<0, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::ShiftLeft<DOUT, S>(lhs, rhs);
+            return Inner::ShiftLeft<DOUT>(lhs, rhs);
          },
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             // Well defined condition in SIMD calls, that is otherwise  
             // undefined behavior by C++ standard                       
-            return rhs < DOUT {sizeof(DOUT) * 8} && rhs >= 0
+            return rhs < DOUT {sizeof(DOUT) * 8} and rhs >= 0
                ? lhs << rhs : 0;
          }
       );
@@ -269,24 +300,11 @@ namespace Langulus::SIMD
    ///      has additional overhead for checking the rhs range and zeroing.   
    template<class LHS, class RHS, class OUT>
    LANGULUS(INLINED)
-   void ShiftLeft(const LHS& lhs, const RHS& rhs, OUT& output) {
-      static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
-      GeneralStore(ShiftLeft<LHS, RHS, OUT>(lhs, rhs), output);
-   }
-
-   ///   @attention this differs from C++'s undefined behavior when shifting  
-   ///      by less than zero, or by a number larger than the bitcount.       
-   ///      the SIMD operations define this behavior very well, by just       
-   ///      defaulting to zero. It is our responsibility to keep this         
-   ///      behavior consistent across C++ and SIMD, so the fallback routine  
-   ///      has additional overhead for checking the rhs range and zeroing.   
-   template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(INLINED)
-   WRAPPER ShiftLeftWrap(const LHS& lhs, const RHS& rhs) {
-      static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
-      WRAPPER result;
-      ShiftLeft<LHS, RHS>(lhs, rhs, result.mArray);
-      return result;
+   constexpr void ShiftLeft(const LHS& lhs, const RHS& rhs, OUT& output) {
+      IF_CONSTEXPR() {
+         StoreConstexpr(ShiftLeftConstexpr<LHS, RHS, OUT>(lhs, rhs), output);
+      }
+      else Store(ShiftLeft<LHS, RHS, OUT>(lhs, rhs), output);
    }
 
 } // namespace Langulus::SIMD

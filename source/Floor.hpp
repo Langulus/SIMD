@@ -22,7 +22,7 @@ namespace Langulus::SIMD
       ///   @tparam REGISTER - the register type (deducible)                  
       ///   @param value - the array                                          
       ///   @return the floored values                                        
-      template<class T, Count S, CT::TSIMD REGISTER>
+      template<class T, Count S, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Floor(const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Suboptimal and pointless for whole numbers");

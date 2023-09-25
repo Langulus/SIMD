@@ -84,7 +84,7 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
       T x, y;
       T r, rCheck;
 
-      if constexpr (!CT::Typed<T>) {
+      if constexpr (not CT::Vector<T>) {
          if constexpr (CT::Sparse<T>) {
             x = nullptr;
             y = nullptr;
@@ -99,7 +99,7 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
       WHEN("Shifted right") {
          ControlSR(x, y, rCheck);
 
-         if constexpr (CT::Typed<T>)
+         if constexpr (CT::Vector<T>)
             SIMD::ShiftRight(x.mArray, y.mArray, r.mArray);
          else
             SIMD::ShiftRight(x, y, r);
@@ -111,13 +111,13 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Shifted right (control)") (timer meter) {
                some<T> nx(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
                      InitOne(i, 1);
                }
 
                some<T> ny(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : ny)
                      InitOne(i, 1);
                }
@@ -130,20 +130,20 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
 
             BENCHMARK_ADVANCED("Shifted right (SIMD)") (timer meter) {
                some<T> nx(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
                      InitOne(i, 1);
                }
 
                some<T> ny(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : ny)
                      InitOne(i, 1);
                }
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Typed<T>)
+                  if constexpr (CT::Vector<T>)
                      SIMD::ShiftRight(nx[i].mArray, ny[i].mArray, nr[i].mArray);
                   else
                      SIMD::ShiftRight(nx[i], ny[i], nr[i]);
@@ -155,7 +155,7 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
       WHEN("Shifted right in reverse") {
          ControlSR(y, x, rCheck);
 
-         if constexpr (CT::Typed<T>)
+         if constexpr (CT::Vector<T>)
             SIMD::ShiftRight(y.mArray, x.mArray, r.mArray);
          else
             SIMD::ShiftRight(y, x, r);

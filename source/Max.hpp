@@ -8,7 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Fill.hpp"
-#include "Convert.hpp"
+#include "Evaluate.hpp"
 #include "IgnoreWarningsPush.inl"
 
 
@@ -31,7 +31,7 @@ namespace Langulus::SIMD
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the maxed values                                          
-      template<class T, Count S, CT::TSIMD REGISTER>
+      template<class T, Count S, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Max(const REGISTER& lhs, const REGISTER& rhs) noexcept {
          if constexpr (CT::SIMD128<REGISTER>) {
@@ -139,8 +139,8 @@ namespace Langulus::SIMD
    NOD() LANGULUS(INLINED)
    auto Max(LHS& lhsOrig, RHS& rhsOrig) noexcept {
       using DOUT = Decay<OUT>;
-      using REGISTER = CT::Register<LHS, RHS, DOUT>;
-      constexpr auto S = OverlapCount<LHS, RHS>();
+      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
+      constexpr auto S = OVERLAP_EXTENTS(lhsOrig, rhsOrig);
 
       return Inner::Evaluate<0, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
@@ -163,15 +163,6 @@ namespace Langulus::SIMD
    LANGULUS(INLINED)
    void Max(LHS& lhs, RHS& rhs, OUT& output) noexcept {
       GeneralStore(Max<LHS, RHS, OUT>(lhs, rhs), output);
-   }
-
-   ///                                                                        
-   template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(INLINED)
-   WRAPPER MaxWrap(LHS& lhs, RHS& rhs) noexcept {
-      WRAPPER result;
-      Max<LHS, RHS>(lhs, rhs, result.mArray);
-      return result;
    }
 
 } // namespace Langulus::SIMD

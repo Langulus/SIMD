@@ -10,7 +10,7 @@
 #include "Load.hpp"
 
 
-namespace Langulus::SIMD
+namespace Langulus::SIMD::Inner
 {
 
    /// Convert __m512 to any other register                                   

@@ -8,7 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Fill.hpp"
-#include "Convert.hpp"
+#include "Evaluate.hpp"
 #include "IgnoreWarningsPush.inl"
 
 
@@ -18,20 +18,19 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class, Count>
+      template<class, CT::NotSIMD T>
       LANGULUS(INLINED)
-      constexpr Unsupported Subtract(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      constexpr Unsupported Subtract(const T&, const T&) noexcept {
          return {};
       }
 
       /// Subtract two arrays using SIMD                                      
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
       ///   @tparam REGISTER - type of register we're operating with          
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the subtracted elements as a register                     
-      template<class T, Count S, CT::TSIMD REGISTER>
+      template<class T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Subtract(const REGISTER& lhs, const REGISTER& rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
@@ -107,15 +106,33 @@ namespace Langulus::SIMD
    ///           or array/scalar if no viable SIMD routine exists             
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
+   constexpr auto SubtractConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+      using DOUT = Decay<TypeOf<OUT>>;
+
+      return Inner::Evaluate<0, Unsupported, DOUT>(
+         lhsOrig, rhsOrig, nullptr,
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+            return lhs - rhs;
+         }
+      );
+   }
+
+   /// Subtract numbers                                                       
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired element type (lossless by default)         
+   ///   @return a register, if viable SIMD routine exists                    
+   ///           or array/scalar if no viable SIMD routine exists             
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   NOD() LANGULUS(INLINED)
    auto Subtract(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<OUT>;
-      using REGISTER = CT::Register<LHS, RHS, DOUT>;
-      constexpr auto S = OverlapCount<LHS, RHS>();
+      using DOUT = Decay<TypeOf<OUT>>;
+      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
 
       return Inner::Evaluate<0, REGISTER, DOUT>(
-         lhsOrig, rhsOrig, 
+         lhsOrig, rhsOrig,
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::Subtract<DOUT, S>(lhs, rhs);
+            return Inner::Subtract<DOUT>(lhs, rhs);
          },
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             return lhs - rhs;
@@ -131,17 +148,11 @@ namespace Langulus::SIMD
    ///              order to fit the result in desired output                 
    template<class LHS, class RHS, class OUT>
    LANGULUS(INLINED)
-   void Subtract(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
-      GeneralStore(Subtract<LHS, RHS, OUT>(lhs, rhs), output);
-   }
-
-   ///                                                                        
-   template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(INLINED)
-   WRAPPER SubtractWrap(const LHS& lhs, const RHS& rhs) noexcept {
-      WRAPPER result;
-      Subtract<LHS, RHS>(lhs, rhs, result.mArray);
-      return result;
+   constexpr void Subtract(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+      IF_CONSTEXPR() {
+         StoreConstexpr(SubtractConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
+      }
+      else Store(Subtract<LHS, RHS, OUT>(lhs, rhs), out);
    }
 
 } // namespace Langulus::SIMD

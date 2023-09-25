@@ -49,7 +49,7 @@ TEMPLATE_TEST_CASE("Subtract", "[subtract]"
       T x, y;
       T r, rCheck;
 
-      if constexpr (!CT::Typed<T>) {
+      if constexpr (not CT::Vector<T>) {
          if constexpr (CT::Sparse<T>) {
             x = nullptr;
             y = nullptr;
@@ -64,7 +64,7 @@ TEMPLATE_TEST_CASE("Subtract", "[subtract]"
       WHEN("Subtracted") {
          ControlSub(x, y, rCheck);
 
-         if constexpr (CT::Typed<T>)
+         if constexpr (CT::Vector<T>)
             SIMD::Subtract(x.mArray, y.mArray, r.mArray);
          else
             SIMD::Subtract(x, y, r);
@@ -76,13 +76,13 @@ TEMPLATE_TEST_CASE("Subtract", "[subtract]"
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Subtract (control)") (timer meter) {
                some<T> nx(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
                      InitOne(i, 1);
                }
 
                some<T> ny(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : ny)
                      InitOne(i, 1);
                }
@@ -95,20 +95,20 @@ TEMPLATE_TEST_CASE("Subtract", "[subtract]"
 
             BENCHMARK_ADVANCED("Subtract (SIMD)") (timer meter) {
                some<T> nx(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
                      InitOne(i, 1);
                }
 
                some<T> ny(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : ny)
                      InitOne(i, 1);
                }
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Typed<T>)
+                  if constexpr (CT::Vector<T>)
                      SIMD::Subtract(nx[i].mArray, ny[i].mArray, nr[i].mArray);
                   else
                      SIMD::Subtract(nx[i], ny[i], nr[i]);
@@ -120,7 +120,7 @@ TEMPLATE_TEST_CASE("Subtract", "[subtract]"
       WHEN("Subtracted in reverse") {
          ControlSub(y, x, rCheck);
 
-         if constexpr (CT::Typed<T>)
+         if constexpr (CT::Vector<T>)
             SIMD::Subtract(y.mArray, x.mArray, r.mArray);
          else
             SIMD::Subtract(y, x, r);

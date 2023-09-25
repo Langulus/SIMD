@@ -10,7 +10,8 @@
 #include <catch2/catch.hpp>
 
 template<CT::Dense B, CT::Dense E>
-NOD() LANGULUS(INLINED) constexpr auto Pow(B base, E exponent) noexcept {
+NOD() LANGULUS(INLINED)
+constexpr auto Pow(B base, E exponent) noexcept {
    if (base == B {1})
       return B {1};
 
@@ -42,12 +43,14 @@ NOD() LANGULUS(INLINED) constexpr auto Pow(B base, E exponent) noexcept {
 }
 
 template<class LHS, class RHS, class OUT>
-LANGULUS(INLINED) void ControlPow(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+LANGULUS(INLINED)
+void ControlPow(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
    DenseCast(out) = Pow(DenseCast(lhs), DenseCast(rhs));
 }
 
 template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(INLINED) void ControlPow(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+LANGULUS(INLINED)
+void ControlPow(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
    auto r = out.mArray;
    auto lhs = lhsArray.mArray;
    auto rhs = rhsArray.mArray;
@@ -76,7 +79,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
       T x, y;
       T r, rCheck;
 
-      if constexpr (!CT::Typed<T>) {
+      if constexpr (not CT::Vector<T>) {
          if constexpr (CT::Sparse<T>) {
             x = nullptr;
             y = nullptr;
@@ -91,7 +94,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
       WHEN("Raised to a power") {
          ControlPow(x, y, rCheck);
 
-         if constexpr (CT::Typed<T>)
+         if constexpr (CT::Vector<T>)
             SIMD::Power(x.mArray, y.mArray, r.mArray);
          else
             SIMD::Power(x, y, r);
@@ -103,13 +106,13 @@ TEMPLATE_TEST_CASE("Power", "[power]"
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Power (control)") (timer meter) {
                some<T> nx(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
                      InitOne(i, 1);
                }
 
                some<T> ny(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : ny)
                      InitOne(i, 1);
                }
@@ -122,20 +125,20 @@ TEMPLATE_TEST_CASE("Power", "[power]"
 
             BENCHMARK_ADVANCED("Power (SIMD)") (timer meter) {
                some<T> nx(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
                      InitOne(i, 1);
                }
 
                some<T> ny(meter.runs());
-               if constexpr (!CT::Typed<T>) {
+               if constexpr (not CT::Vector<T>) {
                   for (auto& i : ny)
                      InitOne(i, 1);
                }
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Typed<T>)
+                  if constexpr (CT::Vector<T>)
                      SIMD::Power(nx[i].mArray, ny[i].mArray, nr[i].mArray);
                   else
                      SIMD::Power(nx[i], ny[i], nr[i]);
@@ -147,7 +150,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
       WHEN("Raise to a power in reverse") {
          ControlPow(y, x, rCheck);
 
-         if constexpr (CT::Typed<T>)
+         if constexpr (CT::Vector<T>)
             SIMD::Power(y.mArray, x.mArray, r.mArray);
          else
             SIMD::Power(y, x, r);

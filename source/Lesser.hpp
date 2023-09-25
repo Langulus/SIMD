@@ -8,7 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Fill.hpp"
-#include "Convert.hpp"
+#include "Evaluate.hpp"
 
 
 namespace Langulus::SIMD
@@ -31,7 +31,7 @@ namespace Langulus::SIMD
       ///   @param rhs - the right-hand-side array                            
       ///   @return a bitmask with the results, or Inner::NotSupported        
       /// https://giannitedesco.github.io/2019/03/08/simd-cmp-bitmasks.html   
-      template<class T, Count S, CT::TSIMD REGISTER>
+      template<class T, Count S, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Lesser(const REGISTER& lhs, const REGISTER& rhs) noexcept {
       #if LANGULUS_SIMD(128BIT)
@@ -367,8 +367,8 @@ namespace Langulus::SIMD
    NOD() LANGULUS(INLINED)
    auto Lesser(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using LOSSLESS = Lossless<LHS, RHS>;
-      using REGISTER = CT::Register<LHS, RHS, LOSSLESS>;
-      constexpr auto S = OverlapCount<LHS, RHS>();
+      using REGISTER = Inner::Register<LHS, RHS, LOSSLESS>;
+      constexpr auto S = OVERLAP_EXTENTS(lhsOrig, rhsOrig);
 
       return Inner::Evaluate<0, REGISTER, LOSSLESS>(
          lhsOrig, rhsOrig,
@@ -391,15 +391,6 @@ namespace Langulus::SIMD
    LANGULUS(INLINED)
    void Lesser(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
       GeneralStore(Lesser<LHS, RHS>(lhs, rhs), output);
-   }
-
-   ///                                                                        
-   template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(INLINED)
-   WRAPPER LesserWrap(const LHS& lhs, const RHS& rhs) noexcept {
-      WRAPPER result;
-      Lesser<LHS, RHS>(lhs, rhs, result.mArray);
-      return result;
    }
 
 } // namespace Langulus::SIMD

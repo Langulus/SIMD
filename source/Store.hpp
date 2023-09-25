@@ -14,337 +14,313 @@
 
 namespace Langulus::SIMD
 {
+   namespace Inner
+   {
 
-   /// Save a register to memory                                              
-   ///   @tparam FROM - the register to save                                  
-   ///   @tparam ALIGNED - whether or not 'to' array is aligned to Alignment  
-   ///   @tparam T - the type of data to write (deducible)                    
-   ///   @tparam S - the number of elements to write (deducible)              
-   ///   @param from - the source register                                    
-   ///   @param to - the destination array                                    
-   template<CT::TSIMD FROM, bool ALIGNED = false, class T, Count S>
-   LANGULUS(INLINED)
-   void Store(const FROM& from, T(&to)[S]) noexcept {
-      static_assert(S > 1, "Storing less than two elements is suboptimal "
-         "- avoid SIMD operations on such arrays as a whole");
-      constexpr Size toSize = sizeof(Decay<T>) * S;
+      /// Save a register to memory                                           
+      ///   @tparam FROM - the register to save                               
+      ///   @tparam TO - the type of data to write (deducible)                
+      ///   @param from - the source register                                 
+      ///   @param to - the destination array                                 
+      template<CT::SIMD FROM, CT::NotSIMD TO>
+      LANGULUS(INLINED)
+      void Store(const FROM& from, TO& to) noexcept {
+         constexpr auto S = CountOf<TO>;
+         static_assert(S > 1, 
+            "Storing less than two elements is suboptimal "
+            "- avoid SIMD operations on such arrays as a whole"
+         );
+         using T = TypeOf<TO>;
+         constexpr Size denseSize = sizeof(Decay<T>) * S;
 
-   #if LANGULUS_SIMD(128BIT)
-      //                                                                
-      // __m128*                                                        
-      //                                                                
-      if constexpr (CT::Same<FROM, simde__m128>) {
-         if constexpr (CT::Dense<T> and toSize >= 16) {
-            // Save to a dense array that can contain everything        
-            if constexpr (ALIGNED) {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm_store_ps");
-               simde_mm_store_ps(to, from);
-            }
-            else {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm_storeu_ps");
-               simde_mm_storeu_ps(to, from);
-            }
-         }
-         else {
-            // Save to a sparse or smaller array                        
-            alignas(16) float temp[4];
-            simde_mm_store_ps(temp, from);
+      #if LANGULUS_SIMD(128BIT)
+         //                                                             
+         // __m128*                                                     
+         //                                                             
+         if constexpr (CT::SIMD128f<FROM>) {
+            auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
 
-            if constexpr (CT::Dense<T>) {
-               LANGULUS_SIMD_VERBOSE("Stores via memcpy of ", toSize, " bytes (of float data)");
-               ::std::memcpy(to, temp, toSize);
+            if constexpr (CT::Dense<T> and denseSize == 16) {
+               // Save to a dense array                                 
+               if constexpr (alignof(TO) % 16 == 0)
+                  simde_mm_store_ps(to_ps, from);
+               else
+                  simde_mm_storeu_ps(to_ps, from);
             }
             else {
-               LANGULUS_SIMD_VERBOSE("Stores by dereferencing ", S, " pointers (of floats)");
-               auto toIt = to;
-               auto fromIt = temp;
-               const auto toItEnd = to + S;
-               while (toIt != toItEnd)
-                  **(toIt++) = DenseCast(fromIt++);
-            }
-         }
-      }
-      else if constexpr (CT::Same<FROM, simde__m128d>) {
-         if constexpr (CT::Dense<T> and toSize >= 16) {
-            // Save to a dense array that can contain everything        
-            if constexpr (ALIGNED) {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm_store_pd");
-               simde_mm_store_pd(to, from);
-            }
-            else {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm_storeu_pd");
-               simde_mm_storeu_pd(to, from);
-            }
-         }
-         else {
-            // Save to a sparse array, or a differently sized array     
-            LANGULUS_SIMD_VERBOSE("Stores by simde_mm_storel_pd and simde_mm_storeh_pd");
-            simde_mm_storel_pd(SparseCast(to[0]), from);
-            simde_mm_storeh_pd(SparseCast(to[1]), from);
-         }
-      }
-      else if constexpr (CT::Same<FROM, simde__m128i>) {
-         if constexpr (CT::Dense<T> and toSize >= 16) {
-            // Save to a dense array that can contain everything        
-            if constexpr (ALIGNED) {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm_store_si128");
-               simde_mm_store_si128(to, from);
-            }
-            else {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm_storeu_si128");
-               simde_mm_storeu_si128(to, from);
-            }
-         }
-         else {
-            // Save to a sparse or smaller array                        
-            alignas(16) Byte temp[16];
-            simde_mm_store_si128(reinterpret_cast<simde__m128i*>(temp), from);
+               // Save to a sparse array, or a differently sized array  
+               alignas(16) simde_float32 temp[4];
+               simde_mm_store_ps(temp, from);
 
-            if constexpr (CT::Dense<T>) {
-               LANGULUS_SIMD_VERBOSE("Stores via memcpy of ", toSize, " bytes (of integer data)");
-               ::std::memcpy(to, temp, toSize);
-            }
-            else {
-               LANGULUS_SIMD_VERBOSE("Stores by dereferencing ", S, " pointers (of integers)");
-               auto toIt = to;
-               auto fromIt = reinterpret_cast<Decay<T>*>(temp);
-               const auto toItEnd = to + S;
-               while (toIt != toItEnd)
-                  **(toIt++) = DenseCast(fromIt++);
+               if constexpr (CT::Dense<T>)
+                  ::std::memcpy(to_ps, temp, denseSize);
+               else {
+                  auto toIt = to;
+                  auto fromIt = temp;
+                  const auto toItEnd = to + S;
+                  while (toIt != toItEnd)
+                     **(toIt++) = DenseCast(fromIt++);
+               }
             }
          }
-      }
-      else
-   #endif
+         else if constexpr (CT::SIMD128d<FROM>) {
+            if constexpr (CT::Dense<T> and denseSize == 16) {
+               // Save to a dense array                                 
+               auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
 
-   #if LANGULUS_SIMD(256BIT)
-      //                                                                
-      // __m256*                                                        
-      //                                                                
-      if constexpr (CT::Same<FROM, simde__m256>) {
-         if constexpr (CT::Dense<T> and toSize >= 32) {
-            // Save to a dense array that can contain everything        
-            if constexpr (ALIGNED) {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm256_store_ps");
-               simde_mm256_store_ps(to, from);
+               if constexpr (alignof(TO) % 16 == 0)
+                  simde_mm_store_pd(to_pd, from);
+               else
+                  simde_mm_storeu_pd(to_pd, from);
             }
             else {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm256_storeu_ps");
-               simde_mm256_storeu_ps(to, from);
+               // Save to a sparse array, or a differently sized array  
+               simde_mm_storel_pd(SparseCast(to[0]), from);
+               if constexpr (S > 1)
+                  simde_mm_storeh_pd(SparseCast(to[1]), from);
             }
          }
-         else {
-            // Save to a sparse or smaller array                        
-            alignas(32) float temp[8];
-            simde_mm256_store_ps(temp, from);
+         else if constexpr (CT::SIMD128i<FROM>) {
+            auto to_si = reinterpret_cast<simde__m128i*>(&Inner::GetFirst(to));
 
-            if constexpr (CT::Dense<T>) {
-               LANGULUS_SIMD_VERBOSE("Stores via memcpy of ", toSize, " bytes (of float data)");
-               ::std::memcpy(to, temp, toSize);
+            if constexpr (CT::Dense<T> and denseSize == 16) {
+               // Save to a dense array                                 
+               if constexpr (alignof(TO) % 16 == 0)
+                  simde_mm_store_si128(to_si, from);
+               else
+                  simde_mm_storeu_si128(to_si, from);
             }
             else {
-               LANGULUS_SIMD_VERBOSE("Stores by dereferencing ", S, " pointers (of floats)");
-               auto toIt = to;
-               auto fromIt = temp;
-               const auto toItEnd = to + S;
-               while (toIt != toItEnd)
-                  **(toIt++) = DenseCast(fromIt++);
-            }
-         }
-      }
-      else if constexpr (CT::Same<FROM, simde__m256d>) {
-         if constexpr (CT::Dense<T> and toSize >= 32) {
-            // Save to a dense array                                    
-            if constexpr (ALIGNED) {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm256_store_pd");
-               simde_mm256_store_pd(to, from);
-            }
-            else {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm256_storeu_pd");
-               simde_mm256_storeu_pd(to, from);
-            }
-         }
-         else {
-            // Save to a sparse array, or a differently sized array     
-            alignas(32) double temp[4];
-            simde_mm256_store_pd(temp, from);
+               // Save to a sparse array, or a differently sized array  
+               simde__m128i temp;
+               simde_mm_store_si128(&temp, from);
 
-            if constexpr (CT::Dense<T>) {
-               LANGULUS_SIMD_VERBOSE("Stores via memcpy of ", toSize, " bytes (of double data)");
-               ::std::memcpy(to, temp, toSize);
-            }
-            else {
-               LANGULUS_SIMD_VERBOSE("Stores by dereferencing ", S, " pointers (of doubles)");
-               auto toIt = to;
-               auto fromIt = temp;
-               const auto toItEnd = to + S;
-               while (toIt != toItEnd)
-                  **(toIt++) = DenseCast(fromIt++);
+               if constexpr (CT::Dense<T>)
+                  ::std::memcpy(to_si, &temp, denseSize);
+               else {
+                  auto toIt = to;
+                  auto fromIt = reinterpret_cast<Decay<T>*>(&temp);
+                  const auto toItEnd = to + S;
+                  while (toIt != toItEnd)
+                     **(toIt++) = DenseCast(fromIt++);
+               }
             }
          }
-      }
-      else if constexpr (CT::Same<FROM, simde__m256i>) {
-         if constexpr (CT::Dense<T> and toSize >= 32) {
-            // Save to a dense array                                    
-            if constexpr (ALIGNED) {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm256_store_si256");
-               simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(to), from);
-            }
-            else {
-               LANGULUS_SIMD_VERBOSE("Stores via simde_mm256_storeu_si256");
-               simde_mm256_storeu_si256(to, from);
-            }
-         }
-         else {
-            // Save to a sparse array, or a differently sized array     
-            alignas(32) Byte temp[32];
-            simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(temp), from);
+         else
+      #endif
 
-            if constexpr (CT::Dense<T>) {
-               LANGULUS_SIMD_VERBOSE("Stores via memcpy of ", toSize, " bytes (of integer data)");
-               ::std::memcpy(to, temp, toSize);
-            }
-            else {
-               LANGULUS_SIMD_VERBOSE("Stores by dereferencing ", S, " pointers (of integers)");
-               auto toIt = to;
-               auto fromIt = reinterpret_cast<Decay<T>*>(temp);
-               const auto toItEnd = to + S;
-               while (toIt != toItEnd)
-                  **(toIt++) = DenseCast(fromIt++);
-            }
-         }
-      }
-      else
-   #endif
+      #if LANGULUS_SIMD(256BIT)
+         //                                                             
+         // __m256*                                                     
+         //                                                             
+         if constexpr (CT::SIMD256f<FROM>) {
+            auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
 
-   #if LANGULUS_SIMD(512BIT)
-      //                                                                
-      // __m512*                                                        
-      //                                                                
-      if constexpr (CT::Same<FROM, simde__m512>) {
-         if constexpr (CT::Dense<T> and toSize == 64) {
-            // Save to a dense array                                    
-            if constexpr (ALIGNED)
-               simde_mm512_store_ps(to, from);
-            else
-               simde_mm512_storeu_ps(to, from);
-         }
-         else {
-            // Save to a sparse array, or a differently sized array     
-            alignas(64) float temp[16];
-            simde_mm512_store_ps(temp, from);
-            if constexpr (CT::Dense<T>)
-               ::std::memcpy(to, temp, toSize);
+            if constexpr (CT::Dense<T> and denseSize == 32) {
+               // Save to a dense array                                 
+               if constexpr (alignof(TO) % 32 == 0)
+                  simde_mm256_store_ps(to_ps, from);
+               else
+                  simde_mm256_storeu_ps(to_ps, from);
+            }
             else {
-               auto toIt = to;
-               auto fromIt = temp;
-               const auto toItEnd = to + S;
-               while (toIt != toItEnd)
-                  **(toIt++) = DenseCast(fromIt++);
+               // Save to a sparse array, or a differently sized array  
+               alignas(32) simde_float32 temp[8];
+               simde_mm256_store_ps(temp, from);
+
+               if constexpr (CT::Dense<T>)
+                  ::std::memcpy(to_ps, temp, denseSize);
+               else {
+                  auto toIt = to;
+                  auto fromIt = temp;
+                  const auto toItEnd = to + S;
+                  while (toIt != toItEnd)
+                     **(toIt++) = DenseCast(fromIt++);
+               }
             }
          }
-      }
-      else if constexpr (CT::Same<FROM, simde__m512d>) {
-         if constexpr (CT::Dense<T> and toSize == 64) {
-            // Save to a dense array                                    
-            if constexpr (ALIGNED)
-               simde_mm512_store_pd(to, from);
-            else
-               simde_mm512_storeu_pd(to, from);
-         }
-         else {
-            // Save to a sparse array, or a differently sized array     
-            alignas(64) double temp[8];
-            simde_mm512_store_pd(temp, from);
-            if constexpr (CT::Dense<T>)
-               ::std::memcpy(to, temp, toSize);
+         else if constexpr (CT::SIMD256d<FROM>) {
+            auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
+
+            if constexpr (CT::Dense<T> and denseSize == 32) {
+               // Save to a dense array                                 
+               if constexpr (alignof(TO) % 32 == 0)
+                  simde_mm256_store_pd(to_pd, from);
+               else
+                  simde_mm256_storeu_pd(to_pd, from);
+            }
             else {
-               auto toIt = to;
-               auto fromIt = temp;
-               const auto toItEnd = to + S;
-               while (toIt != toItEnd)
-                  **(toIt++) = DenseCast(fromIt++);
+               // Save to a sparse array, or a differently sized array  
+               alignas(32) simde_float64 temp[4];
+               simde_mm256_store_pd(temp, from);
+
+               if constexpr (CT::Dense<T>)
+                  ::std::memcpy(to_pd, temp, denseSize);
+               else {
+                  auto toIt = to;
+                  auto fromIt = temp;
+                  const auto toItEnd = to + S;
+                  while (toIt != toItEnd)
+                     **(toIt++) = DenseCast(fromIt++);
+               }
             }
          }
-      }
-      else if constexpr (CT::Same<FROM, simde__m512i>) {
-         if constexpr (CT::Dense<T> and toSize == 64) {
-            // Save to a dense array                                    
-            if constexpr (ALIGNED)
-               simde_mm512_store_si512(to, from);
-            else
-               simde_mm512_storeu_si512(to, from);
-         }
-         else {
-            // Save to a sparse array, or a differently sized array     
-            alignas(64) Byte temp[64];
-            simde_mm512_store_si512(temp, from);
-            if constexpr (CT::Dense<T>)
-               ::std::memcpy(to, temp, toSize);
+         else if constexpr (CT::SIMD256i<FROM>) {
+            auto to_si = reinterpret_cast<simde__m256i*>(&Inner::GetFirst(to));
+
+            if constexpr (CT::Dense<T> and denseSize == 32) {
+               // Save to a dense array                                 
+               if constexpr (alignof(TO) % 32 == 0)
+                  simde_mm256_store_si256(to_si, from);
+               else
+                  simde_mm256_storeu_si256(to_si, from);
+            }
             else {
-               auto toIt = to;
-               auto fromIt = reinterpret_cast<Decay<T>*>(temp);
-               const auto toItEnd = to + S;
-               while (toIt != toItEnd)
-                  **(toIt++) = DenseCast(fromIt++);
+               // Save to a sparse array, or a differently sized array  
+               simde__m256i temp;
+               simde_mm256_store_si256(&temp, from);
+
+               if constexpr (CT::Dense<T>)
+                  ::std::memcpy(to_si, &temp, denseSize);
+               else {
+                  auto toIt = to;
+                  auto fromIt = reinterpret_cast<Decay<T>*>(&temp);
+                  const auto toItEnd = to + S;
+                  while (toIt != toItEnd)
+                     **(toIt++) = DenseCast(fromIt++);
+               }
             }
          }
+         else
+      #endif
+
+      #if LANGULUS_SIMD(512BIT)
+         //                                                             
+         // __m512*                                                     
+         //                                                             
+         if constexpr (CT::SIMD512f<FROM>) {
+            auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
+
+            if constexpr (CT::Dense<T> and denseSize == 64) {
+               // Save to a dense array                                 
+               if constexpr (alignof(TO) % 64 == 0)
+                  simde_mm512_store_ps(to_ps, from);
+               else
+                  simde_mm512_storeu_ps(to_ps, from);
+            }
+            else {
+               // Save to a sparse array, or a differently sized array  
+               alignas(64) simde_float32 temp[16];
+               simde_mm512_store_ps(temp, from);
+
+               if constexpr (CT::Dense<T>)
+                  ::std::memcpy(to_ps, temp, denseSize);
+               else {
+                  auto toIt = to;
+                  auto fromIt = temp;
+                  const auto toItEnd = to + S;
+                  while (toIt != toItEnd)
+                     **(toIt++) = DenseCast(fromIt++);
+               }
+            }
+         }
+         else if constexpr (CT::SIMD512d<FROM>) {
+            auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
+
+            if constexpr (CT::Dense<T> and denseSize == 64) {
+               // Save to a dense array                                 
+               if constexpr (alignof(TO) % 64 == 0)
+                  simde_mm512_store_pd(to_pd, from);
+               else
+                  simde_mm512_storeu_pd(to_pd, from);
+            }
+            else {
+               // Save to a sparse array, or a differently sized array  
+               alignas(64) simde_float64 temp[8];
+               simde_mm512_store_pd(temp, from);
+
+               if constexpr (CT::Dense<T>)
+                  ::std::memcpy(to_pd, temp, denseSize);
+               else {
+                  auto toIt = to;
+                  auto fromIt = temp;
+                  const auto toItEnd = to + S;
+                  while (toIt != toItEnd)
+                     **(toIt++) = DenseCast(fromIt++);
+               }
+            }
+         }
+         else if constexpr (CT::SIMD512i<FROM>) {
+            auto to_si = reinterpret_cast<simde__m512i*>(&Inner::GetFirst(to));
+
+            if constexpr (CT::Dense<T> and denseSize == 64) {
+               // Save to a dense array                                 
+               if constexpr (alignof(TO) % 64 == 0)
+                  simde_mm512_store_si512(to_si, from);
+               else
+                  simde_mm512_storeu_si512(to_si, from);
+            }
+            else {
+               // Save to a sparse array, or a differently sized array  
+               simde__m512i temp;
+               simde_mm512_store_si512(temp, from);
+
+               if constexpr (CT::Dense<T>)
+                  ::std::memcpy(to_si, &temp, denseSize);
+               else {
+                  auto toIt = to;
+                  auto fromIt = reinterpret_cast<Decay<T>*>(&temp);
+                  const auto toItEnd = to + S;
+                  while (toIt != toItEnd)
+                     **(toIt++) = DenseCast(fromIt++);
+               }
+            }
+         }
+         else
+      #endif
+         LANGULUS_ERROR("Unsupported FROM register for SIMD::Store");
       }
-      else
-   #endif
-      LANGULUS_ERROR("Unsupported FROM register for SIMD::Store");
-   }
    
-   /// Generalized store routine                                              
+   } // namespace Langulus::SIMD::Inner
+
+
+   /// Fallback store routine, doesn't use SIMD                               
    ///   @tparam FROM - any source type, SIMD register, std::array,           
    ///                  boolvector, or scalar                                 
    ///   @tparam TO - any destination type, array or scalar                   
    ///   @param from - what to store                                          
    ///   @param to - where to store it                                        
-   template<class FROM, class TO>
+   template<CT::NotSIMD FROM, CT::NotSIMD TO>
    LANGULUS(INLINED)
-   void GeneralStore(const FROM& from, TO& to) noexcept {
-      if constexpr (CT::TSIMD<FROM>) {
-         // Extract from SIMD register (produced from SIMD routine)     
-         Store(from, to);
-      }
-      else if constexpr (CT::Bitmask<FROM>) {
+   constexpr void StoreConstexpr(const FROM& from, TO& to) noexcept {
+      if constexpr (CT::Bitmask<FROM>) {
          // Extract from bitmask (produced from SIMD compare routine)   
          if constexpr (CT::Bitmask<TO>) {
             // Store in another bitmask                                 
             DenseCast(to) = from;
          }
-         else if constexpr (CT::Bool<TO> and CT::Array<TO>) {
-            if constexpr (ExtentOf<TO> == 1) {
-               // Do logic-and on all bits, and write the one bool      
-               DenseCast(to[0]) = static_cast<bool>(from);
-            }
-            else {
-               // Convert each bit to a boolean inside an array         
-               for (Offset i = 0; i < ExtentOf<TO>; ++i)
-                  DenseCast(to[i]) = from[i];
-            }
-         }
          else if constexpr (CT::Bool<TO>) {
-            // Do logic-and on all bits, and write the one bool         
-            DenseCast(to) = static_cast<bool>(from);
+            // Convert each bit to a boolean inside an array            
+            static_assert(CountOf<FROM> == CountOf<TO>, "Counts must match");
+            for (Offset i = 0; i < CountOf<TO>; ++i)
+               DenseCast(to[i]) = from[i];
          }
          else LANGULUS_ERROR("Bad output to store a bitmask");
       }
       else if constexpr (::std::ranges::range<FROM>) {
-         // Extract from std::array, returned by fallback routines      
+         // Extract from anything that has begin() and end() methods    
          if constexpr (CT::Bitmask<TO>) {
             // Store as bitmask                                         
             using T = typename Decay<TO>::Type;
             for (decltype(from.size()) i = 0; i < from.size(); ++i)
                DenseCast(to) |= (static_cast<T>(from[i]) << static_cast<T>(i));
          }
-         else if constexpr (not CT::Array<TO>) {
+         else if constexpr (CountOf<TO> == 1) {
             // Store as a single number (produced from fallback)        
             if constexpr (CT::Bool<TO>) {
-               // A boolean FROM will be collapsed                      
+               // Short-circuit on first false flag (AND logic)         
                for (auto& it : from) {
-                  if (!it) {
+                  if (not it) {
                      to = false;
                      return;
                   }
@@ -354,40 +330,50 @@ namespace Langulus::SIMD
             }
             else {
                // Otherwise just copy first element                     
-               DenseCast(to) = from[0];
+               DenseCast(GetFirst(to)) = from[0];
             }
          }
-         else if constexpr (ExtentOf<TO> == 1) {
-            // Store to an output array of size 1                       
-            DenseCast(to[0]) = from[0];
-         }
-         else if constexpr (CT::Sparse<Deext<TO>>) {
-            // Store to a sparse output array                           
-            for (Count i = 0; i < ExtentOf<TO>; ++i)
-               *to[i] = from[i];
-         }
          else {
-            // Store as a dense output array (fastest)                  
-            static_assert(sizeof(from) == sizeof(to), "Bad memcpy");
-            ::std::memcpy(to, from.data(), sizeof(to));
+            // Store to a sparse/dense output array                     
+            static_assert(CountOf<FROM> == CountOf<TO>, "Counts must match");
+            for (Count i = 0; i < CountOf<TO>; ++i)
+               DenseCast(to[i]) = from[i];
          }
       }
       else {
          // Extract from a scalar                                       
-         if constexpr (not CT::Array<TO>) {
-            // Store as a single number (produced from fallback)        
-            DenseCast(to) = from;
-         }
-         else if constexpr (ExtentOf<TO> == 1) {
-            // Store to an output array of size 1                       
-            DenseCast(to[0]) = from;
+         if constexpr (CountOf<TO> == 1) {
+            if constexpr (CT::Bitmask<TO>) {
+               // Store to a single-bit bitmask                         
+               DenseCast(to) = from;
+            }
+            else {
+               // Store to an output array of size 1, or scalar         
+               DenseCast(Inner::GetFirst(to)) = from;
+            }
          }
          else {
             // Multicast only result to an output array                 
-            for (Count i = 0; i < ExtentOf<TO>; ++i)
+            for (Count i = 0; i < CountOf<TO>; ++i)
                DenseCast(to[i]) = from;
          }
       }
+   }
+
+   /// Generalized store routine                                              
+   /// Can be either constexpr or not, using SIMD or not                      
+   ///   @tparam FROM - any source type, SIMD register, std::array,           
+   ///                  boolvector, or scalar                                 
+   ///   @tparam TO - any destination type, array or scalar                   
+   ///   @param from - what to store                                          
+   ///   @param to - where to store it                                        
+   template<class FROM, CT::NotSIMD TO>
+   LANGULUS(INLINED)
+   constexpr void Store(const FROM& from, TO& to) noexcept {
+      if constexpr (CT::SIMD<FROM>)
+         Inner::Store(from, to);
+      else
+         StoreConstexpr(from, to);
    }
 
 } // namespace Langulus::SIMD

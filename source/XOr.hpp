@@ -8,7 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Fill.hpp"
-#include "Convert.hpp"
+#include "Evaluate.hpp"
 #include "IgnoreWarningsPush.inl"
 
 
@@ -67,9 +67,9 @@ namespace Langulus::SIMD
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
    auto XOr(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-      using DOUT = Decay<OUT>;
-      using REGISTER = CT::Register<LHS, RHS, DOUT>;
-      constexpr auto S = OverlapCount<LHS, RHS>();
+      using DOUT = Decay<TypeOf<OUT>>;
+      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
+      constexpr auto S = OVERLAP_EXTENTS(lhsOrig, rhsOrig);
 
       return Inner::Evaluate<0, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
@@ -92,15 +92,6 @@ namespace Langulus::SIMD
    LANGULUS(INLINED)
    void XOr(LHS& lhs, RHS& rhs, OUT& output) noexcept {
       GeneralStore(XOr<LHS, RHS, OUT>(lhs, rhs), output);
-   }
-
-   ///                                                                        
-   template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(INLINED)
-   WRAPPER XOrWrap(LHS& lhs, RHS& rhs) noexcept {
-      WRAPPER result;
-      XOr<LHS, RHS>(lhs, rhs, result.mArray);
-      return result;
    }
 
 } // namespace Langulus::SIMD

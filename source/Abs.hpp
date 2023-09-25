@@ -22,7 +22,7 @@ namespace Langulus::SIMD
       ///   @tparam REGISTER - the register type (deducible)                  
       ///   @param v - the array                                              
       ///   @return the absolute values                                       
-      template<class T, Count S, CT::TSIMD REGISTER>
+      template<class T, Count S, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Abs(const REGISTER& v) noexcept {
          static_assert(CT::Signed<T>, "Suboptimal and pointless for unsigned values");

@@ -8,7 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Fill.hpp"
-#include "Convert.hpp"
+#include "Evaluate.hpp"
 #include <cmath>
 
 
@@ -18,9 +18,9 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class, Count>
+      template<class, CT::NotSIMD T>
       LANGULUS(INLINED)
-      constexpr Unsupported Power(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      constexpr Unsupported Power(const T&, const T&) noexcept {
          return {};
       }
 
@@ -31,7 +31,7 @@ namespace Langulus::SIMD
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the raised values                                         
-      template<class T, Count S, CT::TSIMD REGISTER>
+      template<class T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Power(REGISTER lhs, REGISTER rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
@@ -138,15 +138,60 @@ namespace Langulus::SIMD
    ///           or array/scalar if no viable SIMD routine exists             
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
+   constexpr auto PowerConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+      using DOUT = Decay<TypeOf<OUT>>;
+
+      return Inner::Evaluate<1, Unsupported, DOUT>(
+         lhsOrig, rhsOrig, nullptr,
+         [](DOUT lhs, DOUT rhs) noexcept -> DOUT {
+            if (lhs == DOUT {1})
+               return DOUT {1};
+
+            if constexpr (CT::IntegerX<DOUT>) {
+               if constexpr (CT::Unsigned<DOUT>) {
+                  DOUT result {1};
+                  while (rhs != DOUT {0}) {
+                     if ((rhs & DOUT {1}) != DOUT {0})
+                        result *= lhs;
+                     rhs >>= DOUT {1};
+                     lhs *= lhs;
+                  }
+                  return result;
+               }
+               else if (rhs > 0) {
+                  DOUT result {1};
+                  while (rhs != DOUT {0}) {
+                     result *= lhs;
+                     --rhs;
+                  }
+                  return result;
+               }
+               else return DOUT {0};
+            }
+            else if constexpr (CT::Real<DOUT>)
+               return ::std::pow(lhs, rhs);
+            else
+               LANGULUS_ERROR("T must be a number");
+         }
+      );
+   }
+   
+   /// Raise numbers to a power                                               
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired element type (lossless by default)         
+   ///   @return a register, if viable SIMD routine exists                    
+   ///           or array/scalar if no viable SIMD routine exists             
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   NOD() LANGULUS(INLINED)
    auto Power(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<OUT>;
-      using REGISTER = CT::Register<LHS, RHS, DOUT>;
-      constexpr auto S = OverlapCount<LHS, RHS>();
+      using DOUT = Decay<TypeOf<OUT>>;
+      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
 
       return Inner::Evaluate<1, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::Power<DOUT, S>(lhs, rhs);
+            return Inner::Power<DOUT>(lhs, rhs);
          },
          [](DOUT lhs, DOUT rhs) noexcept -> DOUT {
             if (lhs == DOUT {1})
@@ -189,17 +234,11 @@ namespace Langulus::SIMD
    ///              order to fit the result in desired output                 
    template<class LHS, class RHS, class OUT>
    LANGULUS(INLINED)
-   void Power(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
-      GeneralStore(Power<LHS, RHS, OUT>(lhs, rhs), output);
-   }
-
-   ///                                                                        
-   template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(INLINED)
-   WRAPPER PowerWrap(const LHS& lhs, const RHS& rhs) noexcept {
-      WRAPPER result;
-      Power<LHS, RHS>(lhs, rhs, result.mArray);
-      return result;
+   constexpr void Power(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+      IF_CONSTEXPR() {
+         StoreConstexpr(PowerConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
+      }
+      else Store(Power<LHS, RHS, OUT>(lhs, rhs), out);
    }
 
 } // namespace Langulus::SIMD
