@@ -9,9 +9,11 @@
 #pragma once
 #include "From128f_To128d.hpp"
 #include "From128f_To128i.hpp"
-#include "From128f_To256d.hpp"
-#include "From128f_To256i.hpp"
 
+#if LANGULUS_SIMD(256BIT)
+   #include "From128f_To256d.hpp"
+   #include "From128f_To256i.hpp"
+#endif
 
 namespace Langulus::SIMD::Inner
 {
@@ -28,11 +30,14 @@ namespace Langulus::SIMD::Inner
          return ConvertFrom128f_To128d(v);
       else if constexpr (CT::SIMD128i<REGISTER>)
          return ConvertFrom128f_To128i<TO>(v);
-      else if constexpr (CT::SIMD256d<REGISTER>)
+      else
+   #if LANGULUS_SIMD(256BIT)
+      if constexpr (CT::SIMD256d<REGISTER>)
          return ConvertFrom128f_To256d(v);
       else if constexpr (CT::SIMD256i<REGISTER>)
          return ConvertFrom128f_To256i<TO>(v);
       else
+   #endif
          LANGULUS_ERROR("Can't convert from __m128 to unsupported");
    }
 
