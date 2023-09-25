@@ -107,14 +107,14 @@ namespace Langulus::SIMD::Inner
          if constexpr (CT::SignedInteger8<TO>) {
             // u/i32[8] -> i8[8]                                        
             auto
-            v16_8 = simde_mm256_packs_epi32(v16_8, v16_8);
+            v16_8 = simde_mm256_packs_epi32(v, v);
             v16_8 = simde_mm256_packs_epi16(v16_8, v16_8);
             return v16_8;
          }
          else if constexpr (CT::UnsignedInteger8<TO>) {
             // u/i32[8] -> u8[8]                                        
             auto
-            v16_8 = simde_mm256_packus_epi32(v16_8, v16_8);
+            v16_8 = simde_mm256_packus_epi32(v, v);
             v16_8 = simde_mm256_packus_epi16(v16_8, v16_8);
             return v16_8;
          }
