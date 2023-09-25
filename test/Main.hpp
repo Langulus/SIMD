@@ -107,11 +107,13 @@ void InitOne(T& a, A&& b) noexcept {
          delete a;
       a = new DT {static_cast<DT>(b)};
    }
-   else a = static_cast<T>(b);
+   else a = static_cast<Decay<TypeOf<T>>>(b);
 }
 
+/// Satisfies the CT::Vector concept                                          
+#pragma pack(push, 1)
 template<class T, Count C>
-struct alignas(Langulus::Alignment) Vector {
+struct /*alignas(Langulus::Alignment)*/ Vector {
    LANGULUS(TYPED) T;
    static constexpr Count MemberCount = C;
 
@@ -171,6 +173,24 @@ struct alignas(Langulus::Alignment) Vector {
          }
       }
    }
+   
+   Vector(const Vector& v) {
+      for (Count i = 0; i < C; ++i) {
+         if constexpr (CT::Sparse<T>)
+            mArray[i] = new Decay<T> {*v.mArray[i]};
+         else
+            mArray[i] = v.mArray[i];
+      }
+   }
+
+   Vector(const Decay<T>& s) {
+      for (Count i = 0; i < C; ++i) {
+         if constexpr (CT::Sparse<T>)
+            mArray[i] = new Decay<T> {s};
+         else
+            mArray[i] = s;
+      }
+   }
 
    ~Vector() {
       for (auto& i : mArray) {
@@ -191,4 +211,26 @@ struct alignas(Langulus::Alignment) Vector {
          DenseCast(mArray[i]) = DenseCast(b.mArray[i]);
       return *this;
    }
+
+   Vector& operator = (const Decay<T>& b) noexcept {
+      for (Count i = 0; i < C; ++i)
+         DenseCast(mArray[i]) = b;
+      return *this;
+   }
+
+   explicit operator const T& () const noexcept requires (C==1) {
+      return mArray[0];
+   }
+   explicit operator T& () noexcept requires (C==1) {
+      return mArray[0];
+   }
+
+   const T& operator [](unsigned i) const noexcept {
+      return mArray[i];
+   }
+
+   T& operator [](unsigned i) noexcept {
+      return mArray[i];
+   }
 };
+#pragma pack(pop)

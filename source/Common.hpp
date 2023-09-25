@@ -194,70 +194,61 @@ namespace Langulus::CT
 
    /// Concept for 128bit SIMD registers                                      
    template<class... T>
-   concept SIMD128 = (SameAsOneOf<T, simde__m128, simde__m128d, simde__m128i> and ...);
+   concept SIMD128 = (ExactAsOneOf<T, simde__m128, simde__m128d, simde__m128i> and ...);
+
+   /// Concept for 128bit SIMD float registers                                
+   template<class... T>
+   concept SIMD128f = (Exact<T, simde__m128> and ...);
+
+   /// Concept for 128bit SIMD double registers                               
+   template<class... T>
+   concept SIMD128d = (Exact<T, simde__m128d> and ...);
+
+   /// Concept for 128bit SIMD integer registers                              
+   template<class... T>
+   concept SIMD128i = (Exact<T, simde__m128i> and ...);
 
    /// Concept for 256bit SIMD registers                                      
    template<class... T>
-   concept SIMD256 = (SameAsOneOf<T, simde__m256, simde__m256d, simde__m256i> and ...);
+   concept SIMD256 = (ExactAsOneOf<T, simde__m256, simde__m256d, simde__m256i> and ...);
+
+   /// Concept for 256bit SIMD float registers                                
+   template<class... T>
+   concept SIMD256f = (Exact<T, simde__m256> and ...);
+
+   /// Concept for 256bit SIMD double registers                               
+   template<class... T>
+   concept SIMD256d = (Exact<T, simde__m256d> and ...);
+
+   /// Concept for 256bit SIMD integer registers                              
+   template<class... T>
+   concept SIMD256i = (Exact<T, simde__m256i> and ...);
 
    /// Concept for 512bit SIMD registers                                      
    template<class... T>
-   concept SIMD512 = (SameAsOneOf<T, simde__m512, simde__m512d, simde__m512i> and ...);
+   concept SIMD512 = (ExactAsOneOf<T, simde__m512, simde__m512d, simde__m512i> and ...);
+
+   /// Concept for 512bit SIMD float registers                                
+   template<class... T>
+   concept SIMD512f = (Exact<T, simde__m512> and ...);
+
+   /// Concept for 512bit SIMD double registers                               
+   template<class... T>
+   concept SIMD512d = (Exact<T, simde__m512d> and ...);
+
+   /// Concept for 512bit SIMD integer registers                              
+   template<class... T>
+   concept SIMD512i = (Exact<T, simde__m512i> and ...);
 
    /// Concept for SIMD registers                                             
    template<class... T>
-   concept TSIMD   = ((SIMD128<T> or SIMD256<T> or SIMD512<T>) and ...);
+   concept SIMD   = ((SIMD128<T> or SIMD256<T> or SIMD512<T>) and ...);
 
-   /// Byte concept                                                           
+   /// Concept anything but SIMD registers                                    
    template<class... T>
-   concept Byte    = (Same<::Langulus::Byte, T> and ...);
+   concept NotSIMD = not SIMD<T...>;
 
-   /// Single precision real number concept                                   
-   template<class... T>
-   concept Float   = (Same<::Langulus::Float, T> and ...);
-
-   /// Double precision real number concept                                   
-   template<class... T>
-   concept Double  = (Same<::Langulus::Double, T> and ...);
-
-   /// Size-related number concepts                                           
-   /// These concepts include character and byte types                        
-   template<class... T>
-   concept SignedInteger8  = ((CT::SignedInteger<T> and sizeof(Decay<T>) == 1) and ...);
-   template<class... T>
-   concept SignedInteger16 = ((CT::SignedInteger<T> and sizeof(Decay<T>) == 2) and ...);
-   template<class... T>
-   concept SignedInteger32 = ((CT::SignedInteger<T> and sizeof(Decay<T>) == 4) and ...);
-   template<class... T>
-   concept SignedInteger64 = ((CT::SignedInteger<T> and sizeof(Decay<T>) == 8) and ...);
-
-   template<class... T>
-   concept UnsignedInteger8 = (((CT::UnsignedInteger<T> or CT::Character<T> or CT::Byte<T>)
-       and sizeof(Decay<T>) == 1) and ...);
-
-   template<class... T>
-   concept UnsignedInteger16 = (((CT::UnsignedInteger<T> or CT::Character<T>)
-       and sizeof(Decay<T>) == 2) and ...);
-
-   template<class... T>
-   concept UnsignedInteger32 = (((CT::UnsignedInteger<T> or CT::Character<T>)
-       and sizeof(Decay<T>) == 4) and ...);
-
-   template<class... T>
-   concept UnsignedInteger64 = (((CT::UnsignedInteger<T> or CT::Character<T>)
-       and sizeof(Decay<T>) == 8) and ...);
-
-   template<class... T>
-   concept Integer8  = ((SignedInteger8<T>  or UnsignedInteger8<T>)  and ...);
-   template<class... T>
-   concept Integer16 = ((SignedInteger16<T> or UnsignedInteger16<T>) and ...);
-   template<class... T>
-   concept Integer32 = ((SignedInteger32<T> or UnsignedInteger32<T>) and ...);
-   template<class... T>
-   concept Integer64 = ((SignedInteger64<T> or UnsignedInteger64<T>) and ...);
-   template<class... T>
-   concept IntegerX  = ((Integer8<T> or Integer16<T> or Integer32<T> or Integer64<T>) and ...);
-
+   /// Concept for detecting bitmask types                                    
    template<class... T>
    concept Bitmask = ((Decay<T>::IsBitmask) and ...);
 
@@ -265,6 +256,51 @@ namespace Langulus::CT
 
 namespace Langulus::SIMD
 {
+   
+   namespace Inner
+   {
+
+      /// Returns the count overlap of two vectors/scalars                    
+      /// This is used to decide the output array size, for containing the    
+      /// result of an arithmetic operation                                   
+      ///   @tparam LHS - left type                                           
+      ///   @tparam RHS - right type                                          
+      ///   @return the overlapping count:                                    
+      ///           the smaller extent, if two arrays are provided;           
+      ///           the bigger extent, if one of the arguments isn't a vector 
+      ///           1 if both arguments are not arrays                        
+      template<CT::NotSIMD LHS, CT::NotSIMD RHS>
+      NOD() constexpr Count OverlapCounts() noexcept {
+         constexpr auto lhs = CountOf<LHS>;
+         constexpr auto rhs = CountOf<RHS>;
+
+         if constexpr (lhs > 1 and rhs > 1)
+            return lhs < rhs ? lhs : rhs;
+         else if constexpr (lhs > 1)
+            return lhs;
+         else if constexpr (rhs > 1)
+            return rhs;
+         else
+            return 1;
+      }
+
+      template<CT::NotSIMD T>
+      NOD() constexpr decltype(auto) GetFirst(const T& a) noexcept {
+         if constexpr (CT::Array<T> or (CT::Dense<T> and requires { a[0]; }))
+            return (a[0]);
+         else
+            return (a);
+      }
+
+      template<CT::NotSIMD T>
+      NOD() constexpr decltype(auto) GetFirst(T& a) noexcept {
+         if constexpr (CT::Array<T> or (CT::Dense<T> and requires { a[0]; }))
+            return (a[0]);
+         else
+            return (a);
+      }
+
+   } // namespace Langulus::SIMD::Inner
 
    using ::Langulus::Inner::Unsupported;
 
@@ -638,122 +674,19 @@ namespace Langulus::SIMD
    template<class F, class T>
    concept Invocable = ::std::invocable<F, T, T>;
 
+   namespace Inner
+   {
+      template<class F, class T>
+      constexpr auto InvocableResultInner() noexcept {
+         if constexpr (CT::Nullptr<F>)
+            return Unsupported {};
+         else
+            return ::std::invoke_result_t<F, T, T> {};
+      }
+   }
+
    template<class F, class T>
-   using InvocableResult = ::std::invoke_result_t<F, T, T>;
-
-
-   /// Constrexpr function to calculate required elements                     
-   /// LHS and RHS can be arrays, and it considers their extents              
-   ///   @tparam LHS - left number type (deducible)                           
-   ///   @tparam RHS - right number type (deducible)                          
-   ///   @return the overlapping count of LHS and RHS                         
-   template<class LHS, class RHS>
-   NOD() constexpr Count OverlapCount() noexcept {
-      if constexpr (CT::Array<LHS> and CT::Array<RHS>)
-         // Array OP Array                                              
-         return (ExtentOf<LHS>) < (ExtentOf<RHS>) ? ExtentOf<LHS> : ExtentOf<RHS>;
-      else if constexpr (CT::Array<LHS>)
-         // Array OP Scalar                                             
-         return ExtentOf<LHS>;
-      else if constexpr (CT::Array<RHS>)
-         // Scalar OP Array                                             
-         return ExtentOf<RHS>;
-      else
-         // Scalar OP Scalar                                            
-         return 1;
-   }
-
-   /// Fallback OP on a single pair of dense numbers                          
-   /// It converts LHS and RHS to the most lossless of the two                
-   ///   @tparam LHS - left number type (deducible)                           
-   ///   @tparam RHS - right number type (deducible)                          
-   ///   @tparam FFALL - the operation to invoke on fallback (deducible)      
-   ///   @param lhs - left argument                                           
-   ///   @param rhs - right argument                                          
-   ///   @param op - the fallback function to invoke                          
-   ///   @return the resulting number or std::array                           
-   template<class LOSSLESS, class LHS, class RHS, class FFALL>
-   NOD() LANGULUS(INLINED)
-   constexpr auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op)
-   requires Invocable<FFALL, LOSSLESS> {
-      using OUT = InvocableResult<FFALL, LOSSLESS>;
-
-      if constexpr (CT::Array<LHS> and CT::Array<RHS>) {
-         // Array OP Array                                              
-         constexpr auto S = OverlapCount<LHS, RHS>();
-         if constexpr (S > 1) {
-            ::std::array<OUT, S> output;
-            for (Count i = 0; i < S; ++i)
-               output[i] = Fallback<LOSSLESS>(lhs[i], rhs[i], ::std::move(op));
-            return output;
-         }
-         else return Fallback<LOSSLESS>(lhs[0], rhs[0], ::std::move(op));
-      }
-      else if constexpr (CT::Array<LHS>) {
-         // Array OP Scalar                                             
-         constexpr auto S = ExtentOf<LHS>;
-         if constexpr (S > 1) {
-            ::std::array<OUT, S> output;
-            if constexpr (CT::Bool<OUT>) {
-               auto& same_rhs = DenseCast(rhs);
-               for (Count i = 0; i < S; ++i)
-                  output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, ::std::move(op));
-            }
-            else {
-               const auto same_rhs = static_cast<LOSSLESS>(DenseCast(rhs));
-               for (Count i = 0; i < S; ++i)
-                  output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, ::std::move(op));
-            }
-            return output;
-         }
-         else {
-            if constexpr (CT::Bool<OUT>) {
-               auto& same_rhs = DenseCast(rhs);
-               return Fallback<LOSSLESS>(lhs[0], same_rhs, ::std::move(op));
-            }
-            else {
-               const auto same_rhs = static_cast<LOSSLESS>(DenseCast(rhs));
-               return Fallback<LOSSLESS>(lhs[0], same_rhs, ::std::move(op));
-            }
-         }
-      }
-      else if constexpr (CT::Array<RHS>) {
-         // Scalar OP Array                                             
-         constexpr auto S = ExtentOf<RHS>;
-         if constexpr (S > 1) {
-            ::std::array<OUT, S> output;
-            if constexpr (CT::Bool<OUT>) {
-               auto& same_lhs = DenseCast(lhs);
-               for (Count i = 0; i < S; ++i)
-                  output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], ::std::move(op));
-            }
-            else {
-               const auto same_lhs = static_cast<LOSSLESS>(DenseCast(lhs));
-               for (Count i = 0; i < S; ++i)
-                  output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], ::std::move(op));
-            }
-            return output;
-         }
-         else {
-            if constexpr (CT::Bool<OUT>) {
-               auto& same_lhs = DenseCast(lhs);
-               return Fallback<LOSSLESS>(same_lhs, rhs[0], ::std::move(op));
-            }
-            else {
-               const auto same_lhs = static_cast<LOSSLESS>(DenseCast(lhs));
-               return Fallback<LOSSLESS>(same_lhs, rhs[0], ::std::move(op));
-            }
-         }
-      }
-      else {
-         // Scalar OP Scalar                                            
-         // Casts should be optimized-out if type is same (I hope)      
-         return op(
-            static_cast<LOSSLESS>(DenseCast(lhs)), 
-            static_cast<LOSSLESS>(DenseCast(rhs))
-         );
-      }
-   }
+   using InvocableResult = decltype(Inner::InvocableResultInner<F, T>());
 
 } // namespace Langulus::SIMD
 

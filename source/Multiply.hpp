@@ -8,7 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Fill.hpp"
-#include "Convert.hpp"
+#include "Evaluate.hpp"
 #include "IgnoreWarningsPush.inl"
 
 
@@ -18,20 +18,19 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class, Count>
+      template<class, CT::NotSIMD T>
       LANGULUS(INLINED)
-      constexpr Unsupported Multiply(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      constexpr Unsupported Multiply(const T&, const T&) noexcept {
          return {};
       }
 
       /// Multiply two arrays using SIMD                                      
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
       ///   @tparam REGISTER - type of register we're operating with          
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the multiplied elements as a register                     
-      template<class T, Count S, CT::TSIMD REGISTER>
+      template<class T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Multiply(const REGISTER& lhs, const REGISTER& rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
@@ -142,7 +141,26 @@ namespace Langulus::SIMD
    } // namespace Langulus::SIMD::Inner
 
 
-   /// Multiply numbers                                                       
+   /// Multiply numbers and return a register, if possible                    
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired element type (lossless by default)         
+   ///   @return a register, if viable SIMD routine exists                    
+   ///           or array/scalar if no viable SIMD routine exists             
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   NOD() LANGULUS(INLINED)
+   constexpr auto MultiplyConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+      using DOUT = Decay<TypeOf<OUT>>;
+
+      return Inner::Evaluate<0, Unsupported, DOUT>(
+         lhsOrig, rhsOrig, nullptr,
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+            return lhs * rhs;
+         }
+      );
+   }
+   
+   /// Multiply numbers and return a register, if possible                    
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
    ///   @tparam OUT - the desired element type (lossless by default)         
@@ -151,15 +169,14 @@ namespace Langulus::SIMD
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
    auto Multiply(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<OUT>;
-      using REGISTER = CT::Register<LHS, RHS, DOUT>;
-      constexpr auto S = OverlapCount<LHS, RHS>();
+      using DOUT = Decay<TypeOf<OUT>>;
+      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
 
       return Inner::Evaluate<0, REGISTER, DOUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
             LANGULUS_SIMD_VERBOSE("Multiplying (SIMD)");
-            return Inner::Multiply<DOUT, S>(lhs, rhs);
+            return Inner::Multiply<DOUT>(lhs, rhs);
          },
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             LANGULUS_SIMD_VERBOSE("Multiplying (Fallback)");
@@ -176,17 +193,11 @@ namespace Langulus::SIMD
    ///              order to fit the result in desired output                 
    template<class LHS, class RHS, class OUT>
    LANGULUS(INLINED)
-   void Multiply(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
-      GeneralStore(Multiply<LHS, RHS, OUT>(lhs, rhs), output);
-   }
-
-   ///                                                                        
-   template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(INLINED)
-   WRAPPER MultiplyWrap(const LHS& lhs, const RHS& rhs) noexcept {
-      WRAPPER result;
-      Multiply<LHS, RHS>(lhs, rhs, result.mArray);
-      return result;
+   constexpr void Multiply(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+      IF_CONSTEXPR() {
+         StoreConstexpr(MultiplyConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
+      }
+      else Store(Multiply<LHS, RHS, OUT>(lhs, rhs), out);
    }
 
 } // namespace Langulus::SIMD

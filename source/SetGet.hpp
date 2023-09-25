@@ -21,45 +21,47 @@ namespace Langulus::SIMD
       ///   @tparam IDX - the index to get                                    
       ///   @tparam MAXS - the maximum number of elements T inside register   
       ///   @tparam REVERSE - whether or not to count in inverse              
-      ///   @tparam T - the type of an array element                          
-      ///   @tparam S - the size of the array                                 
+      ///   @tparam FROM - the scalar/array/vector to use for setting         
       ///   @param values - the array to access                               
       ///   @return a reference to the element, or DEF if out of range        
-      template<class R, int DEF, Offset IDX, Count MAXS, bool REVERSE = false, class T, Count S>
+      template<class R, int DEF, Offset IDX, Count MAXS, bool REVERSE = false, class FROM>
       LANGULUS(INLINED)
-      const R& Get(const T(&values)[S]) {
+      constexpr decltype(auto) Get(const FROM& values) {
+         constexpr auto S = CountOf<FROM>;
          static_assert(S <= MAXS, "S must be in MAXS limit");
          static_assert(IDX < MAXS, "IDX must be in MAXS limit");
-         static constinit auto fallback = static_cast<R>(DEF);
 
          if constexpr (REVERSE) {
-            if constexpr (MAXS - IDX - 1 < S)
-               return reinterpret_cast<const R&>(DenseCast(values[MAXS - IDX - 1]));
-            else
-               return fallback;
+            if constexpr (MAXS - IDX - 1 < S) {
+               return reinterpret_cast<const R&>(
+                  DenseCast(values[MAXS - IDX - 1]));
+            }
+            else return static_cast<R>(DEF);
          }
          else {
-            if constexpr (IDX < S)
-               return reinterpret_cast<const R&>(DenseCast(values[IDX]));
-            else
-               return fallback;
+            if constexpr (IDX < S) {
+               return reinterpret_cast<const R&>(
+                  DenseCast(values[IDX]));
+            }
+            else return static_cast<R>(DEF);
          }
       }
 
       /// Inner array iteration and register setting                          
       ///   @tparam DEF - the default value for the element, if out of S      
       ///   @tparam CHUNK - the size of register to fill (in bytes)           
-      ///   @tparam T - the type of an array element                          
-      ///   @tparam S - the size of the array                                 
+      ///   @tparam FROM - the scalar/array/vector to use for setting         
       ///   @tparam INDICES - the indices to use                              
       ///   @param values - the array to access                               
       ///   @return the register                                              
-      template<int DEF, Size CHUNK, class T, Count S, Offset... INDICES>
+      template<int DEF, Size CHUNK, CT::Vector FROM, Offset... INDICES>
       LANGULUS(INLINED)
-      auto Set(std::integer_sequence<Offset, INDICES...>, const T(&values)[S]) {
+      auto Set(std::integer_sequence<Offset, INDICES...>, const FROM& values) {
+         using T = Decay<TypeOf<FROM>>;
+
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CHUNK == 16) {
-               LANGULUS_SIMD_VERBOSE("Setting 128bit register from ", S, " elements");
+               LANGULUS_SIMD_VERBOSE("Setting 128bit register from ", CountOf<FROM>, " elements");
 
                if constexpr (CT::SignedInteger8<T>)
                   return simde_mm_setr_epi8(Get<int8_t, DEF, INDICES, 16>(values)...);
@@ -89,7 +91,7 @@ namespace Langulus::SIMD
 
          #if LANGULUS_SIMD(256BIT)
             if constexpr (CHUNK == 32) {
-               LANGULUS_SIMD_VERBOSE("Setting 256bit register from ", S, " elements");
+               LANGULUS_SIMD_VERBOSE("Setting 256bit register from ", CountOf<FROM>, " elements");
 
                if constexpr (CT::SignedInteger8<T>)
                   return simde_mm256_setr_epi8(Get<int8_t, DEF, INDICES, 32>(values)...);
@@ -119,7 +121,7 @@ namespace Langulus::SIMD
 
          #if LANGULUS_SIMD(512BIT)
             if constexpr (CHUNK == 64) {
-               LANGULUS_SIMD_VERBOSE("Setting 512bit register from ", S, " elements");
+               LANGULUS_SIMD_VERBOSE("Setting 512bit register from ", CountOf<FROM>, " elements");
 
                if constexpr (CT::SignedInteger8<T>)
                   return simde_mm512_setr_epi8(Get<int8_t, DEF, INDICES, 64>(values)...);
@@ -154,25 +156,22 @@ namespace Langulus::SIMD
 
    /// Construct a register manually                                          
    ///   @tparam CHUNK - the size of the chunk to set                         
-   ///   @tparam T - the type of the array element                            
-   ///   @tparam S - the size of the array                                    
+   ///   @tparam FROM - the scalar/array/vector to use for setting            
    ///   @param values - the array to wrap                                    
    ///   @return the register                                                 
-   template<int DEF, Size CHUNK, class T, Count S>
+   template<int DEF, Size CHUNK, CT::Vector FROM>
    LANGULUS(INLINED)
-   auto Set(const T(&values)[S]) noexcept {
-      if constexpr (S < 2) {
-         // No point in storing a single value in a large register      
-         // If this is reached, then the library did not choose the     
-         // optimal route for your operation at compile time            
-         return Unsupported {};
-      }
-      else {
-         constexpr auto MaxS = CHUNK / sizeof(Decay<T>);
-         static_assert((CT::Dense<T> and MaxS > S) or (CT::Sparse<T> and MaxS >= S),
-            "S should be smaller (or equal if sparse) than MaxS - use load otherwise");
-         return Inner::Set<DEF, CHUNK>(::std::make_integer_sequence<Count, MaxS> {}, values);
-      }
+   auto Set(const FROM& values) noexcept {
+      using T = TypeOf<FROM>;
+      constexpr auto S = CountOf<FROM>;
+      constexpr auto MaxS = CHUNK / sizeof(Decay<T>);
+      static_assert((CT::Dense<T>  and MaxS >  S)
+                 or (CT::Sparse<T> and MaxS >= S),
+         "S should be smaller (or equal if sparse) than MaxS - use load otherwise");
+
+      return Inner::Set<DEF, CHUNK>(
+         ::std::make_integer_sequence<Count, MaxS> {}, values
+      );
    }
 
 } // namespace Langulus::SIMD

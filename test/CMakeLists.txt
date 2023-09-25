@@ -9,6 +9,7 @@ add_executable(LangulusSIMDTest
 	TestShiftLeft.cpp
 	TestShiftRight.cpp
 	TestSub.cpp
+	TestTypeCorrectness.cpp
 )
 
 target_link_libraries(LangulusSIMDTest

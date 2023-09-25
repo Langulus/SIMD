@@ -15,101 +15,117 @@ namespace Langulus::SIMD
 {
 
    /// Fill a register with a single value                                    
-   ///   @tparam REGISTER - tyhe of register to fill                          
-   ///   @tparam T - type of data to use for filling                          
-   ///   @param value - the value to use for filling                          
+   ///   @tparam REGISTER - type of register to fill                          
+   ///   @tparam TO - type of data we're filling as                           
+   ///   @tparam FROM - type of data we're using to fill (deducible)          
+   ///   @param from -  the value to use for filling                          
+   ///                  can be inside a vector or an array                    
    ///   @return the filled register                                          
-   template<CT::TSIMD REGISTER, class T>
+   template<CT::SIMD REGISTER, class TO, CT::Scalar FROM>
    NOD() LANGULUS(INLINED)
-   decltype(auto) Fill(const T& valueOrig) noexcept {
-      auto& value = DenseCast(valueOrig);
-      if constexpr (CT::Same<REGISTER,T>)
-         return value;
-      else if constexpr (CT::Same<REGISTER,simde__m128i>) {
-         if constexpr (CT::Integer8<T>)
-            return simde_mm_set1_epi8(reinterpret_cast<const ::std::int8_t&>(value));
-         else if constexpr (CT::Integer16<T>)
+   decltype(auto) Fill(const FROM& from) noexcept {
+      static_assert(CT::NotSIMD<FROM>,  "FROM can't be a register");
+      static_assert(CT::Decayed<TO>,    "TO must be simplified at this point");
+      static_assert(CountOf<FROM> == 1, "Filling uses only the first element");
+      using OUT = Conditional<
+         CT::Exact<TO, Decay<TypeOf<FROM>>>,
+         const TypeOf<TO>&,
+         const TypeOf<TO>
+      >;
+      OUT value = static_cast<OUT>(DenseCast(Inner::GetFirst(from)));
+
+   #if LANGULUS_SIMD(128BIT)
+      if constexpr (CT::SIMD128i<REGISTER>) {
+         if constexpr (CT::Integer8<TO>)
+            return simde_mm_set1_epi8(value);
+         else if constexpr (CT::UnsignedInteger8<TO>)
+            return simde_x_mm_set1_epu8(value);
+         else if constexpr (CT::Integer16<TO>)
             return simde_mm_set1_epi16(value);
-         else if constexpr (CT::Integer32<T>)
+         else if constexpr (CT::UnsignedInteger16<TO>)
+            return simde_x_mm_set1_epu16(value);
+         else if constexpr (CT::Integer32<TO>)
             return simde_mm_set1_epi32(value);
-         else if constexpr (CT::Integer64<T>)
+         else if constexpr (CT::UnsignedInteger32<TO>)
+            return simde_x_mm_set1_epu32(value);
+         else if constexpr (CT::Integer64<TO>)
             return simde_mm_set1_epi64x(value);
+         else if constexpr (CT::UnsignedInteger64<TO>)
+            return simde_x_mm_set1_epu64(value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128i");
       }
-      else if constexpr (CT::Same<REGISTER,simde__m128>) {
-         if constexpr (CT::Float<T>) {
-            #if defined(SIMDE_X86_AVX_NATIVE)
-               LANGULUS_SIMD_VERBOSE("Attempting _mm_broadcast_ss");
-               return _mm_broadcast_ss(&value);
-            #elif defined(SIMDE_WASM_SIMD128_NATIVE)
-               LANGULUS_SIMD_VERBOSE("Attempting simde__m128_from_wasm_v128");
-               return simde__m128_from_wasm_v128(wasm_v128_load32_splat(&value));
-            #else
-               LANGULUS_SIMD_VERBOSE("Attempting simde_mm_set1_ps");
-               return simde_mm_set1_ps(value);
-            #endif
-
-            //return simde_mm_broadcast_ss(&value); // causing segfault on clang x86 with -mavx ????
-         }
+      else if constexpr (CT::SIMD128f<REGISTER>) {
+         if constexpr (CT::Float<TO>)
+            return simde_mm_broadcast_ss(&value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128");
       }
-      else if constexpr (CT::Same<REGISTER,simde__m128d>) {
-         if constexpr (CT::Double<T>)
+      else if constexpr (CT::SIMD128d<REGISTER>) {
+         if constexpr (CT::Double<TO>)
             return simde_mm_set1_pd(value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128d");
       }
-      else if constexpr (CT::Same<REGISTER,simde__m256i>) {
-         if constexpr (CT::Integer8<T>)
-            return simde_mm256_set1_epi8(reinterpret_cast<const ::std::int8_t&>(value));
-         else if constexpr (CT::Integer16<T>)
+      else
+   #endif
+
+   #if LANGULUS_SIMD(256BIT)
+      if constexpr (CT::SIMD256i<REGISTER>) {
+         if constexpr (CT::Integer8<TO>)
+            return simde_mm256_set1_epi8(value);
+         else if constexpr (CT::Integer16<TO>)
             return simde_mm256_set1_epi16(value);
-         else if constexpr (CT::Integer32<T>)
+         else if constexpr (CT::Integer32<TO>)
             return simde_mm256_set1_epi32(value);
-         else if constexpr (CT::Integer64<T>)
+         else if constexpr (CT::Integer64<TO>)
             return simde_mm256_set1_epi64x(value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256i");
       }
-      else if constexpr (CT::Same<REGISTER,simde__m256>) {
-         if constexpr (CT::Float<T>)
+      else if constexpr (CT::SIMD256f<REGISTER>) {
+         if constexpr (CT::Float<TO>)
             return simde_mm256_broadcast_ss(&value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::Fill __m256");
       }
-      else if constexpr (CT::Same<REGISTER,simde__m256d>) {
-         if constexpr (CT::Double<T>)
+      else if constexpr (CT::SIMD256d<REGISTER>) {
+         if constexpr (CT::Double<TO>)
             return simde_mm256_broadcast_sd(&value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256d");
       }
-      else if constexpr (CT::Same<REGISTER,simde__m512i>) {
-         if constexpr (CT::Integer8<T>)
-            return simde_mm512_set1_epi8(reinterpret_cast<const ::std::int8_t&>(value));
-         else if constexpr (CT::Integer16<T>)
+      else
+   #endif
+
+   #if LANGULUS_SIMD(512BIT)
+      if constexpr (CT::SIMD512i<REGISTER>) {
+         if constexpr (CT::Integer8<TO>)
+            return simde_mm512_set1_epi8(value);
+         else if constexpr (CT::Integer16<TO>)
             return simde_mm512_set1_epi16(value);
-         else if constexpr (CT::Integer32<T>)
+         else if constexpr (CT::Integer32<TO>)
             return simde_mm512_set1_epi32(value);
-         else if constexpr (CT::Integer64<T>)
+         else if constexpr (CT::Integer64<TO>)
             return simde_mm512_set1_epi64(value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m512i");
       }
-      else if constexpr (CT::Same<REGISTER,simde__m512>) {
-         if constexpr (CT::Float<T>)
+      else if constexpr (CT::SIMD512f<REGISTER>) {
+         if constexpr (CT::Float<TO>)
             return simde_mm512_set1_ps(value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::Fill __m512");
       }
-      else if constexpr (CT::Same<REGISTER,simde__m512d>) {
-         if constexpr (CT::Double<T>)
+      else if constexpr (CT::SIMD512d<REGISTER>) {
+         if constexpr (CT::Double<TO>)
             return simde_mm512_set1_pd(&value);
          else
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m512d");
       }
-      else LANGULUS_ERROR("Bad REGISTER type for SIMD::Fill");
+      else
+   #endif
+      LANGULUS_ERROR("Bad REGISTER type for SIMD::Fill");
    }
 
 } // namespace Langulus::SIMD

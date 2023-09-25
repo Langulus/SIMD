@@ -8,7 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Fill.hpp"
-#include "Convert.hpp"
+#include "Evaluate.hpp"
 #include "IgnoreWarningsPush.inl"
 
 
@@ -18,20 +18,19 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class, Count>
+      template<class, CT::NotSIMD T>
       LANGULUS(INLINED)
-      constexpr Unsupported Divide(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      constexpr Unsupported Divide(const T&, const T&) noexcept {
          return {};
       }
 
       /// Divide two arrays using SIMD                                        
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
       ///   @tparam REGISTER - type of register we're operating with          
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the divided elements as a register                        
-      template<class T, Count S, CT::TSIMD REGISTER>
+      template<class T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Divide(const REGISTER& lhs, const REGISTER& rhs) {
       #if LANGULUS_SIMD(128BIT)
@@ -215,19 +214,38 @@ namespace Langulus::SIMD
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
    ///   @tparam OUT - the desired element type (lossless by default)         
+   ///   @return array/scalar                                                 
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   NOD() LANGULUS(INLINED)
+   constexpr auto DivideConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) {
+      using DOUT = Decay<TypeOf<OUT>>;
+
+      return Inner::Evaluate<1, Unsupported, DOUT>(
+         lhsOrig, rhsOrig, nullptr,
+         [](const DOUT& lhs, const DOUT& rhs) -> DOUT {
+            if (rhs == DOUT {0})
+               LANGULUS_THROW(DivisionByZero, "Division by zero");
+            return lhs / rhs;
+         }
+      );
+   }
+
+   /// Divide numbers                                                         
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired element type (lossless by default)         
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
    auto Divide(const LHS& lhsOrig, const RHS& rhsOrig) {
-      using DOUT = Decay<OUT>;
-      using REGISTER = CT::Register<LHS, RHS, DOUT>;
-      constexpr auto S = OverlapCount<LHS, RHS>();
+      using DOUT = Decay<TypeOf<OUT>>;
+      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
 
       return Inner::Evaluate<1, REGISTER, DOUT>(
-         lhsOrig, rhsOrig, 
+         lhsOrig, rhsOrig,
          [](const REGISTER& lhs, const REGISTER& rhs) {
-            return Inner::Divide<DOUT, S>(lhs, rhs);
+            return Inner::Divide<DOUT>(lhs, rhs);
          },
          [](const DOUT& lhs, const DOUT& rhs) -> DOUT {
             if (rhs == DOUT {0})
@@ -245,17 +263,11 @@ namespace Langulus::SIMD
    ///              order to fit the result in desired output                 
    template<class LHS, class RHS, class OUT>
    LANGULUS(INLINED)
-   void Divide(const LHS& lhs, const RHS& rhs, OUT& output) {
-      GeneralStore(Divide<LHS, RHS, OUT>(lhs, rhs), output);
-   }
-
-   ///                                                                        
-   template<CT::Vector WRAPPER, class LHS, class RHS>
-   NOD() LANGULUS(INLINED)
-   WRAPPER DivideWrap(const LHS& lhs, const RHS& rhs) {
-      WRAPPER result;
-      Divide<LHS, RHS>(lhs, rhs, result.mArray);
-      return result;
+   constexpr void Divide(const LHS& lhs, const RHS& rhs, OUT& out) {
+      IF_CONSTEXPR() {
+         StoreConstexpr(DivideConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
+      }
+      else Store(Divide<LHS, RHS, OUT>(lhs, rhs), out);
    }
 
 } // namespace Langulus::SIMD
