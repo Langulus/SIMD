@@ -12,9 +12,11 @@
 #include "From256f_To128i.hpp"
 #include "From256f_To256d.hpp"
 #include "From256f_To256i.hpp"
-#include "From256f_To512d.hpp"
-#include "From256f_To512i.hpp"
 
+#if LANGULUS_SIMD(512BIT)
+   #include "From256f_To512d.hpp"
+   #include "From256f_To512i.hpp"
+#endif
 
 namespace Langulus::SIMD::Inner
 {
@@ -27,37 +29,18 @@ namespace Langulus::SIMD::Inner
    template<CT::Decayed TO, CT::SIMD REGISTER>
    LANGULUS(INLINED)
    auto ConvertFrom256f(const simde__m256& v) noexcept {
-      //                                                                
-      // Converting FROM float[8]                                       
-      //                                                                
-      if constexpr (CT::SIMD128d<REGISTER>) {
-         // float[2] -> double[2]                                       
-         return simde_mm_cvtps_pd(simde_mm256_castps256_ps128(v));
-      }
-      else if constexpr (CT::SIMD128i<REGISTER>) {
+      if constexpr (CT::SIMD128f<REGISTER>)
+         return ConvertFrom256f_To128f(v);
+      else if constexpr (CT::SIMD128d<REGISTER>)
+         return ConvertFrom256f_To128d(v);
+      else if constexpr (CT::SIMD128i<REGISTER>)
          return ConvertFrom256f_To128i<TO>(v);
-      }
-      else if constexpr (CT::SIMD256i<REGISTER>) {
-         //                                                             
-         // Converting TO i64[4], u64[4]                                
-         //                                                             
-         if constexpr (CT::SignedInteger64<TO>) {
-            // float[4] -> i64[4]                                       
-            const auto v32 = simde_mm_cvtps_epi32(simde_mm256_castps256_ps128(v));
-            return simde_mm256_cvtepi32_epi64(v32);
-         }
-         else if constexpr (CT::UnsignedInteger64<TO>) {
-            // float[4] -> u64[4]                                       
-            const auto v32 = simde_mm_cvtps_epi32(simde_mm256_castps256_ps128(v));
-            return simde_mm256_cvtepu32_epi64(v32);
-         }
-         else LANGULUS_ERROR("Can't convert from __m256 to __m256i");
-      }
-      else if constexpr (CT::SIMD256d<REGISTER>) {
-         // float[4] -> double[4]                                       
-         return simde_mm256_cvtps_pd(simde_mm256_castps256_ps128(v));
-      }
-      else LANGULUS_ERROR("Can't convert from __m256 to unsupported");
+      else if constexpr (CT::SIMD256i<REGISTER>)
+         return ConvertFrom256f_To256i<TO>(v);
+      else if constexpr (CT::SIMD256d<REGISTER>)
+         return ConvertFrom256f_To256d(v);
+      else
+         LANGULUS_ERROR("Can't convert from __m256 to unsupported");
    }
 
 } // namespace Langulus::SIMD

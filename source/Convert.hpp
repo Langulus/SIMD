@@ -55,7 +55,7 @@ namespace Langulus::SIMD
 
          #if LANGULUS_SIMD(128BIT)
             else if constexpr (CT::SIMD128f<FROM_SIMD>)
-               return Inner::ConvertFrom128<D_TO, TO_SIMD>(loaded);
+               return Inner::ConvertFrom128f<D_TO, TO_SIMD>(loaded);
             else if constexpr (CT::SIMD128d<FROM_SIMD>)
                return Inner::ConvertFrom128d<D_TO, TO_SIMD>(loaded);
             else if constexpr (CT::SIMD128i<FROM_SIMD>)
@@ -64,7 +64,7 @@ namespace Langulus::SIMD
 
          #if LANGULUS_SIMD(256BIT)
             else if constexpr (CT::SIMD256f<FROM_SIMD>)
-               return Inner::ConvertFrom256<D_TO, TO_SIMD>(loaded);
+               return Inner::ConvertFrom256f<D_TO, TO_SIMD>(loaded);
             else if constexpr (CT::SIMD256d<FROM_SIMD>)
                return Inner::ConvertFrom256d<D_TO, TO_SIMD>(loaded);
             else if constexpr (CT::SIMD256i<FROM_SIMD>)
@@ -73,7 +73,7 @@ namespace Langulus::SIMD
 
          #if LANGULUS_SIMD(512BIT)
             else if constexpr (CT::SIMD512f<FROM_SIMD>)
-               return Inner::ConvertFrom512<D_TO, TO_SIMD>(loaded);
+               return Inner::ConvertFrom512f<D_TO, TO_SIMD>(loaded);
             else if constexpr (CT::SIMD512d<FROM_SIMD>)
                return Inner::ConvertFrom512d<D_TO, TO_SIMD>(loaded);
             else if constexpr (CT::SIMD512i<FROM_SIMD>)
