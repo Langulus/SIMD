@@ -9,14 +9,21 @@
 #pragma once
 #include "Load.hpp"
 #include "IgnoreWarningsPush.inl"
+
 #if LANGULUS_SIMD(128BIT)
-   #include "ConvertFrom128.hpp"
+   #include "converters/From128f.hpp"
+   #include "converters/From128d.hpp"
+   #include "converters/From128i.hpp"
 #endif
 #if LANGULUS_SIMD(256BIT)
-   #include "ConvertFrom256.hpp"
+   #include "converters/From256f.hpp"
+   #include "converters/From256d.hpp"
+   #include "converters/From256i.hpp"
 #endif
 #if LANGULUS_SIMD(512BIT)
-   #include "ConvertFrom512.hpp"
+   #include "converters/From512f.hpp"
+   #include "converters/From512d.hpp"
+   #include "converters/From512i.hpp"
 #endif
 
 
