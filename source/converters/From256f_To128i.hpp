@@ -21,7 +21,7 @@ namespace Langulus::SIMD::Inner
    LANGULUS(INLINED)
    simde__m128i ConvertFrom256f_To128i(const simde__m256& v) noexcept {
       //                                                                
-      // Converting TO  i8[8],  u8[8],  i16[8], u16[8]                  
+      // Converting TO  i8 [8], u8 [8], i16[8], u16[8]                  
       //                i32[4], u32[4], i64[2], u64[2]                  
       //                                                                
       if constexpr (CT::SignedInteger8<TO>) {

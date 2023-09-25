@@ -660,6 +660,36 @@ namespace Langulus::SIMD
          return simde_mm256_inserti128_si256(C, C2, 1);
       #endif
    }
+
+   /// Pack 64bit integers (signed or not) to 32bit integers with truncation  
+   /// https://stackoverflow.com/questions/69408063                           
+   ///   @param a - lower four 64bit integers                                 
+   ///   @param b - higher four 64bit integers                                
+   ///   @return the combined 4 truncated 32bit equivalents                   
+   LANGULUS(INLINED)
+   simde__m256i lgls_pack_epi64(simde__m256i a, simde__m256i b) {
+   #if LANGULUS_SIMD(512BIT)
+      return _mm256_cvtepi64_epi8(v, v);
+   #else
+      // Grab the 32-bit low halves of 64-bit elements into one vector  
+      auto combined = _mm256_shuffle_ps(
+         _mm256_castsi256_ps(a),
+         _mm256_castsi256_ps(b),
+         _MM_SHUFFLE(2, 0, 2, 0)
+      );
+
+      // {b3,b2, a3,a2 | b1,b0, a1,a0}  from high to low                
+      // Re-arrange pairs of 32-bit elements with vpermpd               
+      // (or vpermq if you want)                                        
+      auto ordered = _mm256_permute4x64_pd(
+         _mm256_castps_pd(combined),
+         _MM_SHUFFLE(3, 1, 2, 0)
+      );
+
+      return _mm256_castpd_si256(ordered);
+   #endif
+   }
+
 #endif
 
    /*inline simde__m512i lgls_pack_epi32(const simde__m512i& a, const simde__m512i& b, const simde__m512i& mask) {
