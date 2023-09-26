@@ -42,19 +42,26 @@ namespace Langulus::SIMD
             if constexpr (CT::Dense<T> and denseSize == 16) {
                // Save to a dense array                                 
                if constexpr (alignof(TO) % 16 == 0) {
+                  LANGULUS_SIMD_VERBOSE("Storing full 128f to aligned ", denseSize, " bytes");
                   auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
                   simde_mm_store_ps(to_ps, from);
                }
-               else simde_mm_storeu_ps(&Inner::GetFirst(to), from);
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing full 128f to unaligned ", denseSize, " bytes");
+                  simde_mm_storeu_ps(&Inner::GetFirst(to), from);
+               }
             }
             else if constexpr (denseSize <= 16) {
                // Save to a sparse array, or a differently sized array  
                alignas(16) simde_float32 temp[4];
                simde_mm_store_ps(temp, from);
 
-               if constexpr (CT::Dense<T>)
+               if constexpr (CT::Dense<T>) {
+                  LANGULUS_SIMD_VERBOSE("Storing partial 128f to ", denseSize, " bytes");
                   ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
+               }
                else {
+                  LANGULUS_SIMD_VERBOSE("Storing partial 128f to sparse array of size ", S);
                   auto toIt = to;
                   auto fromIt = temp;
                   const auto toItEnd = to + S;
@@ -68,12 +75,21 @@ namespace Langulus::SIMD
             if constexpr (CT::Dense<T> and denseSize == 16) {
                // Save to a dense array                                 
                if constexpr (alignof(TO) % 16 == 0) {
+                  LANGULUS_SIMD_VERBOSE("Storing full 128d to aligned ", denseSize, " bytes");
                   auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
                   simde_mm_store_pd(to_pd, from);
                }
-               else simde_mm_storeu_pd(&Inner::GetFirst(to), from);
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing full 128d to unaligned ", denseSize, " bytes");
+                  simde_mm_storeu_pd(&Inner::GetFirst(to), from);
+               }
             }
             else if constexpr (denseSize <= 16) {
+               if constexpr (CT::Dense<T>)
+                  LANGULUS_SIMD_VERBOSE("Storing partial 128d to ", denseSize, " bytes");
+               else
+                  LANGULUS_SIMD_VERBOSE("Storing partial 128d to sparse array of size ", S);
+
                // Save to a sparse array, or a differently sized array  
                simde_mm_storel_pd(SparseCast(to[0]), from);
                if constexpr (S > 1)
@@ -85,19 +101,26 @@ namespace Langulus::SIMD
             if constexpr (CT::Dense<T> and denseSize == 16) {
                // Save to a dense array                                 
                if constexpr (alignof(TO) % 16 == 0) {
+                  LANGULUS_SIMD_VERBOSE("Storing full 128i to aligned ", denseSize, " bytes");
                   auto to_si = reinterpret_cast<simde__m128i*>(&Inner::GetFirst(to));
                   simde_mm_store_si128(to_si, from);
                }
-               else simde_mm_storeu_si128(&Inner::GetFirst(to), from);
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing full 128i to unaligned ", denseSize, " bytes");
+                  simde_mm_storeu_si128(&Inner::GetFirst(to), from);
+               }
             }
             else if constexpr (denseSize <= 16) {
                // Save to a sparse array, or a differently sized array  
                simde__m128i temp;
                simde_mm_store_si128(&temp, from);
 
-               if constexpr (CT::Dense<T>)
+               if constexpr (CT::Dense<T>) {
+                  LANGULUS_SIMD_VERBOSE("Storing partial 128i to ", denseSize, " bytes");
                   ::std::memcpy(&Inner::GetFirst(to), &temp, denseSize);
+               }
                else {
+                  LANGULUS_SIMD_VERBOSE("Storing partial 128d to sparse array of size ", S);
                   auto toIt = to;
                   auto fromIt = reinterpret_cast<DT*>(&temp);
                   const auto toItEnd = to + S;
@@ -118,19 +141,26 @@ namespace Langulus::SIMD
             if constexpr (CT::Dense<T> and denseSize == 32) {
                // Save to a dense array                                 
                if constexpr (alignof(TO) % 32 == 0) {
+                  LANGULUS_SIMD_VERBOSE("Storing full 256f to aligned ", denseSize, " bytes");
                   auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
                   simde_mm256_store_ps(to_ps, from);
                }
-               else simde_mm256_storeu_ps(&Inner::GetFirst(to), from);
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing full 256f to unaligned ", denseSize, " bytes");
+                  simde_mm256_storeu_ps(&Inner::GetFirst(to), from);
+               }
             }
             else if constexpr (denseSize <= 32) {
                // Save to a sparse array, or a differently sized array  
                alignas(32) simde_float32 temp[8];
                simde_mm256_store_ps(temp, from);
 
-               if constexpr (CT::Dense<T>)
+               if constexpr (CT::Dense<T>) {
+                  LANGULUS_SIMD_VERBOSE("Storing partial 256f to ", denseSize, " bytes");
                   ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
+               }
                else {
+                  LANGULUS_SIMD_VERBOSE("Storing partial 256f to sparse array of size ", S);
                   auto toIt = to;
                   auto fromIt = temp;
                   const auto toItEnd = to + S;
@@ -144,19 +174,26 @@ namespace Langulus::SIMD
             if constexpr (CT::Dense<T> and denseSize == 32) {
                // Save to a dense array                                 
                if constexpr (alignof(TO) % 32 == 0) {
+                  LANGULUS_SIMD_VERBOSE("Storing full 256d to aligned ", denseSize, " bytes");
                   auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
                   simde_mm256_store_pd(to_pd, from);
                }
-               else simde_mm256_storeu_pd(&Inner::GetFirst(to), from);
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing full 256d to unaligned ", denseSize, " bytes");
+                  simde_mm256_storeu_pd(&Inner::GetFirst(to), from);
+               }
             }
             else if constexpr (denseSize <= 32) {
                // Save to a sparse array, or a differently sized array  
                alignas(32) simde_float64 temp[4];
                simde_mm256_store_pd(temp, from);
 
-               if constexpr (CT::Dense<T>)
+               if constexpr (CT::Dense<T>) {
+                  LANGULUS_SIMD_VERBOSE("Storing partial 256d to ", denseSize, " bytes");
                   ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
+               }
                else {
+                  LANGULUS_SIMD_VERBOSE("Storing partial 256d to sparse array of size ", S);
                   auto toIt = to;
                   auto fromIt = temp;
                   const auto toItEnd = to + S;
@@ -170,19 +207,26 @@ namespace Langulus::SIMD
             if constexpr (CT::Dense<T> and denseSize == 32) {
                // Save to a dense array                                 
                if constexpr (alignof(TO) % 32 == 0) {
+                  LANGULUS_SIMD_VERBOSE("Storing full 256i to aligned ", denseSize, " bytes");
                   auto to_si = reinterpret_cast<simde__m256i*>(&Inner::GetFirst(to));
                   simde_mm256_store_si256(to_si, from);
                }
-               else simde_mm256_storeu_si256(&Inner::GetFirst(to), from);
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing full 256i to unaligned ", denseSize, " bytes");
+                  simde_mm256_storeu_si256(&Inner::GetFirst(to), from);
+               }
             }
             else if constexpr (denseSize <= 32) {
                // Save to a sparse array, or a differently sized array  
                alignas(32) simde__m256i temp;
                simde_mm256_store_si256(&temp, from);
 
-               if constexpr (CT::Dense<T>)
+               if constexpr (CT::Dense<T>) {
+                  LANGULUS_SIMD_VERBOSE("Storing partial 256i to ", denseSize, " bytes");
                   ::std::memcpy(&Inner::GetFirst(to), &temp, denseSize);
+               }
                else {
+                  LANGULUS_SIMD_VERBOSE("Storing partial 256i to sparse array of size ", S);
                   auto toIt = to;
                   auto fromIt = reinterpret_cast<DT*>(&temp);
                   const auto toItEnd = to + S;
