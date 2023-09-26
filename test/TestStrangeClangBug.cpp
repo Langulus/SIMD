@@ -9,7 +9,7 @@
 #include "Main.hpp"
 #include <catch2/catch.hpp>
 
-#if LANGULUS_SIMD(AVX) or LANGULUS_SIMD(AVX2)
+#if LANGULUS_SIMD(256BIT)
 
 TEST_CASE("Strange clang-cl bug", "[bug]") {
    GIVEN("x + y = r") {
