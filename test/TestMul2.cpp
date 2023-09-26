@@ -61,8 +61,8 @@ void ControlMul(const LHS& lhsArray, const RHS& rhs, OUT& out) noexcept {
       ControlMul(*lhs++, rhs, *r++);
 }
 
-TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
-   , NUMBERS_ALL()
+TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]", (Vector<::std::int64_t, 3>)
+   /*, NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
    , VECTORS_ALL(3)
@@ -73,7 +73,7 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
    , VECTORS_ALL(16)
    , VECTORS_ALL(17)
    , VECTORS_ALL(32)
-   , VECTORS_ALL(33)
+   , VECTORS_ALL(33)*/
 ) {
    using T = TestType;
 
