@@ -61,7 +61,7 @@ void ControlMul(const LHS& lhsArray, const RHS& rhs, OUT& out) noexcept {
       ControlMul(*lhs++, rhs, *r++);
 }
 
-TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
+TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -77,27 +77,28 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
 ) {
    using T = TestType;
 
-   GIVEN("x * y = r") {
-      T x, y;
+   GIVEN("Vector<T,N> * Scalar<T> = Vector<T,N>") {
+      T x;
+      TypeOf<T> y {};
       T r, rCheck;
 
       if constexpr (not CT::Vector<T>) {
          if constexpr (CT::Sparse<T>) {
             x = nullptr;
-            y = nullptr;
             r = new Decay<T>;
             rCheck = new Decay<T>;
          }
 
-         InitOne(x, 1);
+         InitOne(x,  1);
          InitOne(y, -5);
       }
+      else InitOne(y, -5);
 
       WHEN("Multiplied") {
          ControlMul(x, y, rCheck);
 
          if constexpr (CT::Vector<T>)
-            SIMD::Multiply(x.mArray, y.mArray, r.mArray);
+            SIMD::Multiply(x.mArray, y, r.mArray);
          else
             SIMD::Multiply(x, y, r);
 
@@ -153,7 +154,7 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          ControlMul(y, x, rCheck);
 
          if constexpr (CT::Vector<T>)
-            SIMD::Multiply(y.mArray, x.mArray, r.mArray);
+            SIMD::Multiply(y, x.mArray, r.mArray);
          else
             SIMD::Multiply(y, x, r);
 
@@ -166,7 +167,6 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          delete r;
          delete rCheck;
          delete x;
-         delete y;
       }
    }
 }
