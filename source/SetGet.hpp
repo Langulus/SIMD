@@ -159,7 +159,7 @@ namespace Langulus::SIMD
    ///   @tparam FROM - the scalar/array/vector to use for setting            
    ///   @param values - the array to wrap                                    
    ///   @return the register                                                 
-   template<int DEF, Size CHUNK, CT::Vector FROM>
+   template<int DEF = 0, Size CHUNK = Alignment, CT::Vector FROM>
    LANGULUS(INLINED)
    auto Set(const FROM& values) noexcept {
       using T = TypeOf<FROM>;
