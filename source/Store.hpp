@@ -218,17 +218,20 @@ namespace Langulus::SIMD
             }
             else if constexpr (denseSize <= 32) {
                // Save to a sparse array, or a differently sized array  
-               alignas(32) simde__m256i temp;
-               simde_mm256_store_si256(&temp, from);
+               alignas(32) DT temp[32 / sizeof(DT)];
+               simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(temp), from);
 
                if constexpr (CT::Dense<T>) {
                   LANGULUS_SIMD_VERBOSE("Storing partial 256i to ", denseSize, " bytes");
-                  ::std::memcpy(&Inner::GetFirst(to), &temp, denseSize);
+                  for (auto& i : temp)
+                     LANGULUS_SIMD_VERBOSE(i, ", ");
+
+                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                }
                else {
                   LANGULUS_SIMD_VERBOSE("Storing partial 256i to sparse array of size ", S);
                   auto toIt = to;
-                  auto fromIt = reinterpret_cast<DT*>(&temp);
+                  auto fromIt = temp;
                   const auto toItEnd = to + S;
                   while (toIt != toItEnd)
                      **(toIt++) = DenseCast(fromIt++);
