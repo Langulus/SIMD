@@ -63,4 +63,37 @@ TEST_CASE("Strange clang-cl bug (simde equivalent)", "[bug]") {
    }
 }
 
+TEST_CASE("Strange clang-cl bug (langulus equivalent)", "[bug]") {
+   GIVEN("x + y = r") {
+      std::int64_t xsrc[3] {1,2,3};
+      std::int64_t ysrc[3] {7,8,9};
+      std::int64_t ctrlsrc[3] {8,10,12};
+
+      simde__m256i x = SIMD::Set(xsrc);
+      simde__m256i y = SIMD::Set(ysrc);
+      simde__m256i control = SIMD::Set(ctrlsrc);
+
+      WHEN("Added") {
+         simde__m256i r = SIMD::Inner::Add<std::int64_t>(x, y);
+
+         THEN("The result should be correct") {
+            std::uint64_t xx[3];
+            std::uint64_t yy[3];
+            std::uint64_t rr[3];
+            std::uint64_t ctrl[3];
+
+            SIMD::Store(x, xx);
+            SIMD::Store(y, yy);
+            SIMD::Store(r, rr);
+            SIMD::Store(control, ctrl);
+
+            REQUIRE(0 == memcmp(xx, xsrc, 24));
+            REQUIRE(0 == memcmp(yy, ysrc, 24));
+            REQUIRE(0 == memcmp(ctrl, ctrlsrc, 24));
+            REQUIRE(0 == memcmp(rr, ctrl, 24));
+         }
+      }
+   }
+}
+
 #endif
