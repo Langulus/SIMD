@@ -31,29 +31,29 @@ namespace Langulus::SIMD
             "- avoid SIMD operations on such arrays as a whole"
          );
          using T = TypeOf<TO>;
-         constexpr Size denseSize = sizeof(Decay<T>) * S;
+         using DT = Decay<T>;
+         constexpr Size denseSize = sizeof(DT) * S;
 
       #if LANGULUS_SIMD(128BIT)
          //                                                             
          // __m128*                                                     
          //                                                             
          if constexpr (CT::SIMD128f<FROM>) {
-            auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
-
             if constexpr (CT::Dense<T> and denseSize == 16) {
                // Save to a dense array                                 
-               if constexpr (alignof(TO) % 16 == 0)
+               if constexpr (alignof(TO) % 16 == 0) {
+                  auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
                   simde_mm_store_ps(to_ps, from);
-               else
-                  simde_mm_storeu_ps(to_ps, from);
+               }
+               else simde_mm_storeu_ps(&Inner::GetFirst(to), from);
             }
-            else {
+            else if constexpr (denseSize <= 16) {
                // Save to a sparse array, or a differently sized array  
                alignas(16) simde_float32 temp[4];
                simde_mm_store_ps(temp, from);
 
                if constexpr (CT::Dense<T>)
-                  ::std::memcpy(to_ps, temp, denseSize);
+                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                else {
                   auto toIt = to;
                   auto fromIt = temp;
@@ -62,49 +62,50 @@ namespace Langulus::SIMD
                      **(toIt++) = DenseCast(fromIt++);
                }
             }
+            else LANGULUS_ERROR("Output size too big");
          }
          else if constexpr (CT::SIMD128d<FROM>) {
             if constexpr (CT::Dense<T> and denseSize == 16) {
                // Save to a dense array                                 
-               auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
-
-               if constexpr (alignof(TO) % 16 == 0)
+               if constexpr (alignof(TO) % 16 == 0) {
+                  auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
                   simde_mm_store_pd(to_pd, from);
-               else
-                  simde_mm_storeu_pd(to_pd, from);
+               }
+               else simde_mm_storeu_pd(&Inner::GetFirst(to), from);
             }
-            else {
+            else if constexpr (denseSize <= 16) {
                // Save to a sparse array, or a differently sized array  
                simde_mm_storel_pd(SparseCast(to[0]), from);
                if constexpr (S > 1)
                   simde_mm_storeh_pd(SparseCast(to[1]), from);
             }
+            else LANGULUS_ERROR("Output size too big");
          }
          else if constexpr (CT::SIMD128i<FROM>) {
-            auto to_si = reinterpret_cast<simde__m128i*>(&Inner::GetFirst(to));
-
             if constexpr (CT::Dense<T> and denseSize == 16) {
                // Save to a dense array                                 
-               if constexpr (alignof(TO) % 16 == 0)
+               if constexpr (alignof(TO) % 16 == 0) {
+                  auto to_si = reinterpret_cast<simde__m128i*>(&Inner::GetFirst(to));
                   simde_mm_store_si128(to_si, from);
-               else
-                  simde_mm_storeu_si128(to_si, from);
+               }
+               else simde_mm_storeu_si128(&Inner::GetFirst(to), from);
             }
-            else {
+            else if constexpr (denseSize <= 16) {
                // Save to a sparse array, or a differently sized array  
                simde__m128i temp;
                simde_mm_store_si128(&temp, from);
 
                if constexpr (CT::Dense<T>)
-                  ::std::memcpy(to_si, &temp, denseSize);
+                  ::std::memcpy(&Inner::GetFirst(to), &temp, denseSize);
                else {
                   auto toIt = to;
-                  auto fromIt = reinterpret_cast<Decay<T>*>(&temp);
+                  auto fromIt = reinterpret_cast<DT*>(&temp);
                   const auto toItEnd = to + S;
                   while (toIt != toItEnd)
                      **(toIt++) = DenseCast(fromIt++);
                }
             }
+            else LANGULUS_ERROR("Output size too big");
          }
          else
       #endif
@@ -114,22 +115,21 @@ namespace Langulus::SIMD
          // __m256*                                                     
          //                                                             
          if constexpr (CT::SIMD256f<FROM>) {
-            auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
-
             if constexpr (CT::Dense<T> and denseSize == 32) {
                // Save to a dense array                                 
-               if constexpr (alignof(TO) % 32 == 0)
+               if constexpr (alignof(TO) % 32 == 0) {
+                  auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
                   simde_mm256_store_ps(to_ps, from);
-               else
-                  simde_mm256_storeu_ps(to_ps, from);
+               }
+               else simde_mm256_storeu_ps(&Inner::GetFirst(to), from);
             }
-            else {
+            else if constexpr (denseSize <= 32) {
                // Save to a sparse array, or a differently sized array  
                alignas(32) simde_float32 temp[8];
                simde_mm256_store_ps(temp, from);
 
                if constexpr (CT::Dense<T>)
-                  ::std::memcpy(to_ps, temp, denseSize);
+                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                else {
                   auto toIt = to;
                   auto fromIt = temp;
@@ -138,24 +138,24 @@ namespace Langulus::SIMD
                      **(toIt++) = DenseCast(fromIt++);
                }
             }
+            else LANGULUS_ERROR("Output size too big");
          }
          else if constexpr (CT::SIMD256d<FROM>) {
-            auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
-
             if constexpr (CT::Dense<T> and denseSize == 32) {
                // Save to a dense array                                 
-               if constexpr (alignof(TO) % 32 == 0)
+               if constexpr (alignof(TO) % 32 == 0) {
+                  auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
                   simde_mm256_store_pd(to_pd, from);
-               else
-                  simde_mm256_storeu_pd(to_pd, from);
+               }
+               else simde_mm256_storeu_pd(&Inner::GetFirst(to), from);
             }
-            else {
+            else if constexpr (denseSize <= 32) {
                // Save to a sparse array, or a differently sized array  
                alignas(32) simde_float64 temp[4];
                simde_mm256_store_pd(temp, from);
 
                if constexpr (CT::Dense<T>)
-                  ::std::memcpy(to_pd, temp, denseSize);
+                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                else {
                   auto toIt = to;
                   auto fromIt = temp;
@@ -164,32 +164,33 @@ namespace Langulus::SIMD
                      **(toIt++) = DenseCast(fromIt++);
                }
             }
+            else LANGULUS_ERROR("Output size too big");
          }
          else if constexpr (CT::SIMD256i<FROM>) {
-            auto to_si = reinterpret_cast<simde__m256i*>(&Inner::GetFirst(to));
-
             if constexpr (CT::Dense<T> and denseSize == 32) {
                // Save to a dense array                                 
-               if constexpr (alignof(TO) % 32 == 0)
+               if constexpr (alignof(TO) % 32 == 0) {
+                  auto to_si = reinterpret_cast<simde__m256i*>(&Inner::GetFirst(to));
                   simde_mm256_store_si256(to_si, from);
-               else
-                  simde_mm256_storeu_si256(to_si, from);
+               }
+               else simde_mm256_storeu_si256(&Inner::GetFirst(to), from);
             }
-            else {
+            else if constexpr (denseSize <= 32) {
                // Save to a sparse array, or a differently sized array  
-               simde__m256i temp;
+               alignas(32) simde__m256i temp;
                simde_mm256_store_si256(&temp, from);
 
                if constexpr (CT::Dense<T>)
-                  ::std::memcpy(to_si, &temp, denseSize);
+                  ::std::memcpy(&Inner::GetFirst(to), &temp, denseSize);
                else {
                   auto toIt = to;
-                  auto fromIt = reinterpret_cast<Decay<T>*>(&temp);
+                  auto fromIt = reinterpret_cast<DT*>(&temp);
                   const auto toItEnd = to + S;
                   while (toIt != toItEnd)
                      **(toIt++) = DenseCast(fromIt++);
                }
             }
+            else LANGULUS_ERROR("Output size too big");
          }
          else
       #endif
@@ -199,22 +200,21 @@ namespace Langulus::SIMD
          // __m512*                                                     
          //                                                             
          if constexpr (CT::SIMD512f<FROM>) {
-            auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
-
             if constexpr (CT::Dense<T> and denseSize == 64) {
                // Save to a dense array                                 
-               if constexpr (alignof(TO) % 64 == 0)
+               if constexpr (alignof(TO) % 64 == 0) {
+                  auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
                   simde_mm512_store_ps(to_ps, from);
-               else
-                  simde_mm512_storeu_ps(to_ps, from);
+               }
+               else simde_mm512_storeu_ps(&Inner::GetFirst(to), from);
             }
-            else {
+            else if constexpr (denseSize <= 64) {
                // Save to a sparse array, or a differently sized array  
                alignas(64) simde_float32 temp[16];
                simde_mm512_store_ps(temp, from);
 
                if constexpr (CT::Dense<T>)
-                  ::std::memcpy(to_ps, temp, denseSize);
+                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                else {
                   auto toIt = to;
                   auto fromIt = temp;
@@ -223,24 +223,24 @@ namespace Langulus::SIMD
                      **(toIt++) = DenseCast(fromIt++);
                }
             }
+            else LANGULUS_ERROR("Output size too big");
          }
          else if constexpr (CT::SIMD512d<FROM>) {
-            auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
-
             if constexpr (CT::Dense<T> and denseSize == 64) {
                // Save to a dense array                                 
-               if constexpr (alignof(TO) % 64 == 0)
+               if constexpr (alignof(TO) % 64 == 0) {
+                  auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
                   simde_mm512_store_pd(to_pd, from);
-               else
-                  simde_mm512_storeu_pd(to_pd, from);
+               }
+               else simde_mm512_storeu_pd(&Inner::GetFirst(to), from);
             }
-            else {
+            else if constexpr (denseSize <= 64) {
                // Save to a sparse array, or a differently sized array  
                alignas(64) simde_float64 temp[8];
                simde_mm512_store_pd(temp, from);
 
                if constexpr (CT::Dense<T>)
-                  ::std::memcpy(to_pd, temp, denseSize);
+                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                else {
                   auto toIt = to;
                   auto fromIt = temp;
@@ -249,32 +249,33 @@ namespace Langulus::SIMD
                      **(toIt++) = DenseCast(fromIt++);
                }
             }
+            else LANGULUS_ERROR("Output size too big");
          }
          else if constexpr (CT::SIMD512i<FROM>) {
-            auto to_si = reinterpret_cast<simde__m512i*>(&Inner::GetFirst(to));
-
             if constexpr (CT::Dense<T> and denseSize == 64) {
                // Save to a dense array                                 
-               if constexpr (alignof(TO) % 64 == 0)
+               if constexpr (alignof(TO) % 64 == 0) {
+                  auto to_si = reinterpret_cast<simde__m512i*>(&Inner::GetFirst(to));
                   simde_mm512_store_si512(to_si, from);
-               else
-                  simde_mm512_storeu_si512(to_si, from);
+               }
+               else simde_mm512_storeu_si512(&Inner::GetFirst(to), from);
             }
-            else {
+            else if constexpr (denseSize <= 64) {
                // Save to a sparse array, or a differently sized array  
                simde__m512i temp;
                simde_mm512_store_si512(temp, from);
 
                if constexpr (CT::Dense<T>)
-                  ::std::memcpy(to_si, &temp, denseSize);
+                  ::std::memcpy(&Inner::GetFirst(to), &temp, denseSize);
                else {
                   auto toIt = to;
-                  auto fromIt = reinterpret_cast<Decay<T>*>(&temp);
+                  auto fromIt = reinterpret_cast<DT*>(&temp);
                   const auto toItEnd = to + S;
                   while (toIt != toItEnd)
                      **(toIt++) = DenseCast(fromIt++);
                }
             }
+            else LANGULUS_ERROR("Output size too big");
          }
          else
       #endif
