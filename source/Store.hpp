@@ -219,7 +219,7 @@ namespace Langulus::SIMD
             else if constexpr (denseSize <= 32) {
                // Save to a sparse array, or a differently sized array  
                alignas(32) simde__m256i temp;
-               simde_mm256_storeu_si256(&temp, from);
+               simde_mm256_store_si256(&temp, from);
 
                if constexpr (CT::Dense<T>) {
                   LANGULUS_SIMD_VERBOSE("Storing partial 256i to ", denseSize, " bytes");

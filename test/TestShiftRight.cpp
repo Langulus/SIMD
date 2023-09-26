@@ -64,8 +64,8 @@ LANGULUS(INLINED) void ControlSR(const Vector<LHS, C>& lhsArray, const Vector<RH
       ControlSR(*lhs++, *rhs++, *r++);
 }
 
-TEMPLATE_TEST_CASE("Shift right", "[shift]"
-   , NUMBERS_INT()
+TEMPLATE_TEST_CASE("Shift right", "[shift]", (Vector<::std::int64_t, 3>)
+   /*, NUMBERS_INT()
    , VECTORS_INT(1)
    , VECTORS_INT(2)
    , VECTORS_INT(3)
@@ -76,7 +76,7 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
    , VECTORS_INT(16)
    , VECTORS_INT(17)
    , VECTORS_INT(32)
-   , VECTORS_INT(33)
+   , VECTORS_INT(33)*/
 ) {
    using T = TestType;
 

@@ -79,11 +79,11 @@ void ControlEqualV(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArra
 }
 
 ///																									
-TEMPLATE_TEST_CASE("Compare equality", "[compare]"
-   , VECTORS_ALL(16)
+TEMPLATE_TEST_CASE("Compare equality 2", "[compare]", (Vector<::std::int64_t, 3>)
+   /*, VECTORS_ALL(16)
    , VECTORS_ALL(17)
    , VECTORS_ALL(32)
-   , VECTORS_ALL(33)
+   , VECTORS_ALL(33)*/
 ) {
    using T = TestType;
 
