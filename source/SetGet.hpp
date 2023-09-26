@@ -33,23 +33,23 @@ namespace Langulus::SIMD
 
          if constexpr (REVERSE) {
             if constexpr (MAXS - IDX - 1 < S) {
-               LANGULUS_SIMD_VERBOSE("Setting [0] to ", DenseCast(values[MAXS - IDX - 1]));
+               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", DenseCast(values[MAXS - IDX - 1]));
                return reinterpret_cast<const R&>(
                   DenseCast(values[MAXS - IDX - 1]));
             }
             else {
-               LANGULUS_SIMD_VERBOSE("Setting [0] to ", static_cast<R>(DEF));
+               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", static_cast<R>(DEF));
                return static_cast<R>(DEF);
             }
          }
          else {
             if constexpr (IDX < S) {
-               LANGULUS_SIMD_VERBOSE("Setting [0] to ", DenseCast(values[IDX]));
+               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", DenseCast(values[IDX]));
                return reinterpret_cast<const R&>(
                   DenseCast(values[IDX]));
             }
             else {
-               LANGULUS_SIMD_VERBOSE("Setting [0] to ", static_cast<R>(DEF));
+               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", static_cast<R>(DEF));
                return static_cast<R>(DEF);
             }
          }
