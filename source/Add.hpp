@@ -144,11 +144,11 @@ namespace Langulus::SIMD
       return Inner::Evaluate<0, REGISTER, DOUT>(
          lhsOrig, rhsOrig,
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            LANGULUS_SIMD_VERBOSE("Adding (SIMD)");
+            LANGULUS_SIMD_VERBOSE("Adding (SIMD) as ", NameOf<REGISTER>());
             return Inner::Add<DOUT>(lhs, rhs);
          },
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            LANGULUS_SIMD_VERBOSE("Adding (Fallback)");
+            LANGULUS_SIMD_VERBOSE("Adding (Fallback) ", lhs, " + ", rhs, " (", NameOf<DOUT>(), ")");
             return lhs + rhs;
          }
       );
