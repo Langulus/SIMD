@@ -44,15 +44,12 @@ namespace Langulus::SIMD
       using D_TO = Decay<TypeOf<TO>>;
       using D_FROM = Decay<TypeOf<FROM>>;
 
-      if constexpr (CT::NotSIMD<FROM_SIMD> or CT::NotSIMD<TO_SIMD>)
+      if constexpr (CT::NotSIMD<FROM_SIMD> or CT::NotSIMD<TO_SIMD>) {
          // FROM can't be wrapped inside a register                     
          return Unsupported {};
+      }
       else {
          const FROM_SIMD loaded = Load<DEF>(in);
-         LANGULUS_SIMD_VERBOSE("Converting register from ",
-            NameOf<FROM_SIMD>(), " to ", NameOf<TO_SIMD>());
-         LANGULUS_SIMD_VERBOSE("Converting type from ",
-            NameOf<D_FROM>(), " to ", NameOf<D_TO>());
 
          if constexpr (CT::Exact<D_FROM, D_TO>)
             // Early exit if Load was enough                            

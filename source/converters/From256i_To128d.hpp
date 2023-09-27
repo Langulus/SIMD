@@ -20,6 +20,8 @@ namespace Langulus::SIMD::Inner
    template<CT::Decayed FROM>
    LANGULUS(INLINED)
    simde__m128d ConvertFrom256i_To128d(const simde__m256i& v) noexcept {
+      LANGULUS_SIMD_VERBOSE("ConvertFrom256i_To128d");
+
       //                                                                
       // Converting TO double[2]                                        
       //                                                                
