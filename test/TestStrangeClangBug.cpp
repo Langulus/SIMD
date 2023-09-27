@@ -24,10 +24,10 @@ TEST_CASE("Strange clang-cl bug (simde equivalent)", "[bug]") {
       WHEN("Added") {
          const simde__m256i r = simde_mm256_add_epi64(x, y);
 
-         alignas(32) std::uint64_t xx[4];
-         alignas(32) std::uint64_t yy[4];
-         alignas(32) std::uint64_t rr[4];
-         alignas(32) std::uint64_t ctrl[4];
+         alignas(32) std::int64_t xx[4];
+         alignas(32) std::int64_t yy[4];
+         alignas(32) std::int64_t rr[4];
+         alignas(32) std::int64_t ctrl[4];
 
          simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(xx), x);
          simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(yy), y);
@@ -57,17 +57,17 @@ TEST_CASE("Strange clang-cl bug (langulus equivalent)", "[bug]") {
       WHEN("Added") {
          const simde__m256i r  = SIMD::Inner::Add<std::int64_t>(x, y);
 
-         std::uint64_t xx[3];
-         std::uint64_t yy[3];
-         std::uint64_t rr[3];
-         std::uint64_t ctrl[3];
+         std::int64_t xx[3];
+         std::int64_t yy[3];
+         std::int64_t rr[3];
+         std::int64_t ctrl[3];
 
          SIMD::Store(x, xx);
          SIMD::Store(y, yy);
          SIMD::Store(r, rr);
          SIMD::Store(control, ctrl);
 
-         std::uint64_t rr2[3];
+         std::int64_t rr2[3];
          SIMD::Add(xsrc, ysrc, rr2);
 
          THEN("The result should be correct") {
