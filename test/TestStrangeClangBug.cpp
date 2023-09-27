@@ -114,4 +114,27 @@ TEST_CASE("Strange clang-cl bug (langulus equivalent)", "[bug]") {
    }
 }
 
+TEST_CASE("Strange clang-cl bug (langulus vector equivalent)", "[bug]") {
+   GIVEN("x + y = r") {
+      const Vector<std::int64_t, 3> xsrc;
+      const Vector<std::int64_t, 3> ysrc;
+      Vector<std::int64_t, 3> ctrlsrc1;
+      Vector<std::int64_t, 3> ctrlsrc2;
+
+      WHEN("Added") {
+         SIMD::Add(xsrc.mArray, ysrc.mArray, ctrlsrc1.mArray);
+         SIMD::Add(xsrc, ysrc, ctrlsrc2);
+
+         THEN("The result should be correct") {
+            REQUIRE(ctrlsrc1[0] == xsrc[0] + ysrc[0]);
+            REQUIRE(ctrlsrc1[1] == xsrc[1] + ysrc[1]);
+            REQUIRE(ctrlsrc1[2] == xsrc[2] + ysrc[2]);
+            REQUIRE(ctrlsrc2[0] == xsrc[0] + ysrc[0]);
+            REQUIRE(ctrlsrc2[1] == xsrc[1] + ysrc[1]);
+            REQUIRE(ctrlsrc2[2] == xsrc[2] + ysrc[2]);
+         }
+      }
+   }
+}
+
 #endif
