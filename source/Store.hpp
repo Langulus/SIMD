@@ -222,9 +222,13 @@ namespace Langulus::SIMD
                simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(temp), from);
 
                if constexpr (CT::Dense<T>) {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 256i to ", denseSize, " bytes");
-                  for (auto& i : temp)
-                     LANGULUS_SIMD_VERBOSE(i, ", ");
+                  LANGULUS_SIMD_VERBOSE("Storing partial 256i to ", denseSize, " bytes; "
+                     "from ", NameOf<FROM>(), " to ", NameOf<TO>(),
+                     " (aka ", NameOf<DT>(), "[", S, "])"
+                  );
+
+                  for (int i = 0; i < S; ++i)
+                     LANGULUS_SIMD_VERBOSE(temp[i], ", ");
 
                   ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                }
