@@ -12,7 +12,7 @@ jobs:
         os: [ubuntu-22.04, windows-latest]
         build: [Release]
         arch: [x86, x64]
-        cxx: [g++, clang++, cl]
+        cxx: [g++, clang++, ClangCl, v143]
         feature: [
           [SSE, 16, '-msse', '/arch:SSE'],
           [SSE2, 16, '-msse2', '/arch:SSE2'],
@@ -26,40 +26,74 @@ jobs:
         ]
         exclude:
           - os: ubuntu-22.04
-            cxx: cl
+            cxx: v143
+          - os: ubuntu-22.04
+            cxx: ClangCl
           - os: windows-latest
             cxx: g++
           - os: windows-latest
             cxx: clang++
+
           - arch: x64
-            cxx: cl
+            cxx: ClangCl
             feature: [SSE, 16, '-msse', '/arch:SSE']
           - arch: x64
-            cxx: cl
+            cxx: ClangCl
             feature: [SSE2, 16, '-msse2', '/arch:SSE2']
           - arch: x64
-            cxx: cl
+            cxx: ClangCl
             feature: [SSE3, 16, '-msse3', '/arch:SSE3']
           - arch: x64
-            cxx: cl
+            cxx: ClangCl
             feature: [SSSE3, 16, '-mssse3', '/arch:SSSE3']
           - arch: x64
-            cxx: cl
+            cxx: ClangCl
             feature: [SSE4.1, 16, '-msse4.1', '/arch:SSE4.1']
           - arch: x64
-            cxx: cl
+            cxx: ClangCl
             feature: [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2']
           - arch: x86
-            cxx: cl
+            cxx: ClangCl
             feature: [SSE3, 16, '-msse3', '/arch:SSE3']
           - arch: x86
-            cxx: cl
+            cxx: ClangCl
             feature: [SSSE3, 16, '-mssse3', '/arch:SSSE3']
           - arch: x86
-            cxx: cl
+            cxx: ClangCl
             feature: [SSE4.1, 16, '-msse4.1', '/arch:SSE4.1']
           - arch: x86
-            cxx: cl
+            cxx: ClangCl
+            feature: [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2']
+
+          - arch: x64
+            cxx: v143
+            feature: [SSE, 16, '-msse', '/arch:SSE']
+          - arch: x64
+            cxx: v143
+            feature: [SSE2, 16, '-msse2', '/arch:SSE2']
+          - arch: x64
+            cxx: v143
+            feature: [SSE3, 16, '-msse3', '/arch:SSE3']
+          - arch: x64
+            cxx: v143
+            feature: [SSSE3, 16, '-mssse3', '/arch:SSSE3']
+          - arch: x64
+            cxx: v143
+            feature: [SSE4.1, 16, '-msse4.1', '/arch:SSE4.1']
+          - arch: x64
+            cxx: v143
+            feature: [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2']
+          - arch: x86
+            cxx: v143
+            feature: [SSE3, 16, '-msse3', '/arch:SSE3']
+          - arch: x86
+            cxx: v143
+            feature: [SSSE3, 16, '-mssse3', '/arch:SSSE3']
+          - arch: x86
+            cxx: v143
+            feature: [SSE4.1, 16, '-msse4.1', '/arch:SSE4.1']
+          - arch: x86
+            cxx: v143
             feature: [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2']
 
           # Seems the cloud at github doesn't have the avx512 extensions
@@ -112,10 +146,9 @@ jobs:
         name: Configure (Windows)
         run: >
           cmake
-          -DCMAKE_CXX_COMPILER=${{matrix.cxx}}
           -S .
           -B out
-          ${{matrix.cmake_args}}
+          ${{matrix.cmake_args}} -T "${{matrix.cxx}}"
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
           -DCMAKE_CXX_FLAGS="${{matrix.feature[3]}}"
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
