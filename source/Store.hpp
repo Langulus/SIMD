@@ -223,8 +223,8 @@ namespace Langulus::SIMD
 
                if constexpr (CT::Dense<T>) {
                   LANGULUS_SIMD_VERBOSE("Storing partial 256i to ", denseSize, " bytes; "
-                     "from ", NameOf<FROM>(), " to ", NameOf<TO>(),
-                     " (aka ", NameOf<DT>(), "[", S, "])"
+                     "from ", NameOf<FROM>(), " of size ", sizeof(FROM), " to ", NameOf<TO>(),
+                     " of size ", sizeof(TO), " (aka ", NameOf<DT>(), "[", S, "] of size ", denseSize,")"
                   );
 
                   auto tempas64 = reinterpret_cast<std::int64_t*>(temp);
