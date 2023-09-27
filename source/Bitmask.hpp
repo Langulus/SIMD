@@ -125,6 +125,24 @@ namespace Langulus::SIMD
          LANGULUS_ASSUME(UserAssumes, idx < C, "Index out of limits");
          return 0 != (mValue & (Type {1} << idx));
       }
+
+      struct BitSwitcher {
+         Bitmask<C>& mOwner;
+         const Type mTag;
+
+         constexpr BitSwitcher& operator = (const bool flag) noexcept {
+            if (flag)
+               mOwner |= mTag;
+            else
+               mOwner &= ~mTag;
+            return *this;
+         }
+      };
+
+      NOD() constexpr BitSwitcher operator [] (const Offset& idx) noexcept {
+         LANGULUS_ASSUME(UserAssumes, idx < C, "Index out of limits");
+         return BitSwitcher {*this, Type {1} << idx};
+      }
    };
 
 } // namespace Langulus::SIMD
