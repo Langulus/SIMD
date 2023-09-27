@@ -20,7 +20,7 @@ namespace Langulus::SIMD::Inner
    ///   @return the resulting __m128i register                               
    template<CT::Decayed TO>
    LANGULUS(INLINED)
-   simde__m128i ConvertFrom128f_To128i(const simde__m128& v) noexcept {
+   auto ConvertFrom128f_To128i(const simde__m128& v) noexcept {
       //                                                                
       // Converting TO i8 [4], u8 [4], i16[4], u16[4]                   
       //               i32[4], u32[4], i64[2], u64[2]                   
