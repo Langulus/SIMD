@@ -49,6 +49,9 @@ namespace Langulus::SIMD
          return Unsupported {};
       else {
          const FROM_SIMD loaded = Load<DEF>(in);
+         LANGULUS_SIMD_VERBOSE("Converting register from ", NameOf<FROM_SIMD>(), " to ", NameOf<TO_SIMD>());
+         LANGULUS_SIMD_VERBOSE("Converting type from ", NameOf<D_FROM>(), " to ", NameOf<D_TO>());
+
          if constexpr (CT::Exact<TypeOf<D_FROM>, D_TO>)
             // Early exit if Load was enough                            
             return loaded;

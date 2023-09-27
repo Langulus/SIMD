@@ -96,6 +96,7 @@ namespace Langulus::SIMD::Inner
    constexpr auto Evaluate(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) {
       using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
       constexpr auto S = Inner::OverlapCounts<LHS, RHS>();
+      LANGULUS_SIMD_VERBOSE("Evaluated to overlapped count of ", S);
 
       if constexpr (S < 2 or CT::NotSIMD<REGISTER> or CT::NotSIMD<OUTSIMD>) {
          // Call the fallback routine if unsupported, or size 1         
@@ -103,6 +104,7 @@ namespace Langulus::SIMD::Inner
       }
       else if constexpr (CT::Vector<LHS> and CT::Vector<RHS>) {
          // Both LHS and RHS are vectors, so wrap in registers          
+         LANGULUS_SIMD_VERBOSE("Both sides are vectors");
          return opSIMD(
             Convert<DEF, OUT>(lhs),
             Convert<DEF, OUT>(rhs)
