@@ -218,7 +218,7 @@ namespace Langulus::SIMD
             }
             else if constexpr (denseSize <= 32) {
                // Save to a sparse array, or a differently sized array  
-               alignas(32) DT temp[32 / sizeof(DT)];
+               alignas(32) Byte temp[32];
                simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(temp), from);
 
                if constexpr (CT::Dense<T>) {
@@ -227,8 +227,9 @@ namespace Langulus::SIMD
                      " (aka ", NameOf<DT>(), "[", S, "])"
                   );
 
+                  auto tempas64 = reinterpret_cast<std::int64_t*>(temp);
                   for (int i = 0; i < S; ++i)
-                     LANGULUS_SIMD_VERBOSE(temp[i], ", ");
+                     LANGULUS_SIMD_VERBOSE(tempas64[i], ", ");
 
                   ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                }
