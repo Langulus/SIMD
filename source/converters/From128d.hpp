@@ -68,7 +68,7 @@ namespace Langulus::SIMD::Inner
          }
          else if constexpr (CT::SignedInteger32<TO>) {
             LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to u/i32[2]");
-            return simde_mm_cvtpd_pi32(v);
+            return simde_mm_cvtpd_epi32(v);
          }
          else if constexpr (CT::UnsignedInteger32<TO>) {
             LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to u/i32[2]");
