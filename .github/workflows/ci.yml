@@ -17,10 +17,10 @@ jobs:
           [NoSIMD, 16, ' ', ' '],
           [SSE, 16, '-msse', '/arch:SSE'],
           [SSE2, 16, '-msse2', '/arch:SSE2'],
-          [SSE3, 16, '-msse3', '/arch:SSE3'],
-          [SSSE3, 16, '-mssse3', '/arch:SSSE3'],
-          [SSE4.1, 16, '-msse4.1', '/arch:SSE4.1'],
-          [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2'],
+          [SSE3, 16, '-msse3', '<not available on msvc>'],
+          [SSSE3, 16, '-mssse3', '<not available on msvc>'],
+          [SSE4.1, 16, '-msse4.1', '<not available on msvc>'],
+          [SSE4.2, 16, '-msse4.2', '<not available on msvc>'],
           [AVX, 32, '-mavx', '/arch:AVX'],
           [AVX2, 32, '-mavx2', '/arch:AVX2'],
           [AVX512, 64, '-mavx512f', '/arch:AVX512']
@@ -43,28 +43,29 @@ jobs:
             feature: [SSE2, 16, '-msse2', '/arch:SSE2']
           - arch: x64
             cxx: ClangCl
-            feature: [SSE3, 16, '-msse3', '/arch:SSE3']
+            feature: [SSE3, 16, '-msse3', '<not available on msvc>']
           - arch: x64
             cxx: ClangCl
-            feature: [SSSE3, 16, '-mssse3', '/arch:SSSE3']
+            feature: [SSSE3, 16, '-mssse3', '<not available on msvc>']
           - arch: x64
             cxx: ClangCl
-            feature: [SSE4.1, 16, '-msse4.1', '/arch:SSE4.1']
+            feature: [SSE4.1, 16, '-msse4.1', '<not available on msvc>']
           - arch: x64
             cxx: ClangCl
-            feature: [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2']
+            feature: [SSE4.2, 16, '-msse4.2', '<not available on msvc>']
+
           - arch: x86
             cxx: ClangCl
-            feature: [SSE3, 16, '-msse3', '/arch:SSE3']
+            feature: [SSE3, 16, '-msse3', '<not available on msvc>']
           - arch: x86
             cxx: ClangCl
-            feature: [SSSE3, 16, '-mssse3', '/arch:SSSE3']
+            feature: [SSSE3, 16, '-mssse3', '<not available on msvc>']
           - arch: x86
             cxx: ClangCl
-            feature: [SSE4.1, 16, '-msse4.1', '/arch:SSE4.1']
+            feature: [SSE4.1, 16, '-msse4.1', '<not available on msvc>']
           - arch: x86
             cxx: ClangCl
-            feature: [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2']
+            feature: [SSE4.2, 16, '-msse4.2', '<not available on msvc>']
 
           - arch: x64
             cxx: v143
@@ -74,28 +75,29 @@ jobs:
             feature: [SSE2, 16, '-msse2', '/arch:SSE2']
           - arch: x64
             cxx: v143
-            feature: [SSE3, 16, '-msse3', '/arch:SSE3']
+            feature: [SSE3, 16, '-msse3', '<not available on msvc>']
           - arch: x64
             cxx: v143
-            feature: [SSSE3, 16, '-mssse3', '/arch:SSSE3']
+            feature: [SSSE3, 16, '-mssse3', '<not available on msvc>']
           - arch: x64
             cxx: v143
-            feature: [SSE4.1, 16, '-msse4.1', '/arch:SSE4.1']
+            feature: [SSE4.1, 16, '-msse4.1', '<not available on msvc>']
           - arch: x64
             cxx: v143
-            feature: [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2']
+            feature: [SSE4.2, 16, '-msse4.2', '<not available on msvc>']
+
           - arch: x86
             cxx: v143
-            feature: [SSE3, 16, '-msse3', '/arch:SSE3']
+            feature: [SSE3, 16, '-msse3', '<not available on msvc>']
           - arch: x86
             cxx: v143
-            feature: [SSSE3, 16, '-mssse3', '/arch:SSSE3']
+            feature: [SSSE3, 16, '-mssse3', '<not available on msvc>']
           - arch: x86
             cxx: v143
-            feature: [SSE4.1, 16, '-msse4.1', '/arch:SSE4.1']
+            feature: [SSE4.1, 16, '-msse4.1', '<not available on msvc>']
           - arch: x86
             cxx: v143
-            feature: [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2']
+            feature: [SSE4.2, 16, '-msse4.2', '<not available on msvc>']
 
           # Seems the cloud at github doesn't have the avx512 extensions
           - feature: [AVX512, 64, '-mavx512f', '/arch:AVX512']
