@@ -18,7 +18,7 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class, CT::NotSIMD T>
+      template<CT::Decayed, CT::NotSIMD T>
       LANGULUS(INLINED)
       constexpr Unsupported Power(const T&, const T&) noexcept {
          return {};
@@ -26,12 +26,11 @@ namespace Langulus::SIMD
 
       /// Raise by a power using SIMD                                         
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
       ///   @tparam REGISTER - the register type (deducible)                  
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the raised values                                         
-      template<class T, CT::SIMD REGISTER>
+      template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Power(REGISTER lhs, REGISTER rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
@@ -141,7 +140,7 @@ namespace Langulus::SIMD
    constexpr auto PowerConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
 
-      return Inner::Evaluate<1, Unsupported, DOUT>(
+      return Inner::Evaluate<1, Unsupported, OUT>(
          lhsOrig, rhsOrig, nullptr,
          [](DOUT lhs, DOUT rhs) noexcept -> DOUT {
             if (lhs == DOUT {1})
@@ -186,9 +185,9 @@ namespace Langulus::SIMD
    NOD() LANGULUS(INLINED)
    auto Power(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
-      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
+      using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
-      return Inner::Evaluate<1, REGISTER, DOUT>(
+      return Inner::Evaluate<1, REGISTER, OUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
             return Inner::Power<DOUT>(lhs, rhs);

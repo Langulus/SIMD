@@ -36,23 +36,25 @@ namespace Langulus::SIMD
    ///   @tparam FROM - type to convert from                                  
    ///   @param in - the input data                                           
    ///   @return the resulting register                                       
-   template<int DEF, class TO, class FROM>
+   template<int DEF, CT::Vector TO, CT::Vector FROM>
    LANGULUS(INLINED)
    auto Convert(const FROM& in) noexcept {
       using FROM_SIMD = Inner::ToSIMD<FROM, FROM>;
       using TO_SIMD = Inner::ToSIMD<FROM, TO>;
-      using D_TO = Decay<TO>;
-      using D_FROM = Decay<FROM>;
+      using D_TO = Decay<TypeOf<TO>>;
+      using D_FROM = Decay<TypeOf<FROM>>;
 
       if constexpr (CT::NotSIMD<FROM_SIMD> or CT::NotSIMD<TO_SIMD>)
          // FROM can't be wrapped inside a register                     
          return Unsupported {};
       else {
          const FROM_SIMD loaded = Load<DEF>(in);
-         LANGULUS_SIMD_VERBOSE("Converting register from ", NameOf<FROM_SIMD>(), " to ", NameOf<TO_SIMD>());
-         LANGULUS_SIMD_VERBOSE("Converting type from ", NameOf<D_FROM>(), " to ", NameOf<D_TO>());
+         LANGULUS_SIMD_VERBOSE("Converting register from ",
+            NameOf<FROM_SIMD>(), " to ", NameOf<TO_SIMD>());
+         LANGULUS_SIMD_VERBOSE("Converting type from ",
+            NameOf<D_FROM>(), " to ", NameOf<D_TO>());
 
-         if constexpr (CT::Exact<TypeOf<D_FROM>, D_TO>)
+         if constexpr (CT::Exact<D_FROM, D_TO>)
             // Early exit if Load was enough                            
             return loaded;
 

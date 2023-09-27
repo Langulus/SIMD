@@ -18,11 +18,10 @@ namespace Langulus::SIMD
 
       /// Get rounded values via SIMD                                         
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
       ///   @tparam REGISTER - the register type (deducible)                  
       ///   @param value - the array                                          
       ///   @return the floored values                                        
-      template<class T, Count S, CT::SIMD REGISTER>
+      template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Round(const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Suboptimal for unreal numbers");
@@ -56,13 +55,13 @@ namespace Langulus::SIMD
 
    /// Get the rounded values                                                 
    ///   @param T - type of a single value                                    
-   ///   @param S - size of the array                                         
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<class T, Count S>
+   template<class T>
    LANGULUS(INLINED)
-   auto Round(const T(&value)[S]) noexcept {
-      return Inner::Round<T, S>(Load<0>(value));
+   auto Round(const T& value) noexcept {
+      using DT = Decay<TypeOf<T>>;
+      return Inner::Round<DT>(Load<0>(value));
    }
 
 } // namespace Langulus::SIMD

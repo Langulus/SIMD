@@ -17,9 +17,9 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class, Count>
+      template<CT::Decayed, Count, CT::NotSIMD T>
       LANGULUS(INLINED)
-      constexpr Unsupported Lesser(CT::Unsupported auto, CT::Unsupported auto) noexcept {
+      constexpr Unsupported Lesser(const T&, const T&) noexcept {
          return {};
       }
       
@@ -31,7 +31,7 @@ namespace Langulus::SIMD
       ///   @param rhs - the right-hand-side array                            
       ///   @return a bitmask with the results, or Inner::NotSupported        
       /// https://giannitedesco.github.io/2019/03/08/simd-cmp-bitmasks.html   
-      template<class T, Count S, CT::SIMD REGISTER>
+      template<CT::Decayed T, Count S, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Lesser(const REGISTER& lhs, const REGISTER& rhs) noexcept {
       #if LANGULUS_SIMD(128BIT)
@@ -363,19 +363,43 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired element type (lossless by default)         
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<class LHS, class RHS>
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   NOD() LANGULUS(INLINED)
+   constexpr auto LesserConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+      // Output will likely contain a bool vector, or a bitmask         
+      // so make sure we operate on Lossless<LHS, RHS>                  
+      using DOUT = Decay<TypeOf<Lossless<LHS, RHS>>>;
+
+      return Inner::Evaluate<0, Unsupported, OUT>(
+         lhsOrig, rhsOrig, nullptr,
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> bool {
+            return lhs < rhs;
+         }
+      );
+   }
+
+   /// Compare numbers for lesser                                             
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired element type (lossless by default)         
+   ///   @return a register, if viable SIMD routine exists                    
+   ///           or array/scalar if no viable SIMD routine exists             
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
    auto Lesser(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+      // Output will likely contain a bool vector, or a bitmask         
+      // so make sure we operate on Lossless<LHS, RHS>                  
       using LOSSLESS = Lossless<LHS, RHS>;
+      using DOUT = Decay<TypeOf<LOSSLESS>>;
       using REGISTER = Inner::Register<LHS, RHS, LOSSLESS>;
-      constexpr auto S = OVERLAP_EXTENTS(lhsOrig, rhsOrig);
+      constexpr auto S = OverlapCounts<LHS, RHS>();
 
-      return Inner::Evaluate<0, REGISTER, LOSSLESS>(
+      return Inner::Evaluate<0, REGISTER, OUT>(
          lhsOrig, rhsOrig,
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::Lesser<LOSSLESS, S>(lhs, rhs);
+            return Inner::Lesser<DOUT, S>(lhs, rhs);
          },
-         [](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> bool {
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> bool {
             return lhs < rhs;
          }
       );
@@ -389,8 +413,11 @@ namespace Langulus::SIMD
    ///              order to fit the result in desired output                 
    template<class LHS, class RHS, class OUT>
    LANGULUS(INLINED)
-   void Lesser(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
-      GeneralStore(Lesser<LHS, RHS>(lhs, rhs), output);
+   constexpr void Lesser(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+      IF_CONSTEXPR() {
+         StoreConstexpr(LesserConstexpr(lhs, rhs), out);
+      }
+      else Store(Lesser(lhs, rhs), out);
    }
 
 } // namespace Langulus::SIMD

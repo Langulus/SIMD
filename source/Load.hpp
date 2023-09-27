@@ -96,9 +96,13 @@ namespace Langulus::SIMD
    namespace Inner
    {
 
+      /// Pick an array that can represent elements of FROM as type TO        
+      template<class FROM, class TO = FROM>
+      using ToArray = Decay<TypeOf<TO>> [CountOf<FROM>];
+
       /// Pick a register that can wrap an array/vector/scalar                
       template<class FROM, class TO = FROM>
-      using ToSIMD = decltype(Load<0>(Fake<TypeOf<TO>[CountOf<FROM>]>()));
+      using ToSIMD = decltype(Load<0>(Fake<ToArray<FROM, TO>>()));
 
       /// Determine a SIMD register type that can best wrap LHS and RHS       
       template<class LHS, class RHS, class OUT>

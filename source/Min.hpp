@@ -18,20 +18,19 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class T, Count S>
+      template<CT::Decayed, CT::NotSIMD T>
       LANGULUS(INLINED)
-      constexpr Unsupported Min(const Unsupported&, const Unsupported&) noexcept {
+      constexpr Unsupported Min(const T&, const T&) noexcept {
          return {};
       }
 
       /// Select the bigger values via SIMD                                   
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
       ///   @tparam REGISTER - type of register we're operating with          
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the maxed values                                          
-      template<class T, Count S, CT::SIMD REGISTER>
+      template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Min(const REGISTER& lhs, const REGISTER& rhs) noexcept {
          if constexpr (CT::SIMD128<REGISTER>) {
@@ -133,19 +132,36 @@ namespace Langulus::SIMD
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
    ///   @tparam OUT - the desired element type (lossless by default)         
+   ///   @return array/scalar                                                 
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   NOD() LANGULUS(INLINED)
+   constexpr auto MinConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+      using DOUT = Decay<TypeOf<OUT>>;
+
+      return Inner::Evaluate<0, Unsupported, OUT>(
+         lhsOrig, rhsOrig, nullptr,
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+            return ::std::min(lhs, rhs);
+         }
+      );
+   }
+
+   /// Min numbers                                                            
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired element type (lossless by default)         
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
    auto Min(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-      using DOUT = Decay<OUT>;
-      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
-      constexpr auto S = OVERLAP_EXTENTS(lhsOrig, rhsOrig);
+      using DOUT = Decay<TypeOf<OUT>>;
+      using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
-      return Inner::Evaluate<0, REGISTER, DOUT>(
+      return Inner::Evaluate<0, REGISTER, OUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::Min<DOUT, S>(lhs, rhs);
+            return Inner::Min<DOUT>(lhs, rhs);
          },
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             return ::std::min(lhs, rhs);
@@ -161,8 +177,11 @@ namespace Langulus::SIMD
    ///              order to fit the result in desired output                 
    template<class LHS, class RHS, class OUT>
    LANGULUS(INLINED)
-   void Min(LHS& lhs, RHS& rhs, OUT& output) noexcept {
-      GeneralStore(Min<LHS, RHS, OUT>(lhs, rhs), output);
+   constexpr void Min(LHS& lhs, RHS& rhs, OUT& out) noexcept {
+      IF_CONSTEXPR() {
+         StoreConstexpr(MinConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
+      }
+      else Store(Min<LHS, RHS, OUT>(lhs, rhs), out);
    }
 
 } // namespace Langulus::SIMD

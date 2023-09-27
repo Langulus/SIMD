@@ -18,11 +18,10 @@ namespace Langulus::SIMD
 
       /// Get absolute values via SIMD                                        
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
-      ///   @tparam REGISTER - the register type (deducible)                  
+      ///   @tparam REGISTER - the register to operate on (deducible)         
       ///   @param v - the array                                              
       ///   @return the absolute values                                       
-      template<class T, Count S, CT::SIMD REGISTER>
+      template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Abs(const REGISTER& v) noexcept {
          static_assert(CT::Signed<T>, "Suboptimal and pointless for unsigned values");
@@ -91,14 +90,14 @@ namespace Langulus::SIMD
 
 
    /// Get the absolute values                                                
-   ///   @param T - type of a single value                                    
-   ///   @param S - size of the array                                         
+   ///   @param T - data to make absolute                                     
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<class T, Count S>
+   template<class T>
    LANGULUS(INLINED)
-   auto Abs(const T(&value)[S]) noexcept {
-      return Inner::Abs<T, S>(Load<0>(value));
+   auto Abs(const T& value) noexcept {
+      using DT = Decay<TypeOf<T>>;
+      return Inner::Abs<DT>(Load<0>(value));
    }
 
 } // namespace Langulus::SIMD

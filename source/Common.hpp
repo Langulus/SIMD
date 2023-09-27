@@ -260,30 +260,6 @@ namespace Langulus::SIMD
    namespace Inner
    {
 
-      /// Returns the count overlap of two vectors/scalars                    
-      /// This is used to decide the output array size, for containing the    
-      /// result of an arithmetic operation                                   
-      ///   @tparam LHS - left type                                           
-      ///   @tparam RHS - right type                                          
-      ///   @return the overlapping count:                                    
-      ///           the smaller extent, if two arrays are provided;           
-      ///           the bigger extent, if one of the arguments isn't a vector 
-      ///           1 if both arguments are not arrays                        
-      template<CT::NotSIMD LHS, CT::NotSIMD RHS>
-      NOD() constexpr Count OverlapCounts() noexcept {
-         constexpr auto lhs = CountOf<LHS>;
-         constexpr auto rhs = CountOf<RHS>;
-
-         if constexpr (lhs > 1 and rhs > 1)
-            return lhs < rhs ? lhs : rhs;
-         else if constexpr (lhs > 1)
-            return lhs;
-         else if constexpr (rhs > 1)
-            return rhs;
-         else
-            return 1;
-      }
-
       template<CT::NotSIMD T>
       NOD() constexpr decltype(auto) GetFirst(const T& a) noexcept {
          if constexpr (CT::Array<T> or (CT::Dense<T> and requires { a[0]; }))
