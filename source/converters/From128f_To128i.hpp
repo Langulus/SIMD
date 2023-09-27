@@ -60,16 +60,28 @@ namespace Langulus::SIMD::Inner
          return simde_mm_cvtps_epi32(v);
       }
       else if constexpr (CT::UnsignedInteger32<TO>) {
-         LANGULUS_SIMD_VERBOSE("Converting 128bit register from float[4] to u32[4]");
-         return _mm_cvtps_epu32(v);
+         LANGULUS_SIMD_VERBOSE("Converting 128bit register from float[4] to i32[4]");
+         #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
+            return simde_mm_cvtps_epu32(v);
+         #else
+            return Unsupported {};
+         #endif
       }
       else if constexpr (CT::SignedInteger64<TO>) {
          LANGULUS_SIMD_VERBOSE("Converting 128bit register from float[2] to i64[2]");
-         return _mm_cvtps_epi64(v);
+         #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
+            return simde_mm_cvtps_epi64(v);
+         #else
+            return Unsupported {};
+         #endif
       }
       else if constexpr (CT::UnsignedInteger64<TO>) {
-         LANGULUS_SIMD_VERBOSE("Converting 128bit register from float[2] to u64[2]");
-         return _mm_cvtps_epu64(v);
+         LANGULUS_SIMD_VERBOSE("Converting 128bit register from float[2] to i64[2]");
+         #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
+            return simde_mm_cvtps_epu64(v);
+         #else
+            return Unsupported {};
+         #endif
       }
       else LANGULUS_ERROR("Can't convert from __m128 to __m128i");
    }
