@@ -8,18 +8,26 @@
 ///                                                                           
 #pragma once
 #include <RTTI/MetaData.hpp>
-#include <immintrin.h>
 #include <array>
 
-#include <simde/x86/avx2.h>
-#include <simde/x86/avx.h>
-#include <simde/x86/sse4.2.h>
-#include <simde/x86/sse4.1.h>
-#include <simde/x86/ssse3.h>
-#include <simde/x86/sse3.h>
-#include <simde/x86/sse2.h>
-#include <simde/x86/sse.h>
-#include <simde/x86/svml.h>
+#if LANGULUS_ALIGNMENT >= 64
+   #include <simde/x86/avx512.h>
+#endif
+
+#if LANGULUS_ALIGNMENT >= 32
+   #include <simde/x86/avx2.h>
+   #include <simde/x86/avx.h>
+#endif
+
+#if LANGULUS_ALIGNMENT >= 16
+   #include <simde/x86/sse4.2.h>
+   #include <simde/x86/sse4.1.h>
+   #include <simde/x86/ssse3.h>
+   #include <simde/x86/sse3.h>
+   #include <simde/x86/sse2.h>
+   #include <simde/x86/sse.h>
+   #include <simde/x86/svml.h>
+#endif
 
 #if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_SIMD)
    #define LANGULUS_API_SIMD() LANGULUS_EXPORT()
@@ -67,7 +75,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 #define LANGULUS_SIMD_256BIT() 0
 #define LANGULUS_SIMD_512BIT() 0
 
-#if defined (__AVX512BW__) and LANGULUS_ALIGNMENT >= 64
+#if defined (SIMDE_ARCH_X86_AVX512BW) and LANGULUS_ALIGNMENT >= 64
    #undef LANGULUS_SIMD_AVX512BW
    #define LANGULUS_SIMD_AVX512BW() 1
    #undef LANGULUS_SIMD_256BIT
@@ -76,7 +84,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512CD__) and LANGULUS_ALIGNMENT >= 64
+#if defined(SIMDE_ARCH_X86_AVX512CD) and LANGULUS_ALIGNMENT >= 64
    #undef LANGULUS_SIMD_AVX512CD
    #define LANGULUS_SIMD_AVX512CD() 1
    #undef LANGULUS_SIMD_256BIT
@@ -85,7 +93,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512DQ__) and LANGULUS_ALIGNMENT >= 64
+#if defined(SIMDE_ARCH_X86_AVX512DQ) and LANGULUS_ALIGNMENT >= 64
    #undef LANGULUS_SIMD_AVX512DQ
    #define LANGULUS_SIMD_AVX512DQ() 1
    #undef LANGULUS_SIMD_256BIT
@@ -94,7 +102,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512F__) and LANGULUS_ALIGNMENT >= 64
+#if defined(SIMDE_ARCH_X86_AVX512F) and LANGULUS_ALIGNMENT >= 64
    #undef LANGULUS_SIMD_AVX512F
    #define LANGULUS_SIMD_AVX512F() 1
    #undef LANGULUS_SIMD_256BIT
@@ -103,7 +111,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512VL__) and LANGULUS_ALIGNMENT >= 64
+#if defined(SIMDE_ARCH_X86_AVX512VL) and LANGULUS_ALIGNMENT >= 64
    #undef LANGULUS_SIMD_AVX512VL
    #define LANGULUS_SIMD_AVX512VL() 1
    #undef LANGULUS_SIMD_256BIT
@@ -127,7 +135,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX2__) and LANGULUS_ALIGNMENT >= 32
+#if defined(SIMDE_ARCH_X86_AVX2) and LANGULUS_ALIGNMENT >= 32
    #undef LANGULUS_SIMD_AVX2
    #define LANGULUS_SIMD_AVX2() 1
    #undef LANGULUS_SIMD_256BIT
@@ -136,7 +144,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX__) and LANGULUS_ALIGNMENT >= 32
+#if defined(SIMDE_ARCH_X86_AVX) and LANGULUS_ALIGNMENT >= 32
    #undef LANGULUS_SIMD_AVX
    #define LANGULUS_SIMD_AVX() 1
    #undef LANGULUS_SIMD_256BIT
@@ -145,46 +153,42 @@ LANGULUS_EXCEPTION(DivisionByZero);
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE4_2__) and LANGULUS_ALIGNMENT >= 16
+#if defined(SIMDE_ARCH_X86_SSE4_2) and LANGULUS_ALIGNMENT >= 16
    #undef LANGULUS_SIMD_SSE4_2
    #define LANGULUS_SIMD_SSE4_2() 1
    #undef LANGULUS_SIMD_128BIT
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE4_1__) and LANGULUS_ALIGNMENT >= 16
+#if defined(SIMDE_ARCH_X86_SSE4_1) and LANGULUS_ALIGNMENT >= 16
    #undef LANGULUS_SIMD_SSE4_1
    #define LANGULUS_SIMD_SSE4_1() 1
    #undef LANGULUS_SIMD_128BIT
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSSE3__) and LANGULUS_ALIGNMENT >= 16
+#if defined(SIMDE_ARCH_X86_SSSE3) and LANGULUS_ALIGNMENT >= 16
    #undef LANGULUS_SIMD_SSSE3
    #define LANGULUS_SIMD_SSSE3() 1
    #undef LANGULUS_SIMD_128BIT
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE3__) and LANGULUS_ALIGNMENT >= 16
+#if defined(SIMDE_ARCH_X86_SSE3) and LANGULUS_ALIGNMENT >= 16
    #undef LANGULUS_SIMD_SSE3
    #define LANGULUS_SIMD_SSE3() 1
    #undef LANGULUS_SIMD_128BIT
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if (defined(__SSE2__) or (defined(_M_IX86_FP) and _M_IX86_FP == 2) \
-                       or defined(_M_AMD64) \
-                       or defined(_M_X64) \
-    ) and LANGULUS_ALIGNMENT >= 16
+#if defined(SIMDE_ARCH_X86_SSE2) and LANGULUS_ALIGNMENT >= 16
    #undef LANGULUS_SIMD_SSE2
    #define LANGULUS_SIMD_SSE2() 1
    #undef LANGULUS_SIMD_128BIT
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if (defined(__SSE__) or (defined(_M_IX86_FP) and _M_IX86_FP == 1)) \
-                     and LANGULUS_ALIGNMENT >= 16
+#if defined(SIMDE_ARCH_X86_SSE) and LANGULUS_ALIGNMENT >= 16
    #undef LANGULUS_SIMD_SSE
    #define LANGULUS_SIMD_SSE() 1
    #undef LANGULUS_SIMD_128BIT
