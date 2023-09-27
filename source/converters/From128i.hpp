@@ -90,7 +90,7 @@ namespace Langulus::SIMD::Inner
             auto
             vi16_32 = simde_mm_unpacklo_epi8(v, simde_mm_setzero_si128());
             vi16_32 = simde_mm_unpacklo_epi16(vi16_32, simde_mm_setzero_si128());
-            return _mm_cvtepu32_pd(vi16_32);                                 
+            return simde_mm_cvtepi32_pd(vi16_32);                                 
          }
          else if constexpr (CT::SignedInteger16<FROM>) {
             LANGULUS_SIMD_VERBOSE("Converting 128bit register from i16[2] to double[2]");
@@ -102,7 +102,7 @@ namespace Langulus::SIMD::Inner
             LANGULUS_SIMD_VERBOSE("Converting 128bit register from u16[2] to double[2]");
             auto
             vi32 = simde_mm_unpacklo_epi16(v, simde_mm_setzero_si128());
-            return _mm_cvtepu32_pd(vi32);                                 
+            return simde_mm_cvtepi32_pd(vi32);
          }
          else if constexpr (CT::SignedInteger32<FROM>) {
             LANGULUS_SIMD_VERBOSE("Converting 128bit register from i32[2] to double[2]");
@@ -110,7 +110,7 @@ namespace Langulus::SIMD::Inner
          }
          else if constexpr (CT::UnsignedInteger32<FROM>) {
             LANGULUS_SIMD_VERBOSE("Converting 128bit register from u32[2] to double[2]");
-            return _mm_cvtepu32_pd(v);
+            return simde_mm_cvtepi32_pd(v);
          }
          else if constexpr (CT::SignedInteger64<FROM>) {
             LANGULUS_SIMD_VERBOSE("Converting 128bit register from i64[2] to double[2]");
