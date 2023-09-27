@@ -14,6 +14,7 @@ jobs:
         arch: [x86, x64]
         cxx: [g++, clang++, ClangCl, v143]
         feature: [
+          [NoSIMD, 16, ' ', ' '],
           [SSE, 16, '-msse', '/arch:SSE'],
           [SSE2, 16, '-msse2', '/arch:SSE2'],
           [SSE3, 16, '-msse3', '/arch:SSE3'],
@@ -150,7 +151,7 @@ jobs:
           -B out
           ${{matrix.cmake_args}} -T "${{matrix.cxx}}"
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
-          -DCMAKE_CXX_FLAGS="${{matrix.feature[3]}}"
+          -DCMAKE_CXX_FLAGS="${{matrix.feature[3]}} /EHsc"
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
 
       - name: Build
