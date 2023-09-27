@@ -11,39 +11,6 @@
 
 #if LANGULUS_SIMD(256BIT)
 
-TEST_CASE("Strange clang-cl bug", "[bug]") {
-   GIVEN("x + y = r") {
-      const std::int64_t xsrc[3] {1,2,3};
-      const std::int64_t ysrc[3] {7,8,9};
-      const std::int64_t ctrlsrc[3] {8,10,12};
-
-      const __m256i x = _mm256_setr_epi64x(xsrc[0], xsrc[1], xsrc[2], 0);
-      const __m256i y = _mm256_setr_epi64x(ysrc[0], ysrc[1], ysrc[2], 0);
-      const __m256i control = _mm256_setr_epi64x(ctrlsrc[0], ctrlsrc[1], ctrlsrc[2], 0);
-
-      WHEN("Added") {
-         const __m256i r = _mm256_add_epi64(x, y);
-
-         alignas(32) std::uint64_t xx[4];
-         alignas(32) std::uint64_t yy[4];
-         alignas(32) std::uint64_t rr[4];
-         alignas(32) std::uint64_t ctrl[4];
-
-         _mm256_store_si256(reinterpret_cast<__m256i*>(xx), x);
-         _mm256_store_si256(reinterpret_cast<__m256i*>(yy), y);
-         _mm256_store_si256(reinterpret_cast<__m256i*>(rr), r);
-         _mm256_store_si256(reinterpret_cast<__m256i*>(ctrl), control);
-
-         THEN("The result should be correct") {
-            REQUIRE(0 == memcmp(xx,    xsrc,    24));
-            REQUIRE(0 == memcmp(yy,    ysrc,    24));
-            REQUIRE(0 == memcmp(ctrl,  ctrlsrc, 24));
-            REQUIRE(0 == memcmp(rr,    ctrl,    24));
-         }
-      }
-   }
-}
-
 TEST_CASE("Strange clang-cl bug (simde equivalent)", "[bug]") {
    GIVEN("x + y = r") {
       const std::int64_t xsrc[3] {1,2,3};

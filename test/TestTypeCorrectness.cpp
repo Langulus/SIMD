@@ -121,6 +121,10 @@ TEST_CASE("OverlapCounts checks", "[OverlapCounts]") {
    Vector<int, 2> v2;
    Vector<int, 4> v4;
 
+   Vector<int, 1> v1x2[2];
+   Vector<int, 2> v2x2[2];
+   Vector<int, 4> v4x2[2];
+
    REQUIRE(OverlapCounts<decltype(scalar),      decltype(scalar)     >() == 1);
    REQUIRE(OverlapCounts<decltype(scalar),      decltype(scalarArray)>() == 1);
    REQUIRE(OverlapCounts<decltype(scalar),      decltype(smallArray) >() == 2);
@@ -128,6 +132,9 @@ TEST_CASE("OverlapCounts checks", "[OverlapCounts]") {
    REQUIRE(OverlapCounts<decltype(scalar),      decltype(v1)         >() == 1);
    REQUIRE(OverlapCounts<decltype(scalar),      decltype(v2)         >() == 2);
    REQUIRE(OverlapCounts<decltype(scalar),      decltype(v4)         >() == 4);
+   REQUIRE(OverlapCounts<decltype(scalar),      decltype(v1x2)       >() == 1*2);
+   REQUIRE(OverlapCounts<decltype(scalar),      decltype(v2x2)       >() == 2*2);
+   REQUIRE(OverlapCounts<decltype(scalar),      decltype(v4x2)       >() == 4*2);
 
    REQUIRE(OverlapCounts<decltype(scalarArray), decltype(scalar)     >() == 1);
    REQUIRE(OverlapCounts<decltype(scalarArray), decltype(scalarArray)>() == 1);
@@ -136,6 +143,9 @@ TEST_CASE("OverlapCounts checks", "[OverlapCounts]") {
    REQUIRE(OverlapCounts<decltype(scalarArray), decltype(v1)         >() == 1);
    REQUIRE(OverlapCounts<decltype(scalarArray), decltype(v2)         >() == 2);
    REQUIRE(OverlapCounts<decltype(scalarArray), decltype(v4)         >() == 4);
+   REQUIRE(OverlapCounts<decltype(scalarArray), decltype(v1x2)       >() == 1*2);
+   REQUIRE(OverlapCounts<decltype(scalarArray), decltype(v2x2)       >() == 2*2);
+   REQUIRE(OverlapCounts<decltype(scalarArray), decltype(v4x2)       >() == 4*2);
 
    REQUIRE(OverlapCounts<decltype(smallArray),  decltype(scalar)     >() == 2);
    REQUIRE(OverlapCounts<decltype(smallArray),  decltype(scalarArray)>() == 2);
@@ -144,6 +154,9 @@ TEST_CASE("OverlapCounts checks", "[OverlapCounts]") {
    REQUIRE(OverlapCounts<decltype(smallArray),  decltype(v1)         >() == 2);
    REQUIRE(OverlapCounts<decltype(smallArray),  decltype(v2)         >() == 2);
    REQUIRE(OverlapCounts<decltype(smallArray),  decltype(v4)         >() == 2);
+   REQUIRE(OverlapCounts<decltype(smallArray),  decltype(v1x2)       >() == 2);
+   REQUIRE(OverlapCounts<decltype(smallArray),  decltype(v2x2)       >() == 2);
+   REQUIRE(OverlapCounts<decltype(smallArray),  decltype(v4x2)       >() == 2);
 
    REQUIRE(OverlapCounts<decltype(bigArray),    decltype(scalar)     >() == 4);
    REQUIRE(OverlapCounts<decltype(bigArray),    decltype(scalarArray)>() == 4);
@@ -152,6 +165,9 @@ TEST_CASE("OverlapCounts checks", "[OverlapCounts]") {
    REQUIRE(OverlapCounts<decltype(bigArray),    decltype(v1)         >() == 4);
    REQUIRE(OverlapCounts<decltype(bigArray),    decltype(v2)         >() == 2);
    REQUIRE(OverlapCounts<decltype(bigArray),    decltype(v4)         >() == 4);
+   REQUIRE(OverlapCounts<decltype(bigArray),    decltype(v1x2)       >() == 2);
+   REQUIRE(OverlapCounts<decltype(bigArray),    decltype(v2x2)       >() == 4);
+   REQUIRE(OverlapCounts<decltype(bigArray),    decltype(v4x2)       >() == 4);
 
    REQUIRE(OverlapCounts<decltype(v1),          decltype(scalar)     >() == 1);
    REQUIRE(OverlapCounts<decltype(v1),          decltype(scalarArray)>() == 1);
@@ -160,6 +176,9 @@ TEST_CASE("OverlapCounts checks", "[OverlapCounts]") {
    REQUIRE(OverlapCounts<decltype(v1),          decltype(v1)         >() == 1);
    REQUIRE(OverlapCounts<decltype(v1),          decltype(v2)         >() == 2);
    REQUIRE(OverlapCounts<decltype(v1),          decltype(v4)         >() == 4);
+   REQUIRE(OverlapCounts<decltype(v1),          decltype(v1x2)       >() == 1*2);
+   REQUIRE(OverlapCounts<decltype(v1),          decltype(v2x2)       >() == 2*2);
+   REQUIRE(OverlapCounts<decltype(v1),          decltype(v4x2)       >() == 4*2);
 
    REQUIRE(OverlapCounts<decltype(v2),          decltype(scalar)     >() == 2);
    REQUIRE(OverlapCounts<decltype(v2),          decltype(scalarArray)>() == 2);
@@ -168,6 +187,9 @@ TEST_CASE("OverlapCounts checks", "[OverlapCounts]") {
    REQUIRE(OverlapCounts<decltype(v2),          decltype(v1)         >() == 2);
    REQUIRE(OverlapCounts<decltype(v2),          decltype(v2)         >() == 2);
    REQUIRE(OverlapCounts<decltype(v2),          decltype(v4)         >() == 2);
+   REQUIRE(OverlapCounts<decltype(v2),          decltype(v1x2)       >() == 2);
+   REQUIRE(OverlapCounts<decltype(v2),          decltype(v2x2)       >() == 2);
+   REQUIRE(OverlapCounts<decltype(v2),          decltype(v4x2)       >() == 2);
 
    REQUIRE(OverlapCounts<decltype(v4),          decltype(scalar)     >() == 4);
    REQUIRE(OverlapCounts<decltype(v4),          decltype(scalarArray)>() == 4);
@@ -176,6 +198,42 @@ TEST_CASE("OverlapCounts checks", "[OverlapCounts]") {
    REQUIRE(OverlapCounts<decltype(v4),          decltype(v1)         >() == 4);
    REQUIRE(OverlapCounts<decltype(v4),          decltype(v2)         >() == 2);
    REQUIRE(OverlapCounts<decltype(v4),          decltype(v4)         >() == 4);
+   REQUIRE(OverlapCounts<decltype(v4),          decltype(v1x2)       >() == 2);
+   REQUIRE(OverlapCounts<decltype(v4),          decltype(v2x2)       >() == 4);
+   REQUIRE(OverlapCounts<decltype(v4),          decltype(v4x2)       >() == 4);
+
+   REQUIRE(OverlapCounts<decltype(v1x2),        decltype(scalar)     >() == 2);
+   REQUIRE(OverlapCounts<decltype(v1x2),        decltype(scalarArray)>() == 2);
+   REQUIRE(OverlapCounts<decltype(v1x2),        decltype(smallArray) >() == 2);
+   REQUIRE(OverlapCounts<decltype(v1x2),        decltype(bigArray)   >() == 2);
+   REQUIRE(OverlapCounts<decltype(v1x2),        decltype(v1)         >() == 2);
+   REQUIRE(OverlapCounts<decltype(v1x2),        decltype(v2)         >() == 2);
+   REQUIRE(OverlapCounts<decltype(v1x2),        decltype(v4)         >() == 2);
+   REQUIRE(OverlapCounts<decltype(v1x2),        decltype(v1x2)       >() == 2);
+   REQUIRE(OverlapCounts<decltype(v1x2),        decltype(v2x2)       >() == 2);
+   REQUIRE(OverlapCounts<decltype(v1x2),        decltype(v4x2)       >() == 2);
+                                                
+   REQUIRE(OverlapCounts<decltype(v2x2),        decltype(scalar)     >() == 4);
+   REQUIRE(OverlapCounts<decltype(v2x2),        decltype(scalarArray)>() == 4);
+   REQUIRE(OverlapCounts<decltype(v2x2),        decltype(smallArray) >() == 2);
+   REQUIRE(OverlapCounts<decltype(v2x2),        decltype(bigArray)   >() == 4);
+   REQUIRE(OverlapCounts<decltype(v2x2),        decltype(v1)         >() == 4);
+   REQUIRE(OverlapCounts<decltype(v2x2),        decltype(v2)         >() == 2);
+   REQUIRE(OverlapCounts<decltype(v2x2),        decltype(v4)         >() == 4);
+   REQUIRE(OverlapCounts<decltype(v2x2),        decltype(v1x2)       >() == 2);
+   REQUIRE(OverlapCounts<decltype(v2x2),        decltype(v2x2)       >() == 4);
+   REQUIRE(OverlapCounts<decltype(v2x2),        decltype(v4x2)       >() == 4);
+                                                
+   REQUIRE(OverlapCounts<decltype(v4x2),        decltype(scalar)     >() == 8);
+   REQUIRE(OverlapCounts<decltype(v4x2),        decltype(scalarArray)>() == 8);
+   REQUIRE(OverlapCounts<decltype(v4x2),        decltype(smallArray) >() == 2);
+   REQUIRE(OverlapCounts<decltype(v4x2),        decltype(bigArray)   >() == 4);
+   REQUIRE(OverlapCounts<decltype(v4x2),        decltype(v1)         >() == 8);
+   REQUIRE(OverlapCounts<decltype(v4x2),        decltype(v2)         >() == 2);
+   REQUIRE(OverlapCounts<decltype(v4x2),        decltype(v4)         >() == 4);
+   REQUIRE(OverlapCounts<decltype(v4x2),        decltype(v1x2)       >() == 2);
+   REQUIRE(OverlapCounts<decltype(v4x2),        decltype(v2x2)       >() == 4);
+   REQUIRE(OverlapCounts<decltype(v4x2),        decltype(v4x2)       >() == 8);
 }
 
 TEST_CASE("Lossless checks", "[lossless]") {
