@@ -26,28 +26,42 @@ namespace Langulus::SIMD
       auto Round(const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Suboptimal for unreal numbers");
 
+      #if LANGULUS_SIMD(128BIT)
+         constexpr auto STYLE = SIMDE_MM_FROUND_TO_NEAREST_INT | SIMDE_MM_FROUND_NO_EXC;
+
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::Float<T>)
-               return simde_mm_round_ps(value, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
+               return simde_mm_round_ps(value, STYLE);
             else if constexpr (CT::Double<T>)
-               return simde_mm_round_pd(value, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
+               return simde_mm_round_pd(value, STYLE);
             else LANGULUS_ERROR("Unsupported type for 16-byte package");
          }
-         else if constexpr (CT::SIMD256<REGISTER>) {
+         else
+      #endif
+
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<REGISTER>) {
             if constexpr (CT::Float<T>)
-               return simde_mm256_round_ps(value, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
+               return simde_mm256_round_ps(value, STYLE);
             else if constexpr (CT::Double<T>)
-               return simde_mm256_round_pd(value, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
+               return simde_mm256_round_pd(value, STYLE);
             else LANGULUS_ERROR("Unsupported type for 32-byte package");
          }
-         else if constexpr (CT::SIMD512<REGISTER>) {
+         else
+      #endif
+
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<REGISTER>) {
             if constexpr (CT::Float<T>)
-               return simde_mm512_roundscale_ps(value, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
+               return simde_mm512_roundscale_ps(value, STYLE);
             else if constexpr (CT::Double<T>)
-               return simde_mm512_roundscale_pd(value, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
+               return simde_mm512_roundscale_pd(value, STYLE);
             else LANGULUS_ERROR("Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else
+      #endif
+
+         LANGULUS_ERROR("Unsupported type");
       }
 
    } // namespace Langulus::SIMD::Inner

@@ -242,15 +242,8 @@ namespace Langulus::SIMD::Inner
                LANGULUS_SIMD_VERBOSE("Converting 128bit register from u32[4] to u16[4]");
                return simde_mm_packus_epi32(v, simde_mm_setzero_si128());
             }
-            else if constexpr (CT::SignedInteger32<TO>) {
-               LANGULUS_SIMD_VERBOSE("Converting 128bit register from u32[4] to i32[4]");
-               auto lo = _mm_cvtepi64_epi32(simde_mm_cvtepu32_epi64(v));
-               auto up = _mm_halfflip(_mm_cvtepi64_epi32(
-                  simde_mm_cvtepu32_epi64(_mm_halfflip(v)))
-               );
-               return simde_mm_add_epi32(lo, up);
-            }
-            else if constexpr (CT::UnsignedInteger32<TO>) {
+            else if constexpr (CT::Integer32<TO>) {
+               LANGULUS_SIMD_VERBOSE("Converting 128bit register from u/i32[4] to u/i32[4]");
                return v;
             }
             else if constexpr (CT::SignedInteger64<TO>) {
