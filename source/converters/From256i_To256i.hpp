@@ -21,9 +21,9 @@ namespace Langulus::SIMD::Inner
    template<CT::Decayed TO, CT::Decayed FROM>
    LANGULUS(INLINED)
    simde__m256i ConvertFrom256i_To256i(const simde__m256i& v) noexcept {
-      if constexpr (CT::Exact<FROM, TO>)
-         return v;
-      else if constexpr (CT::Integer8<FROM>) {
+      LANGULUS_SIMD_VERBOSE("ConvertFrom256i_To256i");
+
+      if constexpr (CT::Integer8<FROM>) {
          //                                                             
          // Converting TO i8[32], u8[32], i16[16], u16[16]              
          //               i32[8], u32[8], i64[4],  u64[4]               

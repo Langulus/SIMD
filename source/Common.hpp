@@ -33,9 +33,13 @@ LANGULUS_EXCEPTION(DivisionByZero);
 
 #ifndef LANGULUS_SIMD_VERBOSE
    #define LANGULUS_SIMD_VERBOSE(...)
+   #define LANGULUS_SIMD_VERBOSE_TAB(...)
 #else
    #undef LANGULUS_SIMD_VERBOSE
-   #define LANGULUS_SIMD_VERBOSE(...) Logger::Info(__VA_ARGS__)
+   #define LANGULUS_SIMD_VERBOSE(...) \
+      Logger::Info(__VA_ARGS__)
+   #define LANGULUS_SIMD_VERBOSE_TAB(...) \
+      const auto scoped = Logger::Info(__VA_ARGS__, Logger::Tabs {})
 #endif
 
 

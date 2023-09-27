@@ -99,7 +99,7 @@ namespace Langulus::SIMD::Inner
    constexpr auto Evaluate(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) {
       using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
       constexpr auto S = OverlapCounts<LHS, RHS>();
-      LANGULUS_SIMD_VERBOSE("Evaluated to overlapped count of ", S);
+      LANGULUS_SIMD_VERBOSE_TAB("Evaluated to overlapped count of ", S);
 
       if constexpr (S < 2 or CT::NotSIMD<REGISTER> or CT::NotSIMD<OUTSIMD>) {
          // Call the fallback routine if unsupported, or size 1         
