@@ -1,5 +1,6 @@
 #pragma once
 #include "Convert.hpp"
+#include "Bitmask.hpp"
 
 
 namespace Langulus::SIMD::Inner
@@ -18,69 +19,51 @@ namespace Langulus::SIMD::Inner
    template<class OUT, class LHS, class RHS, class FFALL>
    NOD() LANGULUS(INLINED)
    constexpr auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) {
-      using DOUT = InvocableResult<FFALL, Decay<TypeOf<OUT>>>;
+      using LOSSLESS = Decay<TypeOf<Lossless<LHS, RHS>>>;
+      using RESULT = InvocableResult<FFALL, LOSSLESS>;
       constexpr auto S = OverlapCounts<LHS, RHS>();
+      using RETURN = Conditional<
+         CT::Bitmask<OUT> or CT::Bool<RESULT>,
+         Bitmask<S>, ::std::array<LOSSLESS, S>
+      >;
 
       if constexpr (CT::Vector<LHS> and CT::Vector<RHS>) {
          // Vector OP Vector                                            
-         ::std::array<DOUT, S> output;
+         RETURN output;
 
          for (Count i = 0; i < S; ++i) {
             output[i] = op(
-               static_cast<DOUT>(DenseCast(lhs[i])),
-               static_cast<DOUT>(DenseCast(rhs[i]))
+               static_cast<LOSSLESS>(DenseCast(lhs[i])),
+               static_cast<LOSSLESS>(DenseCast(rhs[i]))
             );
          }
+
          return output;
       }
       else if constexpr (CT::Vector<LHS>) {
          // Vector OP Scalar                                            
-         ::std::array<DOUT, S> output;
+         RETURN output;
 
-         if constexpr (CT::Bool<DOUT>) {
-            auto& same_rhs = DenseCast(GetFirst(rhs));
-
-            for (Count i = 0; i < S; ++i) {
-               output[i] = op(
-                  static_cast<DOUT>(DenseCast(lhs[i])),
-                  same_rhs
-               );
-            }
-         }
-         else {
-            const auto same_rhs = static_cast<DOUT>(DenseCast(GetFirst(rhs)));
-            for (Count i = 0; i < S; ++i) {
-               output[i] = op(
-                  static_cast<DOUT>(DenseCast(lhs[i])),
-                  same_rhs
-               );
-            }
+         const auto same_rhs = static_cast<LOSSLESS>(DenseCast(GetFirst(rhs)));
+         for (Count i = 0; i < S; ++i) {
+            output[i] = op(
+               static_cast<LOSSLESS>(DenseCast(lhs[i])),
+               same_rhs
+            );
          }
 
          return output;
       }
       else if constexpr (CT::Vector<RHS>) {
          // Scalar OP Vector                                            
-         ::std::array<DOUT, S> output;
+         RETURN output;
 
-         if constexpr (CT::Bool<DOUT>) {
-            auto& same_lhs = DenseCast(GetFirst(lhs));
-
-            for (Count i = 0; i < S; ++i) {
-               output[i] = op(
-                  same_lhs,
-                  static_cast<DOUT>(DenseCast(rhs[i]))
-               );
-            }
-         }
-         else {
-            const auto same_lhs = static_cast<DOUT>(DenseCast(GetFirst(lhs)));
-            for (Count i = 0; i < S; ++i) {
-               output[i] = op(
-                  same_lhs,
-                  static_cast<DOUT>(DenseCast(rhs[i]))
-               );
-            }
+         const auto same_lhs = static_cast<LOSSLESS>(DenseCast(GetFirst(lhs)));
+         for (Count i = 0; i < S; ++i) {
+            output[i] = op(
+               same_lhs,
+               static_cast<LOSSLESS>(DenseCast(rhs[i]))
+            );
          }
 
          return output;
@@ -89,8 +72,8 @@ namespace Langulus::SIMD::Inner
          // Scalar OP Scalar                                            
          // Casts are no-op if types are the same                       
          return op(
-            static_cast<DOUT>(DenseCast(GetFirst(lhs))),
-            static_cast<DOUT>(DenseCast(GetFirst(rhs)))
+            static_cast<LOSSLESS>(DenseCast(GetFirst(lhs))),
+            static_cast<LOSSLESS>(DenseCast(GetFirst(rhs)))
          );
       }
    }

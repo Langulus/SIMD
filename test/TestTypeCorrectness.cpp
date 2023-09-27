@@ -194,7 +194,7 @@ TEST_CASE("Lossless checks", "[lossless]") {
    REQUIRE(CT::Exact<Lossless<std::uint16_t, std::uint16_t>, std::uint16_t>);
    REQUIRE(CT::Exact<Lossless<std::uint16_t, std::uint32_t>, std::uint32_t>);
    REQUIRE(CT::Exact<Lossless<std::uint16_t, std::uint64_t>, std::uint64_t>);
-   REQUIRE(CT::Exact<Lossless<std::uint16_t, std::int8_t  >, std::uint16_t>);
+   REQUIRE(CT::Exact<Lossless<std::uint16_t, std::int8_t  >, std::int16_t >);
    REQUIRE(CT::Exact<Lossless<std::uint16_t, std::int16_t >, std::int16_t >);
    REQUIRE(CT::Exact<Lossless<std::uint16_t, std::int32_t >, std::int32_t >);
    REQUIRE(CT::Exact<Lossless<std::uint16_t, std::int64_t >, std::int64_t >);
@@ -205,8 +205,8 @@ TEST_CASE("Lossless checks", "[lossless]") {
    REQUIRE(CT::Exact<Lossless<std::uint32_t, std::uint16_t>, std::uint32_t>);
    REQUIRE(CT::Exact<Lossless<std::uint32_t, std::uint32_t>, std::uint32_t>);
    REQUIRE(CT::Exact<Lossless<std::uint32_t, std::uint64_t>, std::uint64_t>);
-   REQUIRE(CT::Exact<Lossless<std::uint32_t, std::int8_t  >, std::uint32_t>);
-   REQUIRE(CT::Exact<Lossless<std::uint32_t, std::int16_t >, std::uint32_t>);
+   REQUIRE(CT::Exact<Lossless<std::uint32_t, std::int8_t  >, std::int32_t >);
+   REQUIRE(CT::Exact<Lossless<std::uint32_t, std::int16_t >, std::int32_t >);
    REQUIRE(CT::Exact<Lossless<std::uint32_t, std::int32_t >, std::int32_t >);
    REQUIRE(CT::Exact<Lossless<std::uint32_t, std::int64_t >, std::int64_t >);
    REQUIRE(CT::Exact<Lossless<std::uint32_t, float        >, float        >);
@@ -216,18 +216,18 @@ TEST_CASE("Lossless checks", "[lossless]") {
    REQUIRE(CT::Exact<Lossless<std::uint64_t, std::uint16_t>, std::uint64_t>);
    REQUIRE(CT::Exact<Lossless<std::uint64_t, std::uint32_t>, std::uint64_t>);
    REQUIRE(CT::Exact<Lossless<std::uint64_t, std::uint64_t>, std::uint64_t>);
-   REQUIRE(CT::Exact<Lossless<std::uint64_t, std::int8_t  >, std::uint64_t>);
-   REQUIRE(CT::Exact<Lossless<std::uint64_t, std::int16_t >, std::uint64_t>);
-   REQUIRE(CT::Exact<Lossless<std::uint64_t, std::int32_t >, std::uint64_t>);
+   REQUIRE(CT::Exact<Lossless<std::uint64_t, std::int8_t  >, std::int64_t >);
+   REQUIRE(CT::Exact<Lossless<std::uint64_t, std::int16_t >, std::int64_t >);
+   REQUIRE(CT::Exact<Lossless<std::uint64_t, std::int32_t >, std::int64_t >);
    REQUIRE(CT::Exact<Lossless<std::uint64_t, std::int64_t >, std::int64_t >);
    REQUIRE(CT::Exact<Lossless<std::uint64_t, float        >, float        >);
    REQUIRE(CT::Exact<Lossless<std::uint64_t, double       >, double       >);
 
 
    REQUIRE(CT::Exact<Lossless<std::int8_t  , std::uint8_t >, std::int8_t  >);
-   REQUIRE(CT::Exact<Lossless<std::int8_t  , std::uint16_t>, std::uint16_t>);
-   REQUIRE(CT::Exact<Lossless<std::int8_t  , std::uint32_t>, std::uint32_t>);
-   REQUIRE(CT::Exact<Lossless<std::int8_t  , std::uint64_t>, std::uint64_t>);
+   REQUIRE(CT::Exact<Lossless<std::int8_t  , std::uint16_t>, std::int16_t >);
+   REQUIRE(CT::Exact<Lossless<std::int8_t  , std::uint32_t>, std::int32_t >);
+   REQUIRE(CT::Exact<Lossless<std::int8_t  , std::uint64_t>, std::int64_t >);
    REQUIRE(CT::Exact<Lossless<std::int8_t  , std::int8_t  >, std::int8_t  >);
    REQUIRE(CT::Exact<Lossless<std::int8_t  , std::int16_t >, std::int16_t >);
    REQUIRE(CT::Exact<Lossless<std::int8_t  , std::int32_t >, std::int32_t >);
@@ -237,8 +237,8 @@ TEST_CASE("Lossless checks", "[lossless]") {
                                            
    REQUIRE(CT::Exact<Lossless<std::int16_t , std::uint8_t >, std::int16_t >);
    REQUIRE(CT::Exact<Lossless<std::int16_t , std::uint16_t>, std::int16_t >);
-   REQUIRE(CT::Exact<Lossless<std::int16_t , std::uint32_t>, std::uint32_t>);
-   REQUIRE(CT::Exact<Lossless<std::int16_t , std::uint64_t>, std::uint64_t>);
+   REQUIRE(CT::Exact<Lossless<std::int16_t , std::uint32_t>, std::int32_t >);
+   REQUIRE(CT::Exact<Lossless<std::int16_t , std::uint64_t>, std::int64_t >);
    REQUIRE(CT::Exact<Lossless<std::int16_t , std::int8_t  >, std::int16_t >);
    REQUIRE(CT::Exact<Lossless<std::int16_t , std::int16_t >, std::int16_t >);
    REQUIRE(CT::Exact<Lossless<std::int16_t , std::int32_t >, std::int32_t >);
@@ -249,7 +249,7 @@ TEST_CASE("Lossless checks", "[lossless]") {
    REQUIRE(CT::Exact<Lossless<std::int32_t , std::uint8_t >, std::int32_t >);
    REQUIRE(CT::Exact<Lossless<std::int32_t , std::uint16_t>, std::int32_t >);
    REQUIRE(CT::Exact<Lossless<std::int32_t , std::uint32_t>, std::int32_t >);
-   REQUIRE(CT::Exact<Lossless<std::int32_t , std::uint64_t>, std::uint64_t>);
+   REQUIRE(CT::Exact<Lossless<std::int32_t , std::uint64_t>, std::int64_t >);
    REQUIRE(CT::Exact<Lossless<std::int32_t , std::int8_t  >, std::int32_t >);
    REQUIRE(CT::Exact<Lossless<std::int32_t , std::int16_t >, std::int32_t >);
    REQUIRE(CT::Exact<Lossless<std::int32_t , std::int32_t >, std::int32_t >);
