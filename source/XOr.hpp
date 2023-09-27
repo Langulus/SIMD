@@ -18,19 +18,19 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class T, Count S>
+      template<CT::Decayed, CT::NotSIMD T>
       LANGULUS(INLINED)
-      constexpr Unsupported XOr(const Unsupported&, const Unsupported&) noexcept {
+      constexpr Unsupported XOr(const T&, const T&) noexcept {
          return {};
       }
 
       /// XOr two arrays left using SIMD (shifting in zeroes)                 
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
+      ///   @tparam REGISTER - the register type (deducible)                  
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the xor'd elements as a register                          
-      template<class T, Count S, class REGISTER>
+      template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto XOr(const REGISTER& lhs, const REGISTER& rhs) noexcept {
          if constexpr (CT::Same<REGISTER,simde__m128i>)
@@ -58,6 +58,24 @@ namespace Langulus::SIMD
    } // namespace Langulus::SIMD::Inner
 
 
+   /// Add numbers                                                            
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired element type (lossless by default)         
+   ///   @return array/scalar                                                 
+   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   NOD() LANGULUS(INLINED)
+   constexpr auto XOrConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+      using DOUT = Decay<TypeOf<OUT>>;
+
+      return Inner::Evaluate<0, Unsupported, OUT>(
+         lhsOrig, rhsOrig, nullptr,
+         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+            return lhs ^ rhs;
+         }
+      );
+   }
+
    /// Subtract numbers                                                       
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
@@ -68,13 +86,12 @@ namespace Langulus::SIMD
    NOD() LANGULUS(INLINED)
    auto XOr(LHS& lhsOrig, RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
-      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
-      constexpr auto S = OVERLAP_EXTENTS(lhsOrig, rhsOrig);
+      using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
-      return Inner::Evaluate<0, REGISTER, DOUT>(
+      return Inner::Evaluate<0, REGISTER, OUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::XOr<DOUT, S>(lhs, rhs);
+            return Inner::XOr<DOUT>(lhs, rhs);
          },
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             return lhs ^ rhs;
@@ -90,8 +107,11 @@ namespace Langulus::SIMD
    ///              order to fit the result in desired output                 
    template<class LHS, class RHS, class OUT>
    LANGULUS(INLINED)
-   void XOr(LHS& lhs, RHS& rhs, OUT& output) noexcept {
-      GeneralStore(XOr<LHS, RHS, OUT>(lhs, rhs), output);
+   constexpr void XOr(LHS& lhs, RHS& rhs, OUT& out) noexcept {
+      IF_CONSTEXPR() {
+         StoreConstexpr(XOrConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
+      }
+      else Store(XOr<LHS, RHS, OUT>(lhs, rhs), out);
    }
 
 } // namespace Langulus::SIMD

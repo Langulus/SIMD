@@ -18,7 +18,7 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class, CT::NotSIMD T>
+      template<CT::Decayed, CT::NotSIMD T>
       LANGULUS(INLINED)
       constexpr Unsupported Multiply(const T&, const T&) noexcept {
          return {};
@@ -30,7 +30,7 @@ namespace Langulus::SIMD
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the multiplied elements as a register                     
-      template<class T, CT::SIMD REGISTER>
+      template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Multiply(const REGISTER& lhs, const REGISTER& rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
@@ -152,7 +152,7 @@ namespace Langulus::SIMD
    constexpr auto MultiplyConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
 
-      return Inner::Evaluate<0, Unsupported, DOUT>(
+      return Inner::Evaluate<0, Unsupported, OUT>(
          lhsOrig, rhsOrig, nullptr,
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             return lhs * rhs;
@@ -170,9 +170,9 @@ namespace Langulus::SIMD
    NOD() LANGULUS(INLINED)
    auto Multiply(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
-      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
+      using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
-      return Inner::Evaluate<0, REGISTER, DOUT>(
+      return Inner::Evaluate<0, REGISTER, OUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
             LANGULUS_SIMD_VERBOSE("Multiplying (SIMD)");

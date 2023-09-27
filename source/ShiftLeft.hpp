@@ -17,7 +17,7 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<class, CT::NotSIMD T>
+      template<CT::Decayed, CT::NotSIMD T>
       LANGULUS(INLINED)
       constexpr Unsupported ShiftLeft(const T&, const T&) noexcept {
          return {};
@@ -35,7 +35,7 @@ namespace Langulus::SIMD
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the shifted elements as a register                        
-      template<class T, CT::SIMD REGISTER>
+      template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto ShiftLeft(const REGISTER& lhs, const REGISTER& rhs) noexcept {
          static_assert(CT::IntegerX<Decay<T>>, "Can only shift integers");
@@ -240,7 +240,7 @@ namespace Langulus::SIMD
 
       using DOUT = Decay<TypeOf<OUT>>;
 
-      return Inner::Evaluate<0, Unsupported, DOUT>(
+      return Inner::Evaluate<0, Unsupported, OUT>(
          lhsOrig, rhsOrig, nullptr,
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             // Well defined condition in SIMD calls, that is otherwise  
@@ -270,9 +270,9 @@ namespace Langulus::SIMD
          "Can only shift integers");
 
       using DOUT = Decay<TypeOf<OUT>>;
-      using REGISTER = Inner::Register<LHS, RHS, DOUT>;
+      using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
-      return Inner::Evaluate<0, REGISTER, DOUT>(
+      return Inner::Evaluate<0, REGISTER, OUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
             return Inner::ShiftLeft<DOUT>(lhs, rhs);

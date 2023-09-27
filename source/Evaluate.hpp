@@ -7,70 +7,90 @@ namespace Langulus::SIMD::Inner
 
    /// Fallback OP on a single pair of dense numbers                          
    /// It converts LHS and RHS to the most lossless of the two                
-   ///   @tparam LHS - left number type (deducible)                           
-   ///   @tparam RHS - right number type (deducible)                          
+   ///   @tparam OUT - the desired output array/vector/scalar                 
+   ///   @tparam LHS - left array/vector/scalar  (deducible)                  
+   ///   @tparam RHS - right array/vector/scalar  (deducible)                 
    ///   @tparam FFALL - the operation to invoke on fallback (deducible)      
    ///   @param lhs - left argument                                           
    ///   @param rhs - right argument                                          
    ///   @param op - the fallback function to invoke                          
    ///   @return the resulting number/bool/std::array of numbers/bools        
-   template<class LOSSLESS, class LHS, class RHS, class FFALL>
+   template<class OUT, class LHS, class RHS, class FFALL>
    NOD() LANGULUS(INLINED)
    constexpr auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) {
-      using OUT = InvocableResult<FFALL, LOSSLESS>;
-      constexpr auto S = Inner::OverlapCounts<LHS, RHS>();
+      using DOUT = InvocableResult<FFALL, Decay<TypeOf<OUT>>>;
+      constexpr auto S = OverlapCounts<LHS, RHS>();
 
       if constexpr (CT::Vector<LHS> and CT::Vector<RHS>) {
          // Vector OP Vector                                            
-         static_assert(S > 1, "S can't be less than 2");
-         ::std::array<OUT, S> output;
+         ::std::array<DOUT, S> output;
 
-         for (Count i = 0; i < S; ++i)
-            output[i] = Fallback<LOSSLESS>(lhs[i], rhs[i], ::std::move(op));
+         for (Count i = 0; i < S; ++i) {
+            output[i] = op(
+               static_cast<DOUT>(DenseCast(lhs[i])),
+               static_cast<DOUT>(DenseCast(rhs[i]))
+            );
+         }
          return output;
       }
       else if constexpr (CT::Vector<LHS>) {
          // Vector OP Scalar                                            
-         static_assert(S > 1, "S can't be less than 2");
-         ::std::array<OUT, S> output;
+         ::std::array<DOUT, S> output;
 
-         if constexpr (CT::Bool<OUT>) {
+         if constexpr (CT::Bool<DOUT>) {
             auto& same_rhs = DenseCast(GetFirst(rhs));
-            for (Count i = 0; i < S; ++i)
-               output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, ::std::move(op));
+
+            for (Count i = 0; i < S; ++i) {
+               output[i] = op(
+                  static_cast<DOUT>(DenseCast(lhs[i])),
+                  same_rhs
+               );
+            }
          }
          else {
-            const auto same_rhs = static_cast<LOSSLESS>(DenseCast(GetFirst(rhs)));
-            for (Count i = 0; i < S; ++i)
-               output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, ::std::move(op));
+            const auto same_rhs = static_cast<DOUT>(DenseCast(GetFirst(rhs)));
+            for (Count i = 0; i < S; ++i) {
+               output[i] = op(
+                  static_cast<DOUT>(DenseCast(lhs[i])),
+                  same_rhs
+               );
+            }
          }
+
          return output;
       }
       else if constexpr (CT::Vector<RHS>) {
          // Scalar OP Vector                                            
-         static_assert(S > 1, "S can't be less than 2");
-         ::std::array<OUT, S> output;
+         ::std::array<DOUT, S> output;
 
-         if constexpr (CT::Bool<OUT>) {
+         if constexpr (CT::Bool<DOUT>) {
             auto& same_lhs = DenseCast(GetFirst(lhs));
-            for (Count i = 0; i < S; ++i)
-               output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], ::std::move(op));
+
+            for (Count i = 0; i < S; ++i) {
+               output[i] = op(
+                  same_lhs,
+                  static_cast<DOUT>(DenseCast(rhs[i]))
+               );
+            }
          }
          else {
-            const auto same_lhs = static_cast<LOSSLESS>(DenseCast(GetFirst(lhs)));
-            for (Count i = 0; i < S; ++i)
-               output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], ::std::move(op));
+            const auto same_lhs = static_cast<DOUT>(DenseCast(GetFirst(lhs)));
+            for (Count i = 0; i < S; ++i) {
+               output[i] = op(
+                  same_lhs,
+                  static_cast<DOUT>(DenseCast(rhs[i]))
+               );
+            }
          }
+
          return output;
       }
       else {
-         static_assert(S == 1, "S must be exactly 1");
-
          // Scalar OP Scalar                                            
          // Casts are no-op if types are the same                       
          return op(
-            static_cast<LOSSLESS>(DenseCast(GetFirst(lhs))),
-            static_cast<LOSSLESS>(DenseCast(GetFirst(rhs)))
+            static_cast<DOUT>(DenseCast(GetFirst(lhs))),
+            static_cast<DOUT>(DenseCast(GetFirst(rhs)))
          );
       }
    }
@@ -95,7 +115,7 @@ namespace Langulus::SIMD::Inner
    NOD() LANGULUS(INLINED)
    constexpr auto Evaluate(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) {
       using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
-      constexpr auto S = Inner::OverlapCounts<LHS, RHS>();
+      constexpr auto S = OverlapCounts<LHS, RHS>();
       LANGULUS_SIMD_VERBOSE("Evaluated to overlapped count of ", S);
 
       if constexpr (S < 2 or CT::NotSIMD<REGISTER> or CT::NotSIMD<OUTSIMD>) {

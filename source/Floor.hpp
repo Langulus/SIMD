@@ -18,11 +18,10 @@ namespace Langulus::SIMD
 
       /// Get floored values via SIMD                                         
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
       ///   @tparam REGISTER - the register type (deducible)                  
       ///   @param value - the array                                          
       ///   @return the floored values                                        
-      template<class T, Count S, CT::SIMD REGISTER>
+      template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       auto Floor(const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Suboptimal and pointless for whole numbers");
@@ -58,14 +57,14 @@ namespace Langulus::SIMD
 
 
    /// Get the floor values                                                   
-   ///   @param T - type of a single value                                    
-   ///   @param S - size of the array                                         
+   ///   @param T - type of the data (deducible)                              
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<class T, Count S>
+   template<class T>
    LANGULUS(INLINED)
-   auto Floor(const T(&value)[S]) noexcept {
-      return Inner::Floor<T, S>(Load<0>(value));
+   auto Floor(const T& value) noexcept {
+      using DT = Decay<TypeOf<T>>;
+      return Inner::Floor<DT>(Load<0>(value));
    }
 
 } // namespace Langulus::SIMD

@@ -28,11 +28,10 @@ namespace Langulus::SIMD
       /// Get natural/base-10/1p/base-2/floor(log2(x)) logarithm values       
       ///   @tparam STYLE - the type of the log function                      
       ///   @tparam T - the type of the array element                         
-      ///   @tparam S - the size of the array                                 
       ///   @tparam REGISTER - the register type (deducible)                  
       ///   @param value - the array                                          
       ///   @return the logarithm values                                      
-      template<LogStyle STYLE = LogStyle::Base10, class T, Count S, CT::SIMD REGISTER>
+      template<LogStyle STYLE = LogStyle::Base10, CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
       REGISTER Log(const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Doesn't work for whole numbers");
@@ -131,14 +130,15 @@ namespace Langulus::SIMD
 
 
    /// Get the logarithm values                                               
+   ///   @param STYLE - what flavour of logarithm are we doing here           
    ///   @param T - type of a single value                                    
-   ///   @param S - size of the array                                         
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<LogStyle STYLE, class T, Count S>
+   template<LogStyle STYLE = LogStyle::Base10, class T>
    LANGULUS(INLINED)
-   auto Log(const T(&value)[S]) noexcept {
-      return Inner::Log<STYLE, T, S>(Load<0>(value));
+   auto Log(const T& value) noexcept {
+      using DT = Decay<TypeOf<T>>;
+      return Inner::Log<STYLE, DT>(Load<0>(value));
    }
 
 } // namespace Langulus::SIMD
