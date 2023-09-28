@@ -107,9 +107,18 @@ namespace Langulus::SIMD
                else if constexpr (CT::Integer32<T>)
                   return simde_mm256_setr_epi32(
                      Get<int32_t, DEF, INDICES, 8>(values)...);
-               else if constexpr (CT::Integer64<T>)
+               else if constexpr (CT::Integer64<T>) {
+                  // This hits a very nasty MSVC compiler bug           
+                  // The workaround is temporary, hopefully             
+                  // https://stackoverflow.com/questions/77191454       
+               #if LANGULUS_COMPILER(MSVC) and LANGULUS_BITNESS() == 32 and (LANGULUS_SIMD(AVX) or LANGULUS_SIMD(AVX2))
+                  alignas(32) int64_t temp[4] {Get<int64_t, DEF, INDICES, 4>(values)...};
+                  return simde_mm256_load_si256(temp);
+               #else
                   return simde_mm256_setr_epi64x(
                      Get<int64_t, DEF, INDICES, 4>(values)...);
+               #endif
+               }
                else if constexpr (CT::Float<T>)
                   return simde_mm256_setr_ps(
                      Get<simde_float32, DEF, INDICES, 8>(values)...);
