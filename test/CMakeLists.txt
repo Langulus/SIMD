@@ -9,7 +9,7 @@ add_executable(LangulusSIMDTest
 	TestPow.cpp
 	TestShiftLeft.cpp
 	TestShiftRight.cpp
-	TestStrangeClangBug.cpp
+	TestStrangeMSVCBug.cpp
 	TestSub.cpp
 	TestTypeCorrectness.cpp
 )
