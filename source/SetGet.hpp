@@ -112,8 +112,8 @@ namespace Langulus::SIMD
                   // The workaround is temporary, hopefully             
                   // https://stackoverflow.com/questions/77191454       
                #if LANGULUS_COMPILER(MSVC) and LANGULUS_BITNESS() == 32 and (LANGULUS_SIMD(AVX) or LANGULUS_SIMD(AVX2))
-                  alignas(32) int64_t temp[4] {Get<int64_t, DEF, INDICES, 4>(values)...};
-                  return simde_mm256_load_si256(temp);
+                  alignas(32) const int64_t temp[4] {Get<int64_t, DEF, INDICES, 4>(values)...};
+                  return simde_mm256_load_si256(reinterpret_cast<const simde__m256i*>(temp));
                #else
                   return simde_mm256_setr_epi64x(
                      Get<int64_t, DEF, INDICES, 4>(values)...);
