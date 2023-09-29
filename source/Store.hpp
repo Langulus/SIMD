@@ -85,10 +85,12 @@ namespace Langulus::SIMD
                }
             }
             else if constexpr (denseSize <= 16) {
-               if constexpr (CT::Dense<T>)
+               if constexpr (CT::Dense<T>) {
                   LANGULUS_SIMD_VERBOSE("Storing partial 128d to ", denseSize, " bytes");
-               else
+               }
+               else {
                   LANGULUS_SIMD_VERBOSE("Storing partial 128d to sparse array of size ", S);
+               }
 
                // Save to a sparse array, or a differently sized array  
                simde_mm_storel_pd(SparseCast(to[0]), from);
