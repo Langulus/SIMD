@@ -33,9 +33,10 @@ namespace Langulus::SIMD
       ///   @return the logarithm values                                      
       template<LogStyle STYLE = LogStyle::Base10, CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      REGISTER Log(const REGISTER& value) noexcept {
+      REGISTER Log(UNUSED() const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Doesn't work for whole numbers");
 
+      #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::Float<T>) {
                if constexpr (STYLE == LogStyle::Natural)
@@ -65,7 +66,11 @@ namespace Langulus::SIMD
             }
             else LANGULUS_ERROR("Unsupported type for 16-byte package");
          }
-         else if constexpr (CT::SIMD256<REGISTER>) {
+         else
+      #endif
+
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<REGISTER>) {
             if constexpr (CT::Float<T>) {
                if constexpr (STYLE == LogStyle::Natural)
                   return simde_mm256_log_ps(value);
@@ -94,7 +99,11 @@ namespace Langulus::SIMD
             }
             else LANGULUS_ERROR("Unsupported type for 32-byte package");
          }
-         else if constexpr (CT::SIMD512<REGISTER>) {
+         else
+      #endif
+
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<REGISTER>) {
             if constexpr (CT::Float<T>) {
                if constexpr (STYLE == LogStyle::Natural)
                   return simde_mm512_log_ps(value);
@@ -123,7 +132,9 @@ namespace Langulus::SIMD
             }
             else LANGULUS_ERROR("Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else
+      #endif
+            LANGULUS_ERROR("Unsupported type");
       }
 
    } // namespace Langulus::SIMD::Inner

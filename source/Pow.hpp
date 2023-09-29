@@ -32,7 +32,7 @@ namespace Langulus::SIMD
       ///   @return the raised values                                         
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto Power(REGISTER lhs, REGISTER rhs) noexcept {
+      auto Power(UNUSED() REGISTER lhs, UNUSED() REGISTER rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<REGISTER>) {
                if constexpr (CT::Float<T>)

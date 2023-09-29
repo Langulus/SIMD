@@ -32,7 +32,8 @@ namespace Langulus::SIMD
       ///   @return the maxed values                                          
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto Max(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+      auto Max(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
+      #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::SignedInteger8<T>)
                return simde_mm_max_epi8(lhs, rhs);
@@ -66,7 +67,11 @@ namespace Langulus::SIMD
                return simde_mm_max_pd(lhs, rhs);
             else LANGULUS_ERROR("Unsupported type for 16-byte package");
          }
-         else if constexpr (CT::SIMD256<REGISTER>) {
+         else
+      #endif
+
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<REGISTER>) {
             if constexpr (CT::SignedInteger8<T>)
                return simde_mm256_max_epi8(lhs, rhs);
             else if constexpr (CT::UnsignedInteger8<T>)
@@ -99,7 +104,11 @@ namespace Langulus::SIMD
                return simde_mm256_max_pd(lhs, rhs);
             else LANGULUS_ERROR("Unsupported type for 32-byte package");
          }
-         else if constexpr (CT::SIMD512<REGISTER>) {
+         else
+      #endif
+            
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<REGISTER>) {
             if constexpr (CT::SignedInteger8<T>)
                return simde_mm512_max_epi8(lhs, rhs);
             else if constexpr (CT::UnsignedInteger8<T>)
@@ -122,7 +131,9 @@ namespace Langulus::SIMD
                return simde_mm512_max_pd(lhs, rhs);
             else LANGULUS_ERROR("Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else
+      #endif
+            LANGULUS_ERROR("Unsupported type");
       }
 
    } // namespace Langulus::SIMD::Inner

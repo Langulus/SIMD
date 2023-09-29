@@ -23,7 +23,7 @@ namespace Langulus::SIMD
       ///   @return the floored values                                        
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto Round(const REGISTER& value) noexcept {
+      auto Round(UNUSED() const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Suboptimal for unreal numbers");
 
       #if LANGULUS_SIMD(128BIT)

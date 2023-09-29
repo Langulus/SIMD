@@ -32,7 +32,7 @@ namespace Langulus::SIMD
       ///   @return the multiplied elements as a register                     
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto Multiply(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+      auto Multiply(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<REGISTER>) {
                if constexpr (CT::Integer8<T>) {

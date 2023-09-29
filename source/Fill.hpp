@@ -23,10 +23,10 @@ namespace Langulus::SIMD
    ///   @return the filled register                                          
    template<CT::SIMD REGISTER, CT::Vector TO, CT::Scalar FROM>
    NOD() LANGULUS(INLINED)
-   decltype(auto) Fill(const FROM& from) noexcept {
+   decltype(auto) Fill(UNUSED() const FROM& from) noexcept {
       static_assert(CT::NotSIMD<FROM>, "FROM can't be a register");
       using D_TO = Decay<TypeOf<TO>>;
-      const D_TO value = static_cast<D_TO>(DenseCast(Inner::GetFirst(from)));
+      UNUSED() const D_TO value = static_cast<D_TO>(DenseCast(Inner::GetFirst(from)));
 
    #if LANGULUS_SIMD(128BIT)
       if constexpr (CT::SIMD128i<REGISTER>) {

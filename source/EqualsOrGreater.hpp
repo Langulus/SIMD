@@ -33,7 +33,7 @@ namespace Langulus::SIMD
       /// https://giannitedesco.github.io/2019/03/08/simd-cmp-bitmasks.html   
       template<CT::Decayed T, Count S, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto EqualsOrGreater(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+      auto EqualsOrGreater(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::SignedInteger8<T>) {

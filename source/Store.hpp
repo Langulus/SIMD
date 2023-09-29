@@ -24,7 +24,7 @@ namespace Langulus::SIMD
       ///   @param to - the destination array                                 
       template<CT::SIMD FROM, CT::NotSIMD TO>
       LANGULUS(INLINED)
-      void Store(const FROM& from, TO& to) noexcept {
+      void Store(UNUSED() const FROM& from, UNUSED() TO& to) noexcept {
          constexpr auto S = CountOf<TO>;
          static_assert(S > 1, 
             "Storing less than two elements is suboptimal "
@@ -32,7 +32,7 @@ namespace Langulus::SIMD
          );
          using T = TypeOf<TO>;
          using DT = Decay<T>;
-         constexpr Size denseSize = sizeof(DT) * S;
+         UNUSED() constexpr Size denseSize = sizeof(DT) * S;
 
       #if LANGULUS_SIMD(128BIT)
          //                                                             

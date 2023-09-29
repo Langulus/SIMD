@@ -37,7 +37,7 @@ namespace Langulus::SIMD
       ///   @return the shifted elements as a register                        
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto ShiftLeft(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+      auto ShiftLeft(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
          static_assert(CT::IntegerX<Decay<T>>, "Can only shift integers");
 
          #if LANGULUS_SIMD(128BIT)
