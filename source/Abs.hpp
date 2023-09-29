@@ -23,7 +23,7 @@ namespace Langulus::SIMD
       ///   @return the absolute values                                       
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto Abs(const REGISTER& v) noexcept {
+      auto Abs(UNUSED() const REGISTER& v) noexcept {
          static_assert(CT::Signed<T>, "Suboptimal and pointless for unsigned values");
 
          #if LANGULUS_SIMD(128BIT)

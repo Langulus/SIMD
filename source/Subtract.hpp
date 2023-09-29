@@ -32,7 +32,7 @@ namespace Langulus::SIMD
       ///   @return the subtracted elements as a register                     
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto Subtract(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+      auto Subtract(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<REGISTER>) {
                if constexpr (CT::Integer8<T>)

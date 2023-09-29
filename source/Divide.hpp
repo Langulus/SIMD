@@ -32,7 +32,7 @@ namespace Langulus::SIMD
       ///   @return the divided elements as a register                        
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto Divide(const REGISTER& lhs, const REGISTER& rhs) {
+      auto Divide(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) {
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::UnsignedInteger8<T>) {

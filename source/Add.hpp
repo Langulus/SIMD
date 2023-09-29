@@ -33,7 +33,7 @@ namespace Langulus::SIMD
       ///   @return the added elements as a register                          
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto Add(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+      auto Add(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<REGISTER>) {
                if constexpr (CT::SignedInteger8<T>)

@@ -32,26 +32,48 @@ namespace Langulus::SIMD
       ///   @return the xor'd elements as a register                          
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto XOr(const REGISTER& lhs, const REGISTER& rhs) noexcept {
-         if constexpr (CT::Same<REGISTER,simde__m128i>)
-            return simde_mm_xor_si128(lhs, rhs);
-         else if constexpr (CT::Same<REGISTER,simde__m128>)
-            return simde_mm_xor_ps(lhs, rhs);
-         else if constexpr (CT::Same<REGISTER,simde__m128d>)
-            return simde_mm_xor_pd(lhs, rhs);
-         else if constexpr (CT::Same<REGISTER,simde__m256i>)
-            return simde_mm256_xor_si256(lhs, rhs);
-         else if constexpr (CT::Same<REGISTER,simde__m256>)
-            return simde_mm256_xor_ps(lhs, rhs);
-         else if constexpr (CT::Same<REGISTER,simde__m256d>)
-            return simde_mm256_xor_pd(lhs, rhs);
-         else if constexpr (CT::Same<REGISTER,simde__m512i>)
-            return simde_mm512_xor_si512(lhs, rhs);
-         else if constexpr (CT::Same<REGISTER,simde__m512>)
-            return simde_mm512_xor_ps(lhs, rhs);
-         else if constexpr (CT::Same<REGISTER,simde__m512d>)
-            return simde_mm512_xor_pd(lhs, rhs);
+      auto XOr(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
+      #if LANGULUS_SIMD(128BIT)
+         if constexpr (CT::SIMD128<REGISTER>) {
+            if constexpr (CT::SIMD128i<REGISTER>)
+               return simde_mm_xor_si128(lhs, rhs);
+            else if constexpr (CT::SIMD128f<REGISTER>)
+               return simde_mm_xor_ps(lhs, rhs);
+            else if constexpr (CT::SIMD128d<REGISTER>)
+               return simde_mm_xor_pd(lhs, rhs);
+            else
+               LANGULUS_ERROR("Unsupported type for 16-byte package");
+         }
          else
+      #endif
+
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<REGISTER>) {
+            if constexpr (CT::SIMD256i<REGISTER>)
+               return simde_mm256_xor_si256(lhs, rhs);
+            else if constexpr (CT::SIMD256f<REGISTER>)
+               return simde_mm256_xor_ps(lhs, rhs);
+            else if constexpr (CT::SIMD256d<REGISTER>)
+               return simde_mm256_xor_pd(lhs, rhs);
+            else
+               LANGULUS_ERROR("Unsupported type for 32-byte package");
+         }
+         else
+      #endif
+
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<REGISTER>) {
+            if constexpr (CT::SIMD512i<REGISTER>)
+               return simde_mm512_xor_si512(lhs, rhs);
+            else if constexpr (CT::SIMD512f<REGISTER>)
+               return simde_mm512_xor_ps(lhs, rhs);
+            else if constexpr (CT::SIMD512d<REGISTER>)
+               return simde_mm512_xor_pd(lhs, rhs);
+            else
+               LANGULUS_ERROR("Unsupported type for 64-byte package");
+      }
+         else
+      #endif
             LANGULUS_ERROR("Unsupported type");
       }
 

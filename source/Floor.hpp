@@ -23,9 +23,10 @@ namespace Langulus::SIMD
       ///   @return the floored values                                        
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto Floor(const REGISTER& value) noexcept {
+      auto Floor(UNUSED() const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Suboptimal and pointless for whole numbers");
 
+      #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::Float<T>)
                return simde_mm_floor_ps(value);
@@ -34,7 +35,11 @@ namespace Langulus::SIMD
             else
                LANGULUS_ERROR("Unsupported type for 16-byte package");
          }
-         else if constexpr (CT::SIMD256<REGISTER>) {
+         else
+      #endif
+         
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<REGISTER>) {
             if constexpr (CT::Float<T>)
                return simde_mm256_floor_ps(value);
             else if constexpr (CT::Double<T>)
@@ -42,7 +47,11 @@ namespace Langulus::SIMD
             else
                LANGULUS_ERROR("Unsupported type for 32-byte package");
          }
-         else if constexpr (CT::SIMD512<REGISTER>) {
+         else
+      #endif
+
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<REGISTER>) {
             if constexpr (CT::Float<T>)
                return simde_mm512_floor_ps(value);
             else if constexpr (CT::Double<T>)
@@ -50,7 +59,9 @@ namespace Langulus::SIMD
             else
                LANGULUS_ERROR("Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else
+      #endif
+            LANGULUS_ERROR("Unsupported type");
       }
 
    } // namespace Langulus::SIMD::Inner

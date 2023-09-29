@@ -23,7 +23,7 @@ namespace Langulus::SIMD
       ///   @return the ceiling values                                        
       template<CT::Decayed T, CT::SIMD REGISTER>
       LANGULUS(INLINED)
-      auto Ceil(const REGISTER& value) noexcept {
+      auto Ceil(UNUSED() const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Suboptimal and pointless for whole numbers");
 
          #if LANGULUS_SIMD(128BIT)
