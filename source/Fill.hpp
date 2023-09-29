@@ -27,16 +27,14 @@ namespace Langulus::SIMD
       static_assert(CT::NotSIMD<FROM>, "FROM can't be a register");
       using D_TO = Decay<TypeOf<TO>>;
       using D_FROM = Decay<TypeOf<FROM>>;
-      using OUT = Conditional<CT::Exact<D_TO, D_FROM>, const TypeOf<TO>&, const TypeOf<TO>>;
-
-      OUT value = static_cast<OUT>(DenseCast(Inner::GetFirst(from)));
+      const D_TO value = static_cast<D_TO>(DenseCast(Inner::GetFirst(from)));
 
    #if LANGULUS_SIMD(128BIT)
       if constexpr (CT::SIMD128i<REGISTER>) {
          if constexpr (CT::SignedInteger8<D_TO>)
-            return simde_mm_set1_epi8(value);
+            return simde_mm_set1_epi8(*reinterpret_cast<const int8_t*>(&value));
          else if constexpr (CT::UnsignedInteger8<D_TO>)
-            return simde_x_mm_set1_epu8(value);
+            return simde_x_mm_set1_epu8(*reinterpret_cast<const uint8_t*>(&value));
          else if constexpr (CT::SignedInteger16<D_TO>)
             return simde_mm_set1_epi16(value);
          else if constexpr (CT::UnsignedInteger16<D_TO>)

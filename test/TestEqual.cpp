@@ -70,15 +70,15 @@ void ControlEqualV(const LHS& lhsArray, const RHS& rhsArray, Vector<OUT, CountOf
 }
 
 ///																									
-TEMPLATE_TEST_CASE("Compare equality", "[compare]", (Vector<::std::int64_t, 3>)
-   /*, NUMBERS_ALL()
+TEMPLATE_TEST_CASE("Compare equality", "[compare]"
+   , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
    , VECTORS_ALL(3)
    , VECTORS_ALL(4)
    , VECTORS_ALL(5)
    , VECTORS_ALL(8)
-   , VECTORS_ALL(9)*/
+   , VECTORS_ALL(9)
 ) {
    using T = TestType;
 

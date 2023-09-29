@@ -30,7 +30,6 @@ namespace Langulus::SIMD::Inner
       if constexpr (CT::Vector<LHS> and CT::Vector<RHS>) {
          // Vector OP Vector                                            
          RETURN output;
-
          for (Count i = 0; i < S; ++i) {
             output[i] = op(
                static_cast<LOSSLESS>(DenseCast(lhs[i])),
@@ -43,7 +42,6 @@ namespace Langulus::SIMD::Inner
       else if constexpr (CT::Vector<LHS>) {
          // Vector OP Scalar                                            
          RETURN output;
-
          const auto same_rhs = static_cast<LOSSLESS>(DenseCast(GetFirst(rhs)));
          for (Count i = 0; i < S; ++i) {
             output[i] = op(
@@ -57,7 +55,6 @@ namespace Langulus::SIMD::Inner
       else if constexpr (CT::Vector<RHS>) {
          // Scalar OP Vector                                            
          RETURN output;
-
          const auto same_lhs = static_cast<LOSSLESS>(DenseCast(GetFirst(lhs)));
          for (Count i = 0; i < S; ++i) {
             output[i] = op(
