@@ -59,8 +59,8 @@ void ControlPow(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, 
       ControlPow(*lhs++, *rhs++, *r++);
 }
 
-TEMPLATE_TEST_CASE("Power", "[power]", (Vector<::std::int64_t, 3>)
-   /*, NUMBERS_ALL()
+TEMPLATE_TEST_CASE("Power", "[power]"
+   , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
    , VECTORS_ALL(3)
@@ -71,7 +71,7 @@ TEMPLATE_TEST_CASE("Power", "[power]", (Vector<::std::int64_t, 3>)
    , VECTORS_ALL(16)
    , VECTORS_ALL(17)
    , VECTORS_ALL(32)
-   , VECTORS_ALL(33)*/
+   , VECTORS_ALL(33)
 ) {
    using T = TestType;
 

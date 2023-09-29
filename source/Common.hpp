@@ -283,7 +283,7 @@ namespace Langulus::SIMD
 
       template<CT::NotSIMD T>
       NOD() constexpr decltype(auto) GetFirst(const T& a) noexcept {
-         if constexpr (CT::Array<T> or (CT::Dense<T> and requires { a[0]; }))
+         if constexpr (CT::Array<T> or CT::Sparse<T> or (CT::Dense<T> and requires { a[0]; }))
             return (a[0]);
          else
             return (a);
@@ -291,7 +291,7 @@ namespace Langulus::SIMD
 
       template<CT::NotSIMD T>
       NOD() constexpr decltype(auto) GetFirst(T& a) noexcept {
-         if constexpr (CT::Array<T> or (CT::Dense<T> and requires { a[0]; }))
+         if constexpr (CT::Array<T> or CT::Sparse<T> or (CT::Dense<T> and requires { a[0]; }))
             return (a[0]);
          else
             return (a);

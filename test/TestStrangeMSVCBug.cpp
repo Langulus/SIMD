@@ -11,7 +11,7 @@
 
 #if LANGULUS_SIMD(256BIT)
 
-TEST_CASE("Strange clang-cl bug (simde equivalent)", "[bug]") {
+TEST_CASE("Strange msvc bug (simde equivalent)", "[bug]") {
    GIVEN("x + y = r") {
       const std::int64_t xsrc[3] {1,2,3};
       const std::int64_t ysrc[3] {7,8,9};
@@ -44,7 +44,7 @@ TEST_CASE("Strange clang-cl bug (simde equivalent)", "[bug]") {
    }
 }
 
-TEST_CASE("Strange clang-cl bug (langulus equivalent)", "[bug]") {
+TEST_CASE("Strange msvc bug (langulus equivalent)", "[bug]") {
    GIVEN("x + y = r") {
       const std::int64_t xsrc[3] {1,2,3};
       const std::int64_t ysrc[3] {7,8,9};
@@ -81,7 +81,7 @@ TEST_CASE("Strange clang-cl bug (langulus equivalent)", "[bug]") {
    }
 }
 
-TEST_CASE("Strange clang-cl bug (langulus vector equivalent)", "[bug]") {
+TEST_CASE("Strange msvc bug (langulus vector equivalent)", "[bug]") {
    GIVEN("x + y = r") {
       const Vector<std::int64_t, 3> xsrc;
       const Vector<std::int64_t, 3> ysrc;
