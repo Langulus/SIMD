@@ -91,10 +91,10 @@ namespace Langulus::SIMD
       }
       else if constexpr (CT::SIMD256d<REGISTER>) {
          if constexpr (CT::Double<D_TO>) {
-            if constexpr (CT::Exact<Decay<decltype(value)>, simde_float32>)
-               return simde_mm256_broadcast_sd(reinterpret_cast<const simde_float32*>(&value));
+            if constexpr (CT::Exact<Decay<decltype(value)>, simde_float64>)
+               return simde_mm256_broadcast_sd(reinterpret_cast<const simde_float64*>(&value));
             else
-               return simde_mm256_set1_pd(static_cast<simde_float32>(value));
+               return simde_mm256_set1_pd(static_cast<simde_float64>(value));
          }
          else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256d");
       }
