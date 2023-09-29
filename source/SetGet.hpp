@@ -65,7 +65,7 @@ namespace Langulus::SIMD
       template<int DEF, Size CHUNK, CT::Vector FROM, Offset... INDICES>
       LANGULUS(INLINED)
       auto Set(std::integer_sequence<Offset, INDICES...>, UNUSED() const FROM& values) {
-         using T = Decay<TypeOf<FROM>>;
+         IF_LANGULUS_SIMD(using T = Decay<TypeOf<FROM>>);
 
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CHUNK == 16) {

@@ -68,6 +68,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 ///   Detect available SIMD                                                   
 ///                                                                           
 /// By default, nothing is enabled                                            
+#define LANGULUS_SIMD_ENABLED() 0
 #define LANGULUS_SIMD_AVX512BW() 0
 #define LANGULUS_SIMD_AVX512CD() 0
 #define LANGULUS_SIMD_AVX512DQ() 0
@@ -208,6 +209,16 @@ LANGULUS_EXCEPTION(DivisionByZero);
    #define LANGULUS_SIMD_128BIT() 1
 #endif
 
+#if LANGULUS_SIMD(128BIT) or LANGULUS_SIMD(256BIT) or LANGULUS_SIMD(512BIT)
+   #undef LANGULUS_SIMD_ENABLED
+   #define LANGULUS_SIMD_ENABLED() 1
+   #define IF_LANGULUS_SIMD(a) a
+   #define IF_NOT_LANGULUS_SIMD(a)
+#else
+   #define IF_LANGULUS_SIMD(a) 
+   #define IF_NOT_LANGULUS_SIMD(a) a
+#endif
+
 #include "IgnoreWarningsPush.inl"
 
 namespace Langulus::CT
@@ -301,6 +312,7 @@ namespace Langulus::SIMD
 
    using ::Langulus::Inner::Unsupported;
 
+#if LANGULUS_SIMD(128BIT)
    /// Got these from:                                                        
    /// https://stackoverflow.com/questions/41144668                           
    LANGULUS(INLINED)
@@ -355,6 +367,7 @@ namespace Langulus::SIMD
          simde_mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000))
       );
    }
+#endif
 
    /// Shuffle eight indices                                                  
    NOD() constexpr int Shuffle(int&& z1, int&& y1, int&& x1, int&& w1, int&& z0, int&& y0, int&& x0, int&& w0) noexcept {
@@ -374,6 +387,7 @@ namespace Langulus::SIMD
       return (x << 1) | w;
    }
 
+#if LANGULUS_SIMD(128BIT)
    ///                                                                        
    LANGULUS(INLINED)
    simde__m128 _mm_halfflip(const simde__m128& what) noexcept {
@@ -390,6 +404,7 @@ namespace Langulus::SIMD
       constexpr int8_t imm8 = static_cast<int8_t>(Shuffle(0, 1, 2, 3));
       return simde_mm_shuffle_epi32(what, imm8);
    }
+#endif
 
 #if LANGULUS_SIMD(256BIT)
    LANGULUS(INLINED)
@@ -420,6 +435,7 @@ namespace Langulus::SIMD
       return simde_mm512_shuffle_i64x2(what, what, _MM_SHUFFLE(2, 3, 0, 1));   // AVX512F
    }*/
 
+#if LANGULUS_SIMD(128BIT)
    ///                                                                        
    LANGULUS(INLINED)
    int _mm_hmax_epu8(const simde__m128i v) noexcept {
@@ -510,6 +526,7 @@ namespace Langulus::SIMD
          simde_mm_castsi128_ps(mask)
       ));
    }
+#endif
 
 #if LANGULUS_SIMD(256BIT)
    LANGULUS(INLINED)
@@ -522,6 +539,7 @@ namespace Langulus::SIMD
    }
 #endif
 
+#if LANGULUS_SIMD(128BIT)
    /// Pack 16bit integers (signed or not) to 8bit integers with truncation   
    ///   @param low - lower eight 16bit integers                              
    ///   @param high - higher eight 16bit integers                            
@@ -549,6 +567,7 @@ namespace Langulus::SIMD
          );
       #endif
    }
+#endif
 
 #if LANGULUS_SIMD(256BIT)
    /// Pack 16bit integers (signed or not) to 8bit integers with truncation   
@@ -595,7 +614,8 @@ namespace Langulus::SIMD
          simde_mm512_castsi512_ps(mask)
       ));
    }*/
-   
+
+#if LANGULUS_SIMD(128BIT)
    /// Pack 32bit integers (signed or not) to 16bit integers with truncation  
    ///   @param low - lower four 32bit integers                               
    ///   @param high - higher four 32bit integers                             
@@ -621,6 +641,7 @@ namespace Langulus::SIMD
          );
       #endif
    }
+#endif
 
 #if LANGULUS_SIMD(256BIT)
    /// Pack 32bit integers (signed or not) to 16bit integers with truncation  

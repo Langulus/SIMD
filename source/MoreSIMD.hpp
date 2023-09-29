@@ -15,6 +15,7 @@ namespace Langulus::SIMD
    /// The credit for these goes to this wonderful guy:                       
    /// https://github.com/aklomp/sse-intrinsics-tests                         
 
+#if LANGULUS_SIMD(128BIT)
    /// Calculate absolute difference: abs(x - y)                              
    inline simde__m128i _mm_absdiff_epu16(simde__m128i x, simde__m128i y) {
       return simde_mm_or_si128(simde_mm_subs_epu16(x, y), simde_mm_subs_epu16(y, x));
@@ -216,5 +217,6 @@ namespace Langulus::SIMD
       // Repack the 16-bit uints to clamped 8-bit values                
       return simde_mm_packus_epi16(xlo, xhi);
    }
+#endif
 
 } // namespace Langulus::SIMD

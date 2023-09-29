@@ -50,10 +50,13 @@ namespace Langulus::SIMD
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128i");
       }
       else if constexpr (CT::SIMD128f<REGISTER>) {
-         if constexpr (CT::Float<D_TO>)
-            return simde_mm_broadcast_ss(reinterpret_cast<const simde_float32*>(&value));
-         else
-            LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128");
+         if constexpr (CT::Float<D_TO>) {
+            if constexpr (CT::Exact<Decay<decltype(value)>, simde_float32>)
+               return simde_mm_broadcast_ss(reinterpret_cast<const simde_float32*>(&value));
+            else
+               return simde_mm_set1_ps(static_cast<simde_float32>(value));
+         }
+         else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m128");
       }
       else if constexpr (CT::SIMD128d<REGISTER>) {
          if constexpr (CT::Double<D_TO>)
@@ -78,16 +81,22 @@ namespace Langulus::SIMD
             LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256i");
       }
       else if constexpr (CT::SIMD256f<REGISTER>) {
-         if constexpr (CT::Float<D_TO>)
-            return simde_mm256_broadcast_ss(reinterpret_cast<const simde_float32*>(&value));
-         else
-            LANGULUS_ERROR("Unsupported type for SIMD::Fill __m256");
+         if constexpr (CT::Float<D_TO>) {
+            if constexpr (CT::Exact<Decay<decltype(value)>, simde_float32>)
+               return simde_mm256_broadcast_ss(reinterpret_cast<const simde_float32*>(&value));
+            else
+               return simde_mm256_set1_ps(static_cast<simde_float32>(value));
+         }
+         else LANGULUS_ERROR("Unsupported type for SIMD::Fill __m256");
       }
       else if constexpr (CT::SIMD256d<REGISTER>) {
-         if constexpr (CT::Double<D_TO>)
-            return simde_mm256_broadcast_sd(reinterpret_cast<const simde_float64*>(&value));
-         else
-            LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256d");
+         if constexpr (CT::Double<D_TO>) {
+            if constexpr (CT::Exact<Decay<decltype(value)>, simde_float32>)
+               return simde_mm256_broadcast_sd(reinterpret_cast<const simde_float32*>(&value));
+            else
+               return simde_mm256_set1_pd(static_cast<simde_float32>(value));
+         }
+         else LANGULUS_ERROR("Unsupported type for SIMD::Fill of __m256d");
       }
       else
    #endif
