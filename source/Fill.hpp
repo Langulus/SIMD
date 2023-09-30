@@ -25,8 +25,8 @@ namespace Langulus::SIMD
    NOD() LANGULUS(INLINED)
    decltype(auto) Fill(UNUSED() const FROM& from) noexcept {
       static_assert(CT::NotSIMD<FROM>, "FROM can't be a register");
-      using D_TO = Decay<TypeOf<TO>>;
-      UNUSED() const auto& value = DenseCast(Inner::GetFirst(from));
+      IF_LANGULUS_SIMD(using D_TO = Decay<TypeOf<TO>>);
+      IF_LANGULUS_SIMD(const auto& value = DenseCast(Inner::GetFirst(from)));
 
    #if LANGULUS_SIMD(128BIT)
       if constexpr (CT::SIMD128i<REGISTER>) {
