@@ -106,14 +106,14 @@ namespace Langulus::SIMD::Inner
          // Both LHS and RHS are vectors, so wrap in registers          
          LANGULUS_SIMD_VERBOSE("Both sides are vectors");
          return opSIMD(
-            Convert<DEF, OUT>(lhs),
-            Convert<DEF, OUT>(rhs)
+            Inner::Convert<DEF, OUT>(lhs),
+            Inner::Convert<DEF, OUT>(rhs)
          );
       }
       else if constexpr (CT::Vector<LHS>) {
          // LHS is vector, RHS is scalar                                
          return opSIMD(
-            Convert<DEF, OUT>(lhs),
+            Inner::Convert<DEF, OUT>(lhs),
             Fill<REGISTER, OUT>(rhs)
          );
       }
@@ -121,7 +121,7 @@ namespace Langulus::SIMD::Inner
          // LHS is scalar, RHS is vector                                
          return opSIMD(
             Fill<REGISTER, OUT>(lhs),
-            Convert<DEF, OUT>(rhs)
+            Inner::Convert<DEF, OUT>(rhs)
          );
       }
       else {
