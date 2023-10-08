@@ -1,18 +1,10 @@
-add_executable(LangulusSIMDTest
-	Main.cpp
-	TestAdd.cpp
-	TestDiv.cpp
-	TestEqual.cpp
-	TestEqual2.cpp
-	TestMul.cpp
-	TestMul2.cpp
-	TestPow.cpp
-	TestShiftLeft.cpp
-	TestShiftRight.cpp
-	TestStrangeMSVCBug.cpp
-	TestSub.cpp
-	TestTypeCorrectness.cpp
+file(GLOB_RECURSE
+	LANGULUS_SIMD_TEST_SOURCES 
+	LIST_DIRECTORIES FALSE CONFIGURE_DEPENDS
+	*.cpp *.hpp
 )
+
+add_executable(LangulusSIMDTest ${LANGULUS_SIMD_TEST_SOURCES})
 
 target_link_libraries(LangulusSIMDTest
 	PRIVATE		LangulusSIMD
