@@ -386,7 +386,7 @@ namespace Langulus::SIMD
    ///           or array/scalar if no viable SIMD routine exists             
    template<class LHS, class RHS, class OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
    NOD() LANGULUS(INLINED)
-   auto Equals(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+   auto EqualsDynamic(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       // Output will likely contain a bool vector, or a bitmask         
       // so make sure we operate on Lossless<LHS, RHS>                  
       using LOSSLESS = Lossless<LHS, RHS>;
@@ -404,7 +404,7 @@ namespace Langulus::SIMD
          }
       );
    }
-
+   
    /// Compare numbers for equality, and force output to desired place        
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
@@ -417,7 +417,21 @@ namespace Langulus::SIMD
       IF_CONSTEXPR() {
          StoreConstexpr(EqualsConstexpr(lhs, rhs), out);
       }
-      else Store(Equals(lhs, rhs), out);
+      else Store(EqualsDynamic(lhs, rhs), out);
+   }
+   
+   /// Compare numbers for equality                                           
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired element type (defaults to bitmask)         
+   ///   @attention may generate additional convert/store instructions in     
+   ///              order to fit the result in desired output                 
+   template<class LHS, class RHS, class OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
+   LANGULUS(INLINED)
+   constexpr OUT Equals(const LHS& lhs, const RHS& rhs) noexcept {
+      OUT out;
+      Equals(lhs, rhs, out);
+      return out;
    }
 
 } // namespace Langulus::SIMD
