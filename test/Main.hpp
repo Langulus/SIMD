@@ -225,11 +225,11 @@ struct /*alignas(Langulus::Alignment)*/ Vector {
       return mArray[0];
    }
 
-   const T& operator [](unsigned i) const noexcept {
+   const T& operator [](auto i) const noexcept {
       return mArray[i];
    }
 
-   T& operator [](unsigned i) noexcept {
+   T& operator [](auto i) noexcept {
       return mArray[i];
    }
 };

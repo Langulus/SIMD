@@ -62,9 +62,9 @@ namespace Langulus::SIMD
                }
                else {
                   LANGULUS_SIMD_VERBOSE("Storing partial 128f to sparse array of size ", S);
-                  auto toIt = to;
+                  auto toIt = reinterpret_cast<T*>(&to);
                   auto fromIt = temp;
-                  const auto toItEnd = to + S;
+                  const auto toItEnd = toIt + S;
                   while (toIt != toItEnd)
                      **(toIt++) = DenseCast(fromIt++);
                }
@@ -123,9 +123,9 @@ namespace Langulus::SIMD
                }
                else {
                   LANGULUS_SIMD_VERBOSE("Storing partial 128d to sparse array of size ", S);
-                  auto toIt = to;
+                  auto toIt = reinterpret_cast<T*>(&to);
                   auto fromIt = temp;
-                  const auto toItEnd = to + S;
+                  const auto toItEnd = toIt + S;
                   while (toIt != toItEnd)
                      **(toIt++) = *(fromIt++);
                }
@@ -163,9 +163,9 @@ namespace Langulus::SIMD
                }
                else {
                   LANGULUS_SIMD_VERBOSE("Storing partial 256f to sparse array of size ", S);
-                  auto toIt = to;
+                  auto toIt = reinterpret_cast<T*>(&to);
                   auto fromIt = temp;
-                  const auto toItEnd = to + S;
+                  const auto toItEnd = toIt + S;
                   while (toIt != toItEnd)
                      **(toIt++) = DenseCast(fromIt++);
                }
@@ -196,9 +196,9 @@ namespace Langulus::SIMD
                }
                else {
                   LANGULUS_SIMD_VERBOSE("Storing partial 256d to sparse array of size ", S);
-                  auto toIt = to;
+                  auto toIt = reinterpret_cast<T*>(&to);
                   auto fromIt = temp;
-                  const auto toItEnd = to + S;
+                  const auto toItEnd = toIt + S;
                   while (toIt != toItEnd)
                      **(toIt++) = DenseCast(fromIt++);
                }
@@ -233,9 +233,9 @@ namespace Langulus::SIMD
                }
                else {
                   LANGULUS_SIMD_VERBOSE("Storing partial 256i to sparse array of size ", S);
-                  auto toIt = to;
+                  auto toIt = reinterpret_cast<T*>(&to);
                   auto fromIt = temp;
-                  const auto toItEnd = to + S;
+                  const auto toItEnd = toIt + S;
                   while (toIt != toItEnd)
                      **(toIt++) = *(fromIt++);
                }
@@ -266,9 +266,9 @@ namespace Langulus::SIMD
                if constexpr (CT::Dense<T>)
                   ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                else {
-                  auto toIt = to;
+                  auto toIt = reinterpret_cast<T*>(&to);
                   auto fromIt = temp;
-                  const auto toItEnd = to + S;
+                  const auto toItEnd = toIt + S;
                   while (toIt != toItEnd)
                      **(toIt++) = DenseCast(fromIt++);
                }
@@ -292,9 +292,9 @@ namespace Langulus::SIMD
                if constexpr (CT::Dense<T>)
                   ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                else {
-                  auto toIt = to;
+                  auto toIt = reinterpret_cast<T*>(&to);
                   auto fromIt = temp;
-                  const auto toItEnd = to + S;
+                  const auto toItEnd = toIt + S;
                   while (toIt != toItEnd)
                      **(toIt++) = DenseCast(fromIt++);
                }
@@ -318,9 +318,9 @@ namespace Langulus::SIMD
                if constexpr (CT::Dense<T>)
                   ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
                else {
-                  auto toIt = to;
+                  auto toIt = reinterpret_cast<T*>(&to);
                   auto fromIt = temp;
-                  const auto toItEnd = to + S;
+                  const auto toItEnd = toIt + S;
                   while (toIt != toItEnd)
                      **(toIt++) = *(fromIt++);
                }
