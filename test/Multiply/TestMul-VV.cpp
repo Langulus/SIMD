@@ -6,62 +6,11 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
-#include "Main.hpp"
+#include "TestMul.hpp"
 #include <catch2/catch.hpp>
 
 
-template<CT::Scalar LHS, CT::Scalar RHS, CT::Scalar OUT>
-LANGULUS(INLINED)
-void ControlMul(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-   DenseCast(FundamentalCast(out)) = DenseCast(FundamentalCast(lhs))
-                                   * DenseCast(FundamentalCast(rhs));
-}
-
-template<CT::Vector LHS, CT::Vector RHS, CT::Vector OUT>
-LANGULUS(INLINED)
-void ControlMul(const LHS& lhsArray, const RHS& rhsArray, OUT& out) noexcept {
-   static_assert(LHS::MemberCount == RHS::MemberCount
-             and LHS::MemberCount == OUT::MemberCount,
-      "Vector sizes must match"
-   );
-
-   auto r = out.mArray;
-   auto lhs = lhsArray.mArray;
-   auto rhs = rhsArray.mArray;
-   const auto lhsEnd = lhs + LHS::MemberCount;
-   while (lhs != lhsEnd)
-      ControlMul(*lhs++, *rhs++, *r++);
-}
-
-template<CT::Scalar LHS, CT::Vector RHS, CT::Vector OUT>
-LANGULUS(INLINED)
-void ControlMul(const LHS& lhs, const RHS& rhsArray, OUT& out) noexcept {
-   static_assert(RHS::MemberCount == OUT::MemberCount,
-      "Vector sizes must match"
-   );
-
-   auto r = out.mArray;
-   auto rhs = rhsArray.mArray;
-   const auto rhsEnd = rhs + RHS::MemberCount;
-   while (rhs != rhsEnd)
-      ControlMul(lhs, *rhs++, *r++);
-}
-
-template<CT::Vector LHS, CT::Scalar RHS, CT::Vector OUT>
-LANGULUS(INLINED)
-void ControlMul(const LHS& lhsArray, const RHS& rhs, OUT& out) noexcept {
-   static_assert(LHS::MemberCount == OUT::MemberCount,
-      "Vector sizes must match"
-   );
-
-   auto r = out.mArray;
-   auto lhs = lhsArray.mArray;
-   const auto lhsEnd = lhs + LHS::MemberCount;
-   while (lhs != lhsEnd)
-      ControlMul(*lhs++, rhs, *r++);
-}
-
-TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
+TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -77,30 +26,25 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
 ) {
    using T = TestType;
 
-   GIVEN("Vector<T,N> * Scalar<T> = Vector<T,N>") {
-      T x;
-      TypeOf<T> y {};
+   GIVEN("x * y = r") {
+      T x, y;
       T r, rCheck;
 
       if constexpr (not CT::Vector<T>) {
          if constexpr (CT::Sparse<T>) {
             x = nullptr;
+            y = nullptr;
             r = new Decay<T>;
             rCheck = new Decay<T>;
          }
 
-         InitOne(x,  1);
+         InitOne(x, 1);
          InitOne(y, -5);
       }
-      else InitOne(y, -5);
 
       WHEN("Multiplied") {
          ControlMul(x, y, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::Multiply(x.mArray, y, r.mArray);
-         else
-            SIMD::Multiply(x, y, r);
+         SIMD::Multiply(x, y, r);
 
          THEN("The result should be correct") {
             REQUIRE(DenseCast(r) == DenseCast(rCheck));
@@ -152,11 +96,7 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
 
       WHEN("Multiplied in reverse") {
          ControlMul(y, x, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::Multiply(y, x.mArray, r.mArray);
-         else
-            SIMD::Multiply(y, x, r);
+         SIMD::Multiply(y, x, r);
 
          THEN("The result should be correct") {
             REQUIRE(DenseCast(r) == DenseCast(rCheck));
@@ -167,6 +107,7 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
          delete r;
          delete rCheck;
          delete x;
+         delete y;
       }
    }
 }
