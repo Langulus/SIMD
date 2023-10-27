@@ -19,7 +19,7 @@ endif()
 fetch_external_module(
     SIMDe
     GIT_REPOSITORY  https://github.com/simd-everywhere/simde.git
-    GIT_TAG         e75e82ebec06b66e1243abd21b4506148911d19c
+    GIT_TAG         master
 )
 
 # Build and install SIMD library                                            
