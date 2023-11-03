@@ -350,7 +350,14 @@ namespace Langulus::SIMD
             // Store in another bitmask                                 
             DenseCast(to) = from;
          }
-         else if constexpr (CT::Bool<TO>) {
+         else if constexpr (CountOf<TO> == 1) {
+            if constexpr (CT::Bool<TypeOf<TO>>) {
+               // Convert each bit to a boolean inside an array         
+               to = static_cast<bool>(from);
+            }
+            else LANGULUS_ERROR("Bad output to store a bitmask");
+         }
+         else if constexpr (CT::Bool<TypeOf<TO>>) {
             // Convert each bit to a boolean inside an array            
             static_assert(CountOf<FROM> == CountOf<TO>, "Counts must match");
             for (Offset i = 0; i < CountOf<TO>; ++i)
@@ -368,7 +375,7 @@ namespace Langulus::SIMD
          }
          else if constexpr (CountOf<TO> == 1) {
             // Store as a single number (produced from fallback)        
-            if constexpr (CT::Bool<TO>) {
+            if constexpr (CT::Bool<TypeOf<TO>>) {
                // Short-circuit on first false flag (AND logic)         
                for (auto& it : from) {
                   if (not it) {

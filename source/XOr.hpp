@@ -80,7 +80,7 @@ namespace Langulus::SIMD
    } // namespace Langulus::SIMD::Inner
 
 
-   /// Add numbers                                                            
+   /// XOR numbers                                                            
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
    ///   @tparam OUT - the desired element type (lossless by default)         
@@ -98,7 +98,7 @@ namespace Langulus::SIMD
       );
    }
 
-   /// Subtract numbers                                                       
+   /// XOR numbers                                                            
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
    ///   @tparam OUT - the desired element type (lossless by default)         
@@ -106,7 +106,7 @@ namespace Langulus::SIMD
    ///           or array/scalar if no viable SIMD routine exists             
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
-   auto XOr(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+   auto XOrDynamic(LHS& lhsOrig, RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
       using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
@@ -121,7 +121,7 @@ namespace Langulus::SIMD
       );
    }
 
-   /// Subtract numbers, and force output to desired place                    
+   /// XOR numbers, and force output to desired place                         
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
    ///   @tparam OUT - the desired element type (deducible)                   
@@ -133,7 +133,21 @@ namespace Langulus::SIMD
       IF_CONSTEXPR() {
          StoreConstexpr(XOrConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
       }
-      else Store(XOr<LHS, RHS, OUT>(lhs, rhs), out);
+      else Store(XOrDynamic<LHS, RHS, OUT>(lhs, rhs), out);
+   }
+
+   /// XOR numbers                                                            
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired output type (lossless array by default)    
+   ///   @attention may generate additional convert/store instructions in     
+   ///              order to fit the result in desired output                 
+   template<class LHS, class RHS, class OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
+   LANGULUS(INLINED)
+   constexpr OUT XOr(const LHS& lhs, const RHS& rhs) noexcept {
+      OUT out;
+      XOr(lhs, rhs, out);
+      return out;
    }
 
 } // namespace Langulus::SIMD

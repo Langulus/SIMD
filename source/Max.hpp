@@ -165,7 +165,7 @@ namespace Langulus::SIMD
    ///           or array/scalar if no viable SIMD routine exists             
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
-   auto Max(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+   auto MaxDynamic(LHS& lhsOrig, RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
       using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
@@ -192,7 +192,21 @@ namespace Langulus::SIMD
       IF_CONSTEXPR() {
          StoreConstexpr(MaxConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
       }
-      else Store(Max<LHS, RHS, OUT>(lhs, rhs), out);
+      else Store(MaxDynamic<LHS, RHS, OUT>(lhs, rhs), out);
+   }
+
+   /// Max numbers                                                            
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired output type (lossless array by default)    
+   ///   @attention may generate additional convert/store instructions in     
+   ///              order to fit the result in desired output                 
+   template<class LHS, class RHS, class OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
+   LANGULUS(INLINED)
+   constexpr OUT Max(const LHS& lhs, const RHS& rhs) noexcept {
+      OUT out;
+      Max(lhs, rhs, out);
+      return out;
    }
 
 } // namespace Langulus::SIMD

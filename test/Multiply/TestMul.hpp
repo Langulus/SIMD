@@ -1,6 +1,7 @@
 #pragma once
 #include "../Main.hpp"
 
+
 /// Scalar * Scalar  (either dense or sparse, wrapped or not)                 
 template<CT::Scalar LHS, CT::Scalar RHS, CT::Scalar OUT>
 LANGULUS(INLINED)

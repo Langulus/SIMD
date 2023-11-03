@@ -125,7 +125,7 @@ namespace Langulus::SIMD
    ///           or array/scalar if no viable SIMD routine exists             
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
-   auto Subtract(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+   auto SubtractDynamic(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
       using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
@@ -152,7 +152,21 @@ namespace Langulus::SIMD
       IF_CONSTEXPR() {
          StoreConstexpr(SubtractConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
       }
-      else Store(Subtract<LHS, RHS, OUT>(lhs, rhs), out);
+      else Store(SubtractDynamic<LHS, RHS, OUT>(lhs, rhs), out);
+   }
+
+   /// Subtract numbers                                                       
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired output type (lossless array by default)    
+   ///   @attention may generate additional convert/store instructions in     
+   ///              order to fit the result in desired output                 
+   template<class LHS, class RHS, class OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
+   LANGULUS(INLINED)
+   constexpr OUT Subtract(const LHS& lhs, const RHS& rhs) noexcept {
+      OUT out;
+      Subtract(lhs, rhs, out);
+      return out;
    }
 
 } // namespace Langulus::SIMD
