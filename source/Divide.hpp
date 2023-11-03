@@ -238,7 +238,7 @@ namespace Langulus::SIMD
    ///           or array/scalar if no viable SIMD routine exists             
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
-   auto Divide(const LHS& lhsOrig, const RHS& rhsOrig) {
+   auto DivideDynamic(const LHS& lhsOrig, const RHS& rhsOrig) {
       using DOUT = Decay<TypeOf<OUT>>;
       using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
@@ -267,7 +267,21 @@ namespace Langulus::SIMD
       IF_CONSTEXPR() {
          StoreConstexpr(DivideConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
       }
-      else Store(Divide<LHS, RHS, OUT>(lhs, rhs), out);
+      else Store(DivideDynamic<LHS, RHS, OUT>(lhs, rhs), out);
+   }
+
+   /// Divide numbers                                                         
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired output type (lossless array by default)    
+   ///   @attention may generate additional convert/store instructions in     
+   ///              order to fit the result in desired output                 
+   template<class LHS, class RHS, class OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
+   LANGULUS(INLINED)
+   constexpr OUT Divide(const LHS& lhs, const RHS& rhs) {
+      OUT out;
+      Divide(lhs, rhs, out);
+      return out;
    }
 
 } // namespace Langulus::SIMD

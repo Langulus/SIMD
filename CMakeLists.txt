@@ -10,9 +10,9 @@ if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
     include(LangulusUtilities.cmake)
 
     # Add Langulus::Core/Logger/RTTI libraries                              
-    fetch_langulus_module(Core   GIT_TAG d52feac3e995e3eeac44fadd7812361919b73a11)
-    fetch_langulus_module(Logger GIT_TAG 3314fbe3bf5611a5bd9ee649f2a6ba5c43f6b4c4)
-    fetch_langulus_module(RTTI   GIT_TAG 8c735514612820f76da494421baccaaea0d4d5e1)
+    fetch_langulus_module(Core   GIT_TAG 0097bd180a5c625f88db0db0514bbf93aff53c7a)
+    fetch_langulus_module(Logger GIT_TAG b63513abb9fb3014107335949e17e41e6e8a334b)
+    fetch_langulus_module(RTTI   GIT_TAG f7c610255b819b99a6adcdefa970387490093c25)
 endif()
 
 # Configure SIMDe library                                                   

@@ -265,7 +265,7 @@ namespace Langulus::SIMD
    ///      has additional overhead for checking the rhs range and zeroing.   
    template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
-   auto ShiftLeft(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+   auto ShiftLeftDynamic(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       static_assert(CT::IntegerX<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>,
          "Can only shift integers");
 
@@ -300,11 +300,25 @@ namespace Langulus::SIMD
    ///      has additional overhead for checking the rhs range and zeroing.   
    template<class LHS, class RHS, class OUT>
    LANGULUS(INLINED)
-   constexpr void ShiftLeft(const LHS& lhs, const RHS& rhs, OUT& output) {
+   constexpr void ShiftLeft(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
       IF_CONSTEXPR() {
          StoreConstexpr(ShiftLeftConstexpr<LHS, RHS, OUT>(lhs, rhs), output);
       }
-      else Store(ShiftLeft<LHS, RHS, OUT>(lhs, rhs), output);
+      else Store(ShiftLeftDynamic<LHS, RHS, OUT>(lhs, rhs), output);
+   }
+
+   /// Shift bits left                                                        
+   ///   @tparam LHS - left array, scalar, or register (deducible)            
+   ///   @tparam RHS - right array, scalar, or register (deducible)           
+   ///   @tparam OUT - the desired output type (lossless array by default)    
+   ///   @attention may generate additional convert/store instructions in     
+   ///              order to fit the result in desired output                 
+   template<class LHS, class RHS, class OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
+   LANGULUS(INLINED)
+   constexpr OUT ShiftLeft(const LHS& lhs, const RHS& rhs) noexcept {
+      OUT out;
+      ShiftLeft(lhs, rhs, out);
+      return out;
    }
 
 } // namespace Langulus::SIMD
