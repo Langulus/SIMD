@@ -17,11 +17,11 @@
 //    simde-f16.h(94,11): error : _Float16 is not supported             
 // So make sure _Float16 identifier exists in such cases, and if not,   
 // use the portable alternative provided by SIMDe                       
-#ifdef __is_identifier
+/*#ifdef __is_identifier
   #if !__is_identifier(_Float16)
     #define SIMDE_FLOAT16_API 1     // SIMDE_FLOAT16_API_PORTABLE == 1  
   #endif
-#endif
+#endif*/
 
 #if LANGULUS_ALIGNMENT >= 64
    #include <simde/x86/avx512.h>
