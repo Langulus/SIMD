@@ -10,19 +10,6 @@
 #include <RTTI/MetaData.hpp>
 #include <array>
 
-// The following settings:                                              
-//    -G "Visual Studio 17 2022" -A Win32 -T "ClangCl"                  
-//    -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="/arch:SSE /EHsc"    
-// Cause:                                                               
-//    simde-f16.h(94,11): error : _Float16 is not supported             
-// So make sure _Float16 identifier exists in such cases, and if not,   
-// use the portable alternative provided by SIMDe                       
-/*#ifdef __is_identifier
-  #if !__is_identifier(_Float16)
-    #define SIMDE_FLOAT16_API 1     // SIMDE_FLOAT16_API_PORTABLE == 1  
-  #endif
-#endif*/
-
 #if LANGULUS_ALIGNMENT >= 64
    #include <simde/x86/avx512.h>
 #endif
