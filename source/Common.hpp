@@ -10,6 +10,12 @@
 #include <RTTI/MetaData.hpp>
 #include <array>
 
+#ifdef __is_identifier
+  #if !__is_identifier(_Float16)
+    #define SIMDE_FLOAT16_API 1     // SIMDE_FLOAT16_API_PORTABLE == 1  
+  #endif
+#endif
+
 #if LANGULUS_ALIGNMENT >= 64
    #include <simde/x86/avx512.h>
 #endif
@@ -211,6 +217,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 namespace Langulus::CT
 {
 
+#if LANGULUS_SIMD(128BIT)
    /// Concept for 128bit SIMD registers                                      
    template<class... T>
    concept SIMD128 = (ExactAsOneOf<T, simde__m128, simde__m128d, simde__m128i> and ...);
@@ -226,7 +233,18 @@ namespace Langulus::CT
    /// Concept for 128bit SIMD integer registers                              
    template<class... T>
    concept SIMD128i = (Exact<T, simde__m128i> and ...);
+#else
+   template<class... T>
+   concept SIMD128 = false;
+   template<class... T>
+   concept SIMD128f = false;
+   template<class... T>
+   concept SIMD128d = false;
+   template<class... T>
+   concept SIMD128i = false;
+#endif
 
+#if LANGULUS_SIMD(256BIT)
    /// Concept for 256bit SIMD registers                                      
    template<class... T>
    concept SIMD256 = (ExactAsOneOf<T, simde__m256, simde__m256d, simde__m256i> and ...);
@@ -242,7 +260,18 @@ namespace Langulus::CT
    /// Concept for 256bit SIMD integer registers                              
    template<class... T>
    concept SIMD256i = (Exact<T, simde__m256i> and ...);
+#else
+   template<class... T>
+   concept SIMD256 = false;
+   template<class... T>
+   concept SIMD256f = false;
+   template<class... T>
+   concept SIMD256d = false;
+   template<class... T>
+   concept SIMD256i = false;
+#endif
 
+#if LANGULUS_SIMD(512BIT)
    /// Concept for 512bit SIMD registers                                      
    template<class... T>
    concept SIMD512 = (ExactAsOneOf<T, simde__m512, simde__m512d, simde__m512i> and ...);
@@ -258,6 +287,16 @@ namespace Langulus::CT
    /// Concept for 512bit SIMD integer registers                              
    template<class... T>
    concept SIMD512i = (Exact<T, simde__m512i> and ...);
+#else
+   template<class... T>
+   concept SIMD512 = false;
+   template<class... T>
+   concept SIMD512f = false;
+   template<class... T>
+   concept SIMD512d = false;
+   template<class... T>
+   concept SIMD512i = false;
+#endif
 
    /// Concept for SIMD registers                                             
    template<class... T>
