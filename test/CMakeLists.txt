@@ -15,5 +15,3 @@ add_test(
 	NAME		LangulusSIMDTest
 	COMMAND		LangulusSIMDTest
 )
-
-langulus_copy_dlls(LangulusSIMDTest ON LangulusSIMDTest)
