@@ -27,10 +27,6 @@ jobs:
         ]
 
         exclude:
-          - cxx: g++
-            c: gcc
-          - cxx: clang++-16
-            c: clang-16
           - os: ubuntu-22.04
             cxx: v143
           - os: ubuntu-22.04
@@ -108,6 +104,10 @@ jobs:
           - feature: [AVX512, 64, '-mavx512f', '/arch:AVX512']
 
         include:
+          - cxx: g++
+            c: gcc
+          - cxx: clang++-16
+            c: clang-16
           - os: ubuntu-22.04
             arch: x86
             cmake_args: "-DCMAKE_CXX_FLAGS=-m32"
