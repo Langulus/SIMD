@@ -7,7 +7,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include <RTTI/MetaData.hpp>
+#include <RTTI/Meta.hpp>
 #include <array>
 
 #ifdef __is_identifier
