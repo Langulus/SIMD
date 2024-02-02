@@ -219,95 +219,95 @@ namespace Langulus::CT
 
 #if LANGULUS_SIMD(128BIT)
    /// Concept for 128bit SIMD registers                                      
-   template<class... T>
+   template<class...T>
    concept SIMD128 = (ExactAsOneOf<T, simde__m128, simde__m128d, simde__m128i> and ...);
 
    /// Concept for 128bit SIMD float registers                                
-   template<class... T>
+   template<class...T>
    concept SIMD128f = (Exact<T, simde__m128> and ...);
 
    /// Concept for 128bit SIMD double registers                               
-   template<class... T>
+   template<class...T>
    concept SIMD128d = (Exact<T, simde__m128d> and ...);
 
    /// Concept for 128bit SIMD integer registers                              
-   template<class... T>
+   template<class...T>
    concept SIMD128i = (Exact<T, simde__m128i> and ...);
 #else
-   template<class... T>
+   template<class...T>
    concept SIMD128 = false;
-   template<class... T>
+   template<class...T>
    concept SIMD128f = false;
-   template<class... T>
+   template<class...T>
    concept SIMD128d = false;
-   template<class... T>
+   template<class...T>
    concept SIMD128i = false;
 #endif
 
 #if LANGULUS_SIMD(256BIT)
    /// Concept for 256bit SIMD registers                                      
-   template<class... T>
+   template<class...T>
    concept SIMD256 = (ExactAsOneOf<T, simde__m256, simde__m256d, simde__m256i> and ...);
 
    /// Concept for 256bit SIMD float registers                                
-   template<class... T>
+   template<class...T>
    concept SIMD256f = (Exact<T, simde__m256> and ...);
 
    /// Concept for 256bit SIMD double registers                               
-   template<class... T>
+   template<class...T>
    concept SIMD256d = (Exact<T, simde__m256d> and ...);
 
    /// Concept for 256bit SIMD integer registers                              
-   template<class... T>
+   template<class...T>
    concept SIMD256i = (Exact<T, simde__m256i> and ...);
 #else
-   template<class... T>
+   template<class...T>
    concept SIMD256 = false;
-   template<class... T>
+   template<class...T>
    concept SIMD256f = false;
-   template<class... T>
+   template<class...T>
    concept SIMD256d = false;
-   template<class... T>
+   template<class...T>
    concept SIMD256i = false;
 #endif
 
 #if LANGULUS_SIMD(512BIT)
    /// Concept for 512bit SIMD registers                                      
-   template<class... T>
+   template<class...T>
    concept SIMD512 = (ExactAsOneOf<T, simde__m512, simde__m512d, simde__m512i> and ...);
 
    /// Concept for 512bit SIMD float registers                                
-   template<class... T>
+   template<class...T>
    concept SIMD512f = (Exact<T, simde__m512> and ...);
 
    /// Concept for 512bit SIMD double registers                               
-   template<class... T>
+   template<class...T>
    concept SIMD512d = (Exact<T, simde__m512d> and ...);
 
    /// Concept for 512bit SIMD integer registers                              
-   template<class... T>
+   template<class...T>
    concept SIMD512i = (Exact<T, simde__m512i> and ...);
 #else
-   template<class... T>
+   template<class...T>
    concept SIMD512 = false;
-   template<class... T>
+   template<class...T>
    concept SIMD512f = false;
-   template<class... T>
+   template<class...T>
    concept SIMD512d = false;
-   template<class... T>
+   template<class...T>
    concept SIMD512i = false;
 #endif
 
    /// Concept for SIMD registers                                             
-   template<class... T>
-   concept SIMD   = ((SIMD128<T> or SIMD256<T> or SIMD512<T>) and ...);
+   template<class...T>
+   concept SIMD = ((SIMD128<T> or SIMD256<T> or SIMD512<T>) and ...);
 
    /// Concept anything but SIMD registers                                    
-   template<class... T>
-   concept NotSIMD = not SIMD<T...>;
+   template<class...T>
+   concept NotSIMD = ((not SIMD<T>) and ...);
 
    /// Concept for detecting bitmask types                                    
-   template<class... T>
+   template<class...T>
    concept Bitmask = ((Decay<T>::IsBitmask) and ...);
 
 } // namespace Langulus::CT
