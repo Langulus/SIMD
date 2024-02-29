@@ -62,7 +62,7 @@ namespace Langulus::SIMD
       ///   @tparam INDICES - the indices to use                              
       ///   @param values - the array to access                               
       ///   @return the register                                              
-      template<int DEF, Size CHUNK, CT::Vector FROM, Offset... INDICES>
+      template<int DEF, Offset CHUNK, CT::Vector FROM, Offset... INDICES>
       LANGULUS(INLINED)
       auto Set(std::integer_sequence<Offset, INDICES...>, UNUSED() const FROM& values) {
          IF_LANGULUS_SIMD(using T = Decay<TypeOf<FROM>>);
@@ -168,7 +168,7 @@ namespace Langulus::SIMD
    ///   @tparam FROM - the scalar/array/vector to use for setting            
    ///   @param values - the array to wrap                                    
    ///   @return the register                                                 
-   template<int DEF = 0, Size CHUNK = Alignment, CT::Vector FROM>
+   template<int DEF = 0, Offset CHUNK = Alignment, CT::Vector FROM>
    LANGULUS(INLINED)
    auto Set(const FROM& values) noexcept {
       using T = TypeOf<FROM>;

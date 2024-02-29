@@ -17,8 +17,7 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<CT::Decayed, CT::NotSIMD T>
-      LANGULUS(INLINED)
+      template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
       constexpr Unsupported ShiftLeft(const T&, const T&) noexcept {
          return {};
       }
@@ -35,8 +34,7 @@ namespace Langulus::SIMD
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the shifted elements as a register                        
-      template<CT::Decayed T, CT::SIMD REGISTER>
-      LANGULUS(INLINED)
+      template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
       auto ShiftLeft(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
          static_assert(CT::IntegerX<Decay<T>>, "Can only shift integers");
 
@@ -298,8 +296,7 @@ namespace Langulus::SIMD
    ///      defaulting to zero. It is our responsibility to keep this         
    ///      behavior consistent across C++ and SIMD, so the fallback routine  
    ///      has additional overhead for checking the rhs range and zeroing.   
-   template<class LHS, class RHS, class OUT>
-   LANGULUS(INLINED)
+   template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
    constexpr void ShiftLeft(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
       IF_CONSTEXPR() {
          StoreConstexpr(ShiftLeftConstexpr<LHS, RHS, OUT>(lhs, rhs), output);

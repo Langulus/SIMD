@@ -21,8 +21,7 @@ namespace Langulus::SIMD
       ///   @tparam REGISTER - the register to operate on (deducible)         
       ///   @param v - the array                                              
       ///   @return the absolute values                                       
-      template<CT::Decayed T, CT::SIMD REGISTER>
-      LANGULUS(INLINED)
+      template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
       auto Abs(UNUSED() const REGISTER& v) noexcept {
          static_assert(CT::Signed<T>, "Suboptimal and pointless for unsigned values");
 
@@ -93,8 +92,7 @@ namespace Langulus::SIMD
    ///   @param T - data to make absolute                                     
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<class T>
-   LANGULUS(INLINED)
+   template<class T> LANGULUS(INLINED)
    auto Abs(const T& value) noexcept {
       using DT = Decay<TypeOf<T>>;
       return Inner::Abs<DT>(Load<0>(value));

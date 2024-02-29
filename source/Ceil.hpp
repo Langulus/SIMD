@@ -21,8 +21,7 @@ namespace Langulus::SIMD
       ///   @tparam REGISTER - the register type (deducible)                  
       ///   @param value - the array                                          
       ///   @return the ceiling values                                        
-      template<CT::Decayed T, CT::SIMD REGISTER>
-      LANGULUS(INLINED)
+      template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
       auto Ceil(UNUSED() const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Suboptimal and pointless for whole numbers");
 
@@ -70,8 +69,7 @@ namespace Langulus::SIMD
    ///   @param S - size of the array                                         
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<class T>
-   LANGULUS(INLINED)
+   template<class T> LANGULUS(INLINED)
    auto Ceil(const T& value) noexcept {
       using DT = Decay<TypeOf<T>>;
       return Inner::Ceil<DT>(Load<0>(value));

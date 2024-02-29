@@ -39,8 +39,7 @@ namespace Langulus::SIMD
       ///   @tparam FROM - type to convert from                               
       ///   @param in - the input data                                        
       ///   @return the resulting register                                    
-      template<int DEF, CT::Vector TO, CT::Vector FROM>
-      LANGULUS(INLINED)
+      template<int DEF, CT::Vector TO, CT::Vector FROM> LANGULUS(INLINED)
       auto Convert(const FROM& in) noexcept {
          using FROM_SIMD = Inner::ToSIMD<FROM, FROM>;
          using TO_SIMD = Inner::ToSIMD<FROM, TO>;
@@ -97,8 +96,7 @@ namespace Langulus::SIMD
    ///   @tparam FROM - source array, scalar, or register (deducible)         
    ///   @tparam TO - the desired element type (deducible)                    
    ///   @return array/scalar                                                 
-   template<int DEF, class FROM, class TO>
-   NOD() LANGULUS(INLINED)
+   template<int DEF, class FROM, class TO> NOD() LANGULUS(INLINED)
    constexpr auto ConvertConstexpr(const FROM& from, TO& to) noexcept {
       using T = Decay<TypeOf<TO>>;
 
@@ -140,8 +138,7 @@ namespace Langulus::SIMD
    ///   @tparam TO - the desired element type (deducible)                    
    ///   @attention may generate additional convert/store instructions in     
    ///              order to fit the result in desired output                 
-   template<int DEF, class FROM, class TO>
-   LANGULUS(INLINED)
+   template<int DEF, class FROM, class TO> LANGULUS(INLINED)
    constexpr void Convert(const FROM& from, TO& to) noexcept {
       using T = Decay<TypeOf<TO>>;
 

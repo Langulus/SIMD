@@ -751,7 +751,7 @@ namespace Langulus::SIMD
    namespace Inner
    {
       template<class F, class T>
-      constexpr auto InvocableResultInner() noexcept {
+      consteval auto InvocableResultInner() noexcept {
          if constexpr (CT::Nullptr<F>)
             return Unsupported {};
          else
