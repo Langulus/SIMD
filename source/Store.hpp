@@ -22,8 +22,7 @@ namespace Langulus::SIMD
       ///   @tparam TO - the type of data to write (deducible)                
       ///   @param from - the source register                                 
       ///   @param to - the destination array                                 
-      template<CT::SIMD FROM, CT::NotSIMD TO>
-      LANGULUS(INLINED)
+      template<CT::SIMD FROM, CT::NotSIMD TO> LANGULUS(INLINED)
       void Store(UNUSED() const FROM& from, UNUSED() TO& to) noexcept {
          constexpr auto S = CountOf<TO>;
          static_assert(S > 1, 
@@ -32,7 +31,7 @@ namespace Langulus::SIMD
          );
          using T = TypeOf<TO>;
          using DT = Decay<T>;
-         UNUSED() constexpr Size denseSize = sizeof(DT) * S;
+         UNUSED() constexpr Offset denseSize = sizeof(DT) * S;
 
       #if LANGULUS_SIMD(128BIT)
          //                                                             
@@ -341,8 +340,7 @@ namespace Langulus::SIMD
    ///   @tparam TO - any destination type, array or scalar                   
    ///   @param from - what to store                                          
    ///   @param to - where to store it                                        
-   template<CT::NotSIMD FROM, CT::NotSIMD TO>
-   LANGULUS(INLINED)
+   template<CT::NotSIMD FROM, CT::NotSIMD TO> LANGULUS(INLINED)
    constexpr void StoreConstexpr(const FROM& from, TO& to) noexcept {
       if constexpr (CT::Bitmask<FROM>) {
          // Extract from bitmask (produced from SIMD compare routine)   
@@ -425,8 +423,7 @@ namespace Langulus::SIMD
    ///   @tparam TO - any destination type, array or scalar                   
    ///   @param from - what to store                                          
    ///   @param to - where to store it                                        
-   template<class FROM, CT::NotSIMD TO>
-   LANGULUS(INLINED)
+   template<class FROM, CT::NotSIMD TO> LANGULUS(INLINED)
    constexpr void Store(const FROM& from, TO& to) noexcept {
       if constexpr (CT::SIMD<FROM>)
          Inner::Store(from, to);

@@ -18,8 +18,7 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      template<CT::Decayed, CT::NotSIMD T>
-      LANGULUS(INLINED)
+      template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
       constexpr Unsupported Subtract(const T&, const T&) noexcept {
          return {};
       }
@@ -30,8 +29,7 @@ namespace Langulus::SIMD
       ///   @param lhs - the left-hand-side array                             
       ///   @param rhs - the right-hand-side array                            
       ///   @return the subtracted elements as a register                     
-      template<CT::Decayed T, CT::SIMD REGISTER>
-      LANGULUS(INLINED)
+      template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
       auto Subtract(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<REGISTER>) {
@@ -146,8 +144,7 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired element type (deducible)                   
    ///   @attention may generate additional convert/store instructions in     
    ///              order to fit the result in desired output                 
-   template<class LHS, class RHS, class OUT>
-   LANGULUS(INLINED)
+   template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
    constexpr void Subtract(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
       IF_CONSTEXPR() {
          StoreConstexpr(SubtractConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
