@@ -19,7 +19,7 @@ namespace Langulus::SIMD
    ///   @tparam FROM - the array/vector to load (deducible)                  
    ///   @param v - the array/vector to load inside a register                
    ///   @return the register if loaded, or Unsupported if not                
-   template<int DEF, class FROM> LANGULUS(INLINED)
+   template<int DEF, CT::NotSemantic FROM> LANGULUS(INLINED)
    auto Load(UNUSED() const FROM& v) noexcept {
       UNUSED() constexpr auto S = CountOf<FROM>;
       if constexpr (S < 2) {

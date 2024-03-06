@@ -423,7 +423,7 @@ namespace Langulus::SIMD
    ///   @tparam TO - any destination type, array or scalar                   
    ///   @param from - what to store                                          
    ///   @param to - where to store it                                        
-   template<class FROM, CT::NotSIMD TO> LANGULUS(INLINED)
+   template<CT::NotSemantic FROM, CT::NotSIMD TO> LANGULUS(INLINED)
    constexpr void Store(const FROM& from, TO& to) noexcept {
       if constexpr (CT::SIMD<FROM>)
          Inner::Store(from, to);

@@ -361,7 +361,7 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired element type (bitmask by default)          
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<class LHS, class RHS, class OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
    NOD() LANGULUS(INLINED)
    constexpr auto LesserConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       // Output will likely contain a bool vector, or a bitmask         
@@ -382,7 +382,7 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired element type (bitmask by default)          
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<class LHS, class RHS, class OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
    NOD() LANGULUS(INLINED)
    auto LesserDynamic(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       // Output will likely contain a bool vector, or a bitmask         
@@ -409,7 +409,7 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired element type (deducible)                   
    ///   @attention may generate additional convert/store instructions in     
    ///              order to fit the result in desired output                 
-   template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
    constexpr void Lesser(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
       IF_CONSTEXPR() {
          StoreConstexpr(LesserConstexpr(lhs, rhs), out);
@@ -423,7 +423,7 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired element type (defaults to bitmask)         
    ///   @attention may generate additional convert/store instructions in     
    ///              order to fit the result in desired output                 
-   template<class LHS, class RHS, class OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
    LANGULUS(INLINED)
    constexpr OUT Lesser(const LHS& lhs, const RHS& rhs) noexcept {
       OUT out;

@@ -142,7 +142,7 @@ namespace Langulus::SIMD
    ///   @tparam RHS - right array, scalar, or register (deducible)           
    ///   @tparam OUT - the desired element type (lossless by default)         
    ///   @return array/scalar                                                 
-   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
    constexpr auto MaxConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
@@ -161,7 +161,7 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired element type (lossless by default)         
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
    auto MaxDynamic(LHS& lhsOrig, RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
@@ -184,7 +184,7 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired element type (deducible)                   
    ///   @attention may generate additional convert/store instructions in     
    ///              order to fit the result in desired output                 
-   template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
    constexpr void Max(LHS& lhs, RHS& rhs, OUT& out) noexcept {
       IF_CONSTEXPR() {
          StoreConstexpr(MaxConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
@@ -198,7 +198,7 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired output type (lossless array by default)    
    ///   @attention may generate additional convert/store instructions in     
    ///              order to fit the result in desired output                 
-   template<class LHS, class RHS, class OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
    LANGULUS(INLINED)
    constexpr OUT Max(const LHS& lhs, const RHS& rhs) noexcept {
       OUT out;
