@@ -145,7 +145,8 @@ namespace Langulus::SIMD
    ///   @param T - type of a single value                                    
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<LogStyle STYLE = LogStyle::Base10, class T> LANGULUS(INLINED)
+   template<LogStyle STYLE = LogStyle::Base10, CT::NotSemantic T>
+   LANGULUS(INLINED)
    auto Log(const T& value) noexcept {
       using DT = Decay<TypeOf<T>>;
       return Inner::Log<STYLE, DT>(Load<0>(value));

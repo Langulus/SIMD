@@ -230,7 +230,7 @@ namespace Langulus::SIMD
    ///      defaulting to zero. It is our responsibility to keep this         
    ///      behavior consistent across C++ and SIMD, so the fallback routine  
    ///      has additional overhead for checking the rhs range and zeroing.   
-   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
    constexpr auto ShiftLeftConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       static_assert(CT::IntegerX<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>,
@@ -261,7 +261,7 @@ namespace Langulus::SIMD
    ///      defaulting to zero. It is our responsibility to keep this         
    ///      behavior consistent across C++ and SIMD, so the fallback routine  
    ///      has additional overhead for checking the rhs range and zeroing.   
-   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
    NOD() LANGULUS(INLINED)
    auto ShiftLeftDynamic(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       static_assert(CT::IntegerX<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>,
@@ -296,7 +296,7 @@ namespace Langulus::SIMD
    ///      defaulting to zero. It is our responsibility to keep this         
    ///      behavior consistent across C++ and SIMD, so the fallback routine  
    ///      has additional overhead for checking the rhs range and zeroing.   
-   template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
    constexpr void ShiftLeft(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
       IF_CONSTEXPR() {
          StoreConstexpr(ShiftLeftConstexpr<LHS, RHS, OUT>(lhs, rhs), output);
@@ -310,7 +310,7 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired output type (lossless array by default)    
    ///   @attention may generate additional convert/store instructions in     
    ///              order to fit the result in desired output                 
-   template<class LHS, class RHS, class OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
+   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
    LANGULUS(INLINED)
    constexpr OUT ShiftLeft(const LHS& lhs, const RHS& rhs) noexcept {
       OUT out;

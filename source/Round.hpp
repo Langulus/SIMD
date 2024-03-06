@@ -70,7 +70,7 @@ namespace Langulus::SIMD
    ///   @param T - type of a single value                                    
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<class T> LANGULUS(INLINED)
+   template<CT::NotSemantic T> LANGULUS(INLINED)
    auto Round(const T& value) noexcept {
       using DT = Decay<TypeOf<T>>;
       return Inner::Round<DT>(Load<0>(value));
