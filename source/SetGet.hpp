@@ -24,7 +24,7 @@ namespace Langulus::SIMD
       ///   @tparam FROM - the scalar/array/vector to use for setting         
       ///   @param values - the array to access                               
       ///   @return a reference to the element, or DEF if out of range        
-      template<class R, int DEF, Offset IDX, Count MAXS, bool REVERSE = false, class FROM>
+      template<class R, auto DEF, Offset IDX, Count MAXS, bool REVERSE = false, class FROM>
       LANGULUS(INLINED)
       constexpr decltype(auto) Get(const FROM& values) {
          constexpr auto S = CountOf<FROM>;
@@ -33,23 +33,27 @@ namespace Langulus::SIMD
 
          if constexpr (REVERSE) {
             if constexpr (MAXS - IDX - 1 < S) {
-               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", DenseCast(values[MAXS - IDX - 1]));
+               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ",
+                  DenseCast(values[MAXS - IDX - 1]));
                return reinterpret_cast<const R&>(
                   DenseCast(values[MAXS - IDX - 1]));
             }
             else {
-               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", static_cast<R>(DEF));
+               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ",
+                  static_cast<R>(DEF));
                return static_cast<R>(DEF);
             }
          }
          else {
             if constexpr (IDX < S) {
-               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", DenseCast(values[IDX]));
+               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ",
+                  DenseCast(values[IDX]));
                return reinterpret_cast<const R&>(
                   DenseCast(values[IDX]));
             }
             else {
-               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", static_cast<R>(DEF));
+               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ",
+                  static_cast<R>(DEF));
                return static_cast<R>(DEF);
             }
          }
@@ -62,14 +66,15 @@ namespace Langulus::SIMD
       ///   @tparam INDICES - the indices to use                              
       ///   @param values - the array to access                               
       ///   @return the register                                              
-      template<int DEF, Offset CHUNK, CT::Vector FROM, Offset... INDICES>
+      template<auto DEF, Offset CHUNK, CT::Vector FROM, Offset... INDICES>
       LANGULUS(INLINED)
       auto Set(std::integer_sequence<Offset, INDICES...>, UNUSED() const FROM& values) {
          IF_LANGULUS_SIMD(using T = Decay<TypeOf<FROM>>);
 
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CHUNK == 16) {
-               LANGULUS_SIMD_VERBOSE("Setting 128bit register from ", CountOf<FROM>, " elements");
+               LANGULUS_SIMD_VERBOSE("Setting 128bit register from ",
+                  CountOf<FROM>, " elements");
 
                if constexpr (CT::Integer8<T>)
                   return simde_mm_setr_epi8(
@@ -168,7 +173,7 @@ namespace Langulus::SIMD
    ///   @tparam FROM - the scalar/array/vector to use for setting            
    ///   @param values - the array to wrap                                    
    ///   @return the register                                                 
-   template<int DEF = 0, Offset CHUNK = Alignment, CT::Vector FROM>
+   template<auto DEF = 0, Offset CHUNK = Alignment, CT::Vector FROM>
    LANGULUS(INLINED)
    auto Set(const FROM& values) noexcept {
       using T = TypeOf<FROM>;
