@@ -115,11 +115,10 @@ namespace Langulus::SIMD
                DenseCast(to[i]) = static_cast<T>(DenseCast(from[i]));
 
             constexpr auto SMAX = CountOf<TO>;
-            constexpr auto DEFAULT = static_cast<T>(DEF);
             if constexpr (S < SMAX) {
                // Fill the rest with the default value                  
                for (Count i = S; i < SMAX; ++i)
-                  DenseCast(to[i]) = DEFAULT;
+                  DenseCast(to[i]) = static_cast<T>(DEF);
             }
          }
       }
@@ -142,9 +141,7 @@ namespace Langulus::SIMD
    constexpr void Convert(const FROM& from, TO& to) noexcept {
       using T = Decay<TypeOf<TO>>;
 
-      IF_CONSTEXPR() {
-         ConvertConstexpr<DEF>(from, to);
-      }
+      IF_CONSTEXPR() { ConvertConstexpr<DEF>(from, to); }
       else if constexpr (CT::Vector<FROM>) {
          //                                                             
          // Convert from vectors...                                     

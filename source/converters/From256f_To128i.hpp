@@ -17,8 +17,7 @@ namespace Langulus::SIMD::Inner
    ///   @tparam TO - the desired element type in __m128i                     
    ///   @param v - the input __m256 register                                 
    ///   @return the resulting __m128i register                               
-   template<CT::Decayed TO>
-   LANGULUS(INLINED)
+   template<CT::Decayed TO> LANGULUS(INLINED)
    simde__m128i ConvertFrom256f_To128i(const simde__m256& v) noexcept {
       //                                                                
       // Converting TO  i8 [8], u8 [8], i16[8], u16[8]                  

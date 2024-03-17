@@ -31,8 +31,7 @@ namespace Langulus::SIMD::Inner
    ///   @tparam REGISTER - register to convert to                            
    ///   @param v - the input register                                        
    ///   @return the resulting register                                       
-   template<CT::Decayed TO, CT::Decayed FROM, CT::SIMD REGISTER>
-   LANGULUS(INLINED)
+   template<CT::Decayed TO, CT::Decayed FROM, CT::SIMD REGISTER> LANGULUS(INLINED)
    auto ConvertFrom256i(const simde__m256i& v) noexcept {
       //                                                                
       // Converting FROM i8[32], u8[32], i16[16], u16[16]               

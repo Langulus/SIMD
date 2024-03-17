@@ -91,7 +91,7 @@ namespace Langulus::SIMD::Inner
    ///   @param opSIMD - the function to invoke                               
    ///   @param opFALL - the function to invoke                               
    ///   @return the result (either std::array, number, or register)          
-   template<int DEF, class REGISTER, CT::NotSemantic OUT, CT::NotSemantic LHS, CT::NotSemantic RHS, class FSIMD, class FFALL>
+   template<auto DEF, class REGISTER, CT::NotSemantic OUT, CT::NotSemantic LHS, CT::NotSemantic RHS, class FSIMD, class FFALL>
    NOD() LANGULUS(INLINED)
    constexpr auto Evaluate(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) {
       using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
