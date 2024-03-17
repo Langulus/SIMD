@@ -20,8 +20,7 @@ namespace Langulus::SIMD::Inner
    ///   @tparam REGISTER - register to convert to                            
    ///   @param v - the input register                                        
    ///   @return the resulting register                                       
-   template<CT::Decayed TO, CT::Decayed FROM, CT::SIMD REGISTER>
-   LANGULUS(INLINED)
+   template<CT::Decayed TO, CT::Decayed FROM, CT::SIMD REGISTER> LANGULUS(INLINED)
    auto ConvertFrom128i(const simde__m128i& v) noexcept {
       //                                                                
       // Converting FROM i/u8[16], i/u16[8], i/u32[4], i/u64[2]         

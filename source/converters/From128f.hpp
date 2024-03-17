@@ -23,8 +23,7 @@ namespace Langulus::SIMD::Inner
    ///   @tparam REGISTER - register to convert to                            
    ///   @param v - the input register                                        
    ///   @return the resulting register                                       
-   template<CT::Decayed TO, CT::SIMD REGISTER>
-   LANGULUS(INLINED)
+   template<CT::Decayed TO, CT::SIMD REGISTER> LANGULUS(INLINED)
    auto ConvertFrom128f(const simde__m128& v) noexcept {
       if constexpr (CT::SIMD128d<REGISTER>)
          return ConvertFrom128f_To128d(v);

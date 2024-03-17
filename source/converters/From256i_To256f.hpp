@@ -17,8 +17,7 @@ namespace Langulus::SIMD::Inner
    ///   @tparam FROM - the 256i register can contain various kinds of ints   
    ///   @param v - the __m256i register                                      
    ///   @return the resulting __m256 register                                
-   template<CT::Decayed FROM>
-   LANGULUS(INLINED)
+   template<CT::Decayed FROM> LANGULUS(INLINED)
    simde__m256 ConvertFrom256i_To256f(const simde__m256i& v) noexcept {
       LANGULUS_SIMD_VERBOSE("ConvertFrom256i_To256f");
 
