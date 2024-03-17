@@ -18,8 +18,7 @@ namespace Langulus::SIMD::Inner
    ///   @tparam REGISTER - register to convert to                            
    ///   @param v - the input register                                        
    ///   @return the resulting register                                       
-   template<CT::Decayed TO, CT::SIMD REGISTER>
-   LANGULUS(INLINED)
+   template<CT::Decayed TO, CT::SIMD REGISTER> LANGULUS(INLINED)
    auto ConvertFrom128d(const simde__m128d& v) noexcept {
       //                                                                
       // Converting FROM double[2]                                      
