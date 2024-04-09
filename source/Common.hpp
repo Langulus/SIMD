@@ -338,6 +338,9 @@ namespace Langulus::SIMD
 
    using ::Langulus::Inner::Unsupported;
 
+   template<class LHS, class RHS>
+   using LosslessArray = std::array<Lossless<Decay<TypeOf<Desem<LHS>>>, Decay<TypeOf<Desem<RHS>>>>, OverlapCounts<LHS, RHS>()>;
+
 #if LANGULUS_SIMD(128BIT)
    /// Got these from:                                                        
    /// https://stackoverflow.com/questions/41144668                           

@@ -97,7 +97,7 @@ namespace Langulus::SIMD
 
       /// Pick an array that can represent elements of FROM as type TO        
       template<class FROM, class TO = FROM>
-      using ToArray = Decay<TypeOf<TO>> [CountOf<FROM>];
+      using ToArray = Decay<TypeOf<Desem<TO>>> [CountOf<FROM>];
 
       /// Pick a register that can wrap an array/vector/scalar                
       template<class FROM, class TO = FROM>

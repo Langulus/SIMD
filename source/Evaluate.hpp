@@ -16,14 +16,14 @@ namespace Langulus::SIMD::Inner
    ///   @param rhs - right argument                                          
    ///   @param op - the fallback function to invoke                          
    ///   @return the resulting number/bool/std::array of numbers/bools        
-   template<CT::NotSemantic OUT, CT::NotSemantic LHS, CT::NotSemantic RHS, class FFALL>
+   template<class OUT, class LHS, class RHS, class FFALL>
    NOD() LANGULUS(INLINED)
    constexpr auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) {
       using LOSSLESS = Decay<TypeOf<Lossless<LHS, RHS>>>;
       using RESULT = InvocableResult<FFALL, LOSSLESS>;
       constexpr auto S = OverlapCounts<LHS, RHS>();
       using RETURN = Conditional<
-         CT::Bitmask<OUT> or CT::Bool<RESULT>,
+         CT::Bitmask<Desem<OUT>> or CT::Bool<RESULT>,
          Bitmask<S>, ::std::array<LOSSLESS, S>
       >;
 
@@ -91,7 +91,7 @@ namespace Langulus::SIMD::Inner
    ///   @param opSIMD - the function to invoke                               
    ///   @param opFALL - the function to invoke                               
    ///   @return the result (either std::array, number, or register)          
-   template<auto DEF, class REGISTER, CT::NotSemantic OUT, CT::NotSemantic LHS, CT::NotSemantic RHS, class FSIMD, class FFALL>
+   template<auto DEF, class REGISTER, class OUT, class LHS, class RHS, class FSIMD, class FFALL>
    NOD() LANGULUS(INLINED)
    constexpr auto Evaluate(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) {
       using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
