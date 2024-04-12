@@ -20,79 +20,78 @@ using namespace Langulus;
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
 
 #define NUMBERS_SIGNED() \
-   ::std::int8_t,    ::std::int8_t*,  \
-   ::std::int16_t,   ::std::int16_t*, \
-   ::std::int32_t,   ::std::int32_t*, \
-   ::std::int64_t,   ::std::int64_t*, \
-   float, float*, \
-   double, double*
+   ::std::int8_t,   \
+   ::std::int16_t,  \
+   ::std::int32_t,  \
+   ::std::int64_t,  \
+   float, double
 
 #define NUMBERS_UNSIGNED() \
-   ::std::uint8_t,   ::std::uint8_t*,  \
-   ::std::uint16_t,  ::std::uint16_t*, \
-   ::std::uint32_t,  ::std::uint32_t*, \
-   ::std::uint64_t,  ::std::uint64_t*, \
-   Byte, Byte*, \
-   char8_t, char8_t*, \
-   char16_t, char16_t*, \
-   char32_t, char32_t*, \
-   wchar_t, wchar_t*
+   ::std::uint8_t,  \
+   ::std::uint16_t, \
+   ::std::uint32_t, \
+   ::std::uint64_t, \
+   Byte,            \
+   char8_t,         \
+   char16_t,        \
+   char32_t,        \
+   wchar_t
 
 #define NUMBERS_INT() \
-   ::std::int8_t,    ::std::int8_t*,  \
-   ::std::int16_t,   ::std::int16_t*, \
-   ::std::int32_t,   ::std::int32_t*, \
-   ::std::int64_t,   ::std::int64_t*, \
-   ::std::uint8_t,   ::std::uint8_t*,  \
-   ::std::uint16_t,  ::std::uint16_t*, \
-   ::std::uint32_t,  ::std::uint32_t*, \
-   ::std::uint64_t,  ::std::uint64_t*, \
-   Byte, Byte*, \
-   char8_t, char8_t*, \
-   char16_t, char16_t*, \
-   char32_t, char32_t*, \
-   wchar_t, wchar_t*
+   ::std::int8_t,   \
+   ::std::int16_t,  \
+   ::std::int32_t,  \
+   ::std::int64_t,  \
+   ::std::uint8_t,  \
+   ::std::uint16_t, \
+   ::std::uint32_t, \
+   ::std::uint64_t, \
+   Byte,            \
+   char8_t,         \
+   char16_t,        \
+   char32_t,        \
+   wchar_t
 
 #define NUMBERS_ALL() \
-   NUMBERS_SIGNED(), \
+   NUMBERS_SIGNED(),  \
    NUMBERS_UNSIGNED()
 
-#define VECTORS_SIGNED(S) \
-   (Vector<::std::int8_t, S>),   (Vector<::std::int8_t*, S>), \
-   (Vector<::std::int16_t, S>),  (Vector<::std::int16_t*, S>), \
-   (Vector<::std::int32_t, S>),  (Vector<::std::int32_t*, S>), \
-   (Vector<::std::int64_t, S>),  (Vector<::std::int64_t*, S>), \
-   (Vector<float, S>),           (Vector<float*, S>), \
-   (Vector<double, S>),          (Vector<double*, S>)
+#define VECTORS_SIGNED(S)       \
+   (Vector<::std::int8_t, S>),  \
+   (Vector<::std::int16_t, S>), \
+   (Vector<::std::int32_t, S>), \
+   (Vector<::std::int64_t, S>), \
+   (Vector<float, S>),          \
+   (Vector<double, S>)
 
-#define VECTORS_UNSIGNED(S) \
-   (Vector<::std::uint8_t, S>),  (Vector<::std::uint8_t*, S>), \
-   (Vector<::std::uint16_t, S>), (Vector<::std::uint16_t*, S>), \
-   (Vector<::std::uint32_t, S>), (Vector<::std::uint32_t*, S>), \
-   (Vector<::std::uint64_t, S>), (Vector<::std::uint64_t*, S>), \
-   (Vector<Byte, S>),            (Vector<Byte*, S>), \
-   (Vector<char8_t, S>),         (Vector<char8_t*, S>), \
-   (Vector<char16_t, S>),        (Vector<char16_t*, S>), \
-   (Vector<char32_t, S>),        (Vector<char32_t*, S>), \
-   (Vector<wchar_t, S>),         (Vector<wchar_t*, S>)
+#define VECTORS_UNSIGNED(S)     \
+   (Vector<::std::uint8_t, S>), \
+   (Vector<::std::uint16_t, S>),\
+   (Vector<::std::uint32_t, S>),\
+   (Vector<::std::uint64_t, S>),\
+   (Vector<Byte, S>),           \
+   (Vector<char8_t, S>),        \
+   (Vector<char16_t, S>),       \
+   (Vector<char32_t, S>),       \
+   (Vector<wchar_t, S>)
 
 #define VECTORS_INT(S) \
-   (Vector<::std::int8_t, S>),   (Vector<::std::int8_t*, S>), \
-   (Vector<::std::int16_t, S>),  (Vector<::std::int16_t*, S>), \
-   (Vector<::std::int32_t, S>),  (Vector<::std::int32_t*, S>), \
-   (Vector<::std::int64_t, S>),  (Vector<::std::int64_t*, S>), \
-   (Vector<::std::uint8_t, S>),  (Vector<::std::uint8_t*, S>), \
-   (Vector<::std::uint16_t, S>), (Vector<::std::uint16_t*, S>), \
-   (Vector<::std::uint32_t, S>), (Vector<::std::uint32_t*, S>), \
-   (Vector<::std::uint64_t, S>), (Vector<::std::uint64_t*, S>), \
-   (Vector<Byte, S>),            (Vector<Byte*, S>), \
-   (Vector<char8_t, S>),         (Vector<char8_t*, S>), \
-   (Vector<char16_t, S>),        (Vector<char16_t*, S>), \
-   (Vector<char32_t, S>),        (Vector<char32_t*, S>), \
-   (Vector<wchar_t, S>),         (Vector<wchar_t*, S>)
+   (Vector<::std::int8_t, S>),  \
+   (Vector<::std::int16_t, S>), \
+   (Vector<::std::int32_t, S>), \
+   (Vector<::std::int64_t, S>), \
+   (Vector<::std::uint8_t, S>), \
+   (Vector<::std::uint16_t, S>),\
+   (Vector<::std::uint32_t, S>),\
+   (Vector<::std::uint64_t, S>),\
+   (Vector<Byte, S>),           \
+   (Vector<char8_t, S>),        \
+   (Vector<char16_t, S>),       \
+   (Vector<char32_t, S>),       \
+   (Vector<wchar_t, S>)
 
 #define VECTORS_ALL(S) \
-   VECTORS_SIGNED(S), \
+   VECTORS_SIGNED(S),  \
    VECTORS_UNSIGNED(S)
 
 using uint = unsigned int;
@@ -110,10 +109,13 @@ void InitOne(T& a, A&& b) noexcept {
    else a = static_cast<Decay<TypeOf<T>>>(b);
 }
 
-/// Satisfies the CT::Vector concept                                          
+///                                                                           
+/// Satisfies the CT::Vector concept when C > 1                               
+/// Satisfied the CT::Scalar concept when C == 1                              
+///                                                                           
 #pragma pack(push, 1)
 template<class T, Count C>
-struct /*alignas(Langulus::Alignment)*/ Vector {
+struct Vector {
    LANGULUS(TYPED) T;
    static constexpr Count MemberCount = C;
 

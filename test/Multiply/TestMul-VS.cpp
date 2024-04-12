@@ -26,6 +26,7 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
 ) {
    using T = TestType;
    using E = TypeOf<T>;
+   static_assert(CountOf<Vector<signed char, 2>> == 2);
 
    GIVEN("Vector<T,N> * Scalar<T> = Vector<T,N>") {
       T x;
