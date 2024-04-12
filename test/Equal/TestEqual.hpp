@@ -3,8 +3,7 @@
 
 
 /// Compare two scalars and put result in a bit                               
-template<CT::Scalar LHS, CT::Scalar RHS>
-LANGULUS(INLINED)
+template<CT::Scalar LHS, CT::Scalar RHS> LANGULUS(INLINED)
 void ControlEqualM(const LHS& lhs, const RHS& rhs, SIMD::Bitmask<1>& out) noexcept {
    out = (DenseCast(lhs) == DenseCast(rhs));
 }
@@ -21,15 +20,13 @@ void ControlEqualM(const LHS& lhsArray, const RHS& rhsArray, OUT& out) noexcept 
 }
 
 /// Compare two scalars and put result in a boolean									
-template<class LHS, class RHS, CT::Bool OUT>
-LANGULUS(INLINED)
+template<class LHS, class RHS, CT::Bool OUT> LANGULUS(INLINED)
 void ControlEqualV(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
    DenseCast(out) = (DenseCast(lhs) == DenseCast(rhs));
 }
 
 /// Compare two vectors and put the result in a vector of bools               
-template<CT::Vector LHS, CT::Vector RHS, CT::Bool OUT>
-LANGULUS(INLINED)
+template<CT::Vector LHS, CT::Vector RHS, CT::Bool OUT> LANGULUS(INLINED)
 void ControlEqualV(const LHS& lhsArray, const RHS& rhsArray, Vector<OUT, CountOf<LHS>>& out) noexcept requires (CountOf<LHS> == CountOf<RHS>) {
    auto r = out.mArray;
    auto lhs = lhsArray.mArray;
