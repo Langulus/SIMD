@@ -35,14 +35,15 @@ namespace Langulus::SIMD
             if constexpr (CT::SIMD128<REGISTER>) {
                if constexpr (CT::Integer8<T>) {
                   // https://stackoverflow.com/questions/8193601        
-                  simde__m128i zero = simde_mm_setzero_si128();
+                  /*simde__m128i zero = simde_mm_setzero_si128();
                   simde__m128i Alo = simde_mm_cvtepu8_epi16(lhs);
                   simde__m128i Ahi = simde_mm_unpackhi_epi8(lhs, zero);
                   simde__m128i Blo = simde_mm_cvtepu8_epi16(rhs);
                   simde__m128i Bhi = simde_mm_unpackhi_epi8(rhs, zero);
                   simde__m128i Clo = simde_mm_mullo_epi16(Alo, Blo);
                   simde__m128i Chi = simde_mm_mullo_epi16(Ahi, Bhi);
-                  return lgls_pack_epi16(Clo, Chi);
+                  return lgls_pack_epi16(Clo, Chi);*/
+                  return Unsupported {};
                }
                else if constexpr (CT::Integer16<T>)
                   return simde_mm_mullo_epi16(lhs, rhs);
@@ -178,7 +179,17 @@ namespace Langulus::SIMD
          },
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             LANGULUS_SIMD_VERBOSE("Multiplying (Fallback)");
-            return lhs * rhs;
+            if constexpr (CT::Same<DOUT, uint8_t>) {
+               // 8-bit unsigned multiplication with saturation         
+               const uint32_t temp = lhs * rhs; // promoted             
+               return temp > 255 ? 255 : temp;
+            }
+            else if constexpr (CT::Same<DOUT, int8_t>) {
+               // 8-bit signed multiplication with saturation           
+               const int32_t temp = lhs * rhs;  // promoted             
+               return temp > 127 ? 127 : (temp < -128 ? -128 : temp);
+            }
+            else return lhs * rhs;
          }
       );
    }
