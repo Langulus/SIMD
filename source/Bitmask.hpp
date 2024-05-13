@@ -147,4 +147,24 @@ namespace Langulus::SIMD
       }
    };
 
+   namespace Inner
+   {
+      
+      template<class LHS, class RHS>
+      consteval auto BitmaskArray() {
+         constexpr auto C = OverlapCounts<LHS, RHS>();
+         if constexpr (C == 1)
+            return bool {};
+         else
+            return Bitmask<C> {};
+      }
+
+   } // namespace Langulus::SIMD::Inner
+
+   /// Useful tool for auto-deducing operation return type based on arguments 
+   ///   @tparam LHS - left operand                                           
+   ///   @tparam RHS - right operand                                          
+   template<class LHS, class RHS>
+   using BitmaskArray = decltype(Inner::BitmaskArray<LHS, RHS>());
+
 } // namespace Langulus::SIMD

@@ -19,22 +19,19 @@ namespace Langulus::SIMD::Inner
    template<class OUT, class LHS, class RHS, class FFALL>
    NOD() LANGULUS(INLINED)
    constexpr auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) {
-      using LOSSLESS = Decay<TypeOf<Lossless<LHS, RHS>>>;
-      using RESULT = InvocableResult<FFALL, LOSSLESS>;
-      constexpr auto S = OverlapCounts<LHS, RHS>();
-      using RETURN = Conditional<
-         CT::Bitmask<Desem<OUT>> or CT::Bool<RESULT>,
-         Bitmask<S>, ::std::array<LOSSLESS, S>
-      >;
+      using RETURN = SIMD::LosslessArray<LHS, RHS>;
+      using LOSSLESS = TypeOf<RETURN>;
+      //using RESULT = InvocableResult<FFALL, LOSSLESS>;
+      constexpr auto S = CountOf<RETURN>;
 
       if constexpr (CT::Vector<LHS> and CT::Vector<RHS>) {
          // Vector OP Vector                                            
          RETURN output;
          for (Count i = 0; i < S; ++i) {
-            output[i] = op(
+            output[i] = static_cast<LOSSLESS>(op(
                static_cast<LOSSLESS>(DenseCast(lhs[i])),
                static_cast<LOSSLESS>(DenseCast(rhs[i]))
-            );
+            ));
          }
 
          return output;
@@ -44,10 +41,10 @@ namespace Langulus::SIMD::Inner
          RETURN output;
          const auto same_rhs = static_cast<LOSSLESS>(DenseCast(GetFirst(rhs)));
          for (Count i = 0; i < S; ++i) {
-            output[i] = op(
+            output[i] = static_cast<LOSSLESS>(op(
                static_cast<LOSSLESS>(DenseCast(lhs[i])),
                same_rhs
-            );
+            ));
          }
 
          return output;
@@ -57,10 +54,10 @@ namespace Langulus::SIMD::Inner
          RETURN output;
          const auto same_lhs = static_cast<LOSSLESS>(DenseCast(GetFirst(lhs)));
          for (Count i = 0; i < S; ++i) {
-            output[i] = op(
+            output[i] = static_cast<LOSSLESS>(op(
                same_lhs,
                static_cast<LOSSLESS>(DenseCast(rhs[i]))
-            );
+            ));
          }
 
          return output;
@@ -68,10 +65,10 @@ namespace Langulus::SIMD::Inner
       else {
          // Scalar OP Scalar                                            
          // Casts are no-op if types are the same                       
-         return op(
+         return static_cast<LOSSLESS>(op(
             static_cast<LOSSLESS>(DenseCast(GetFirst(lhs))),
             static_cast<LOSSLESS>(DenseCast(GetFirst(rhs)))
-         );
+         ));
       }
    }
 
@@ -106,14 +103,14 @@ namespace Langulus::SIMD::Inner
          // Both LHS and RHS are vectors, so wrap in registers          
          LANGULUS_SIMD_VERBOSE("Both sides are vectors");
          return opSIMD(
-            Inner::Convert<DEF, OUT>(lhs),
-            Inner::Convert<DEF, OUT>(rhs)
+            Convert<DEF, OUT>(lhs),
+            Convert<DEF, OUT>(rhs)
          );
       }
       else if constexpr (CT::Vector<LHS>) {
          // LHS is vector, RHS is scalar                                
          return opSIMD(
-            Inner::Convert<DEF, OUT>(lhs),
+            Convert<DEF, OUT>(lhs),
             Fill<REGISTER, OUT>(rhs)
          );
       }
@@ -121,7 +118,7 @@ namespace Langulus::SIMD::Inner
          // LHS is scalar, RHS is vector                                
          return opSIMD(
             Fill<REGISTER, OUT>(lhs),
-            Inner::Convert<DEF, OUT>(rhs)
+            Convert<DEF, OUT>(rhs)
          );
       }
       else {

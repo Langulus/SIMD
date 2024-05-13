@@ -334,12 +334,26 @@ namespace Langulus::SIMD
             return (a);
       }
 
+      template<class LHS, class RHS>
+      consteval auto LosslessArray() {
+         constexpr auto C = OverlapCounts<LHS, RHS>();
+         using LT = Decay<TypeOf<Desem<LHS>>>;
+         using RT = Decay<TypeOf<Desem<RHS>>>;
+         if constexpr (C == 1)
+            return Lossless<LT, RT> {};
+         else
+            return std::array<Lossless<LT, RT>, C> {};
+      }
+      
    } // namespace Langulus::SIMD::Inner
 
    using ::Langulus::Inner::Unsupported;
 
+   /// Useful tool for auto-deducing operation return type based on arguments 
+   ///   @tparam LHS - left operand                                           
+   ///   @tparam RHS - right operand                                          
    template<class LHS, class RHS>
-   using LosslessArray = std::array<Lossless<Decay<TypeOf<Desem<LHS>>>, Decay<TypeOf<Desem<RHS>>>>, OverlapCounts<LHS, RHS>()>;
+   using LosslessArray = decltype(Inner::LosslessArray<LHS, RHS>());
 
 #if LANGULUS_SIMD(128BIT)
    /// Got these from:                                                        

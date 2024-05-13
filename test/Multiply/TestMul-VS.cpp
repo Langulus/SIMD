@@ -11,9 +11,9 @@
 
 
 TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
+   , VECTORS_ALL(2)
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
-   , VECTORS_ALL(2)
    , VECTORS_ALL(3)
    , VECTORS_ALL(4)
    , VECTORS_ALL(5)
@@ -34,31 +34,23 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
       T r, rCheck;
 
       if constexpr (not CT::Vector<T>) {
-         if constexpr (CT::Sparse<T>) {
-            x = nullptr;
-            r = new Decay<T>;
-            rCheck = new Decay<T>;
-         }
-
          InitOne(x,  1);
          InitOne(y, -5);
       }
       else InitOne(y, -5);
 
-      /*WHEN("Multiplied as constexpr") {
-         constexpr T lhs {E{0}};
-         constexpr E rhs {5};
-         constexpr T res {E{0}};
+      WHEN("Multiplied as constexpr") {
+         constexpr T lhs = E {0};
+         constexpr T rhs = E {5};
+         constexpr T res = E {0};
          static_assert(SIMD::Multiply(lhs, rhs) == res);
-      }*/
+      }
 
       WHEN("Multiplied") {
          ControlMul(x, y, rCheck);
          SIMD::Multiply(x, y, r);
-
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
+            
+         REQUIRE(r == rCheck);
 
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Multiply (control)") (timer meter) {
@@ -108,15 +100,7 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
          ControlMul(y, x, rCheck);
          SIMD::Multiply(y, x, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
-      }
-
-      if constexpr (CT::Sparse<T>) {
-         delete r;
-         delete rCheck;
-         delete x;
+         REQUIRE(r == rCheck);
       }
    }
 }

@@ -92,9 +92,9 @@ namespace Langulus::SIMD
    ///   @param T - data to make absolute                                     
    ///   @return a register, if viable SIMD routine exists                    
    ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic T> LANGULUS(INLINED)
-   auto Abs(const T& value) noexcept {
-      using DT = Decay<TypeOf<T>>;
+   LANGULUS(INLINED)
+   auto Abs(const auto& value) noexcept {
+      using DT = Decay<TypeOf<Desem<decltype(value)>>>;
       return Inner::Abs<DT>(Load<0>(value));
    }
 
