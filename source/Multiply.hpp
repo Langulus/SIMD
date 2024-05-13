@@ -19,7 +19,7 @@ namespace Langulus::SIMD
 
       /// Used to detect missing SIMD routine                                 
       template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
-      constexpr Unsupported Multiply(const T&, const T&) noexcept {
+      constexpr Unsupported MultiplySIMD(const T&, const T&) noexcept {
          return {};
       }
 
@@ -30,7 +30,7 @@ namespace Langulus::SIMD
       ///   @param rhs - the right-hand-side array                            
       ///   @return the multiplied elements as a register                     
       template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto Multiply(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
+      auto MultiplySIMD(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<REGISTER>) {
                if constexpr (CT::Integer8<T>) {
@@ -137,62 +137,66 @@ namespace Langulus::SIMD
             LANGULUS_ERROR("Unsupported type");
       }
 
+      /// Multiply numbers and return a register, if possible                 
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///           or array/scalar if no viable SIMD routine exists          
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      constexpr auto MultiplyConstexpr(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = TypeOf<SIMD::LosslessArray<OUT, OUT>>;
+
+         return Evaluate<0, Unsupported, OUT>(
+            lhsOrig, rhsOrig, nullptr,
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+               if constexpr (CT::Same<DOUT, uint8_t>) {
+                  // 8-bit unsigned multiplication with saturation      
+                  const unsigned temp = lhs * rhs;
+                  return temp > 255 ? 255 : temp;
+               }
+               else if constexpr (CT::Same<DOUT, int8_t>) {
+                  // 8-bit signed multiplication with saturation        
+                  const signed temp = lhs * rhs;
+                  return temp > 127 ? 127 : (temp < -128 ? -128 : temp);
+               }
+               else return lhs * rhs;
+            }
+         );
+      }
+
+      /// Multiply numbers and return a register, if possible                 
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///           or array/scalar if no viable SIMD routine exists          
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      auto MultiplyDynamic(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = TypeOf<SIMD::LosslessArray<OUT, OUT>>;
+         using REGISTER = Register<decltype(lhsOrig), decltype(rhsOrig), OUT>;
+
+         return Evaluate<0, REGISTER, OUT>(
+            lhsOrig, rhsOrig,
+            [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+               LANGULUS_SIMD_VERBOSE("Multiplying (SIMD)");
+               return MultiplySIMD<DOUT>(lhs, rhs);
+            },
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+               LANGULUS_SIMD_VERBOSE("Multiplying (Fallback)");
+               if constexpr (CT::Same<DOUT, uint8_t>) {
+                  // 8-bit unsigned multiplication with saturation      
+                  const unsigned temp = lhs * rhs;
+                  return temp > 255 ? 255 : temp;
+               }
+               else if constexpr (CT::Same<DOUT, int8_t>) {
+                  // 8-bit signed multiplication with saturation        
+                  const signed temp = lhs * rhs;
+                  return temp > 127 ? 127 : (temp < -128 ? -128 : temp);
+               }
+               else return lhs * rhs;
+            }
+         );
+      }
+
    } // namespace Langulus::SIMD::Inner
 
-
-   /// Multiply numbers and return a register, if possible                    
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   constexpr auto MultiplyConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<TypeOf<OUT>>;
-
-      return Inner::Evaluate<0, Unsupported, OUT>(
-         lhsOrig, rhsOrig, nullptr,
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            return lhs * rhs;
-         }
-      );
-   }
-   
-   /// Multiply numbers and return a register, if possible                    
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   auto MultiplyDynamic(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<TypeOf<OUT>>;
-      using REGISTER = Inner::Register<LHS, RHS, OUT>;
-
-      return Inner::Evaluate<0, REGISTER, OUT>(
-         lhsOrig, rhsOrig, 
-         [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            LANGULUS_SIMD_VERBOSE("Multiplying (SIMD)");
-            return Inner::Multiply<DOUT>(lhs, rhs);
-         },
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            LANGULUS_SIMD_VERBOSE("Multiplying (Fallback)");
-            if constexpr (CT::Same<DOUT, uint8_t>) {
-               // 8-bit unsigned multiplication with saturation         
-               const uint32_t temp = lhs * rhs; // promoted             
-               return temp > 255 ? 255 : temp;
-            }
-            else if constexpr (CT::Same<DOUT, int8_t>) {
-               // 8-bit signed multiplication with saturation           
-               const int32_t temp = lhs * rhs;  // promoted             
-               return temp > 127 ? 127 : (temp < -128 ? -128 : temp);
-            }
-            else return lhs * rhs;
-         }
-      );
-   }
 
    /// Multiply numbers, and force output to desired place                    
    ///   @tparam LHS - left array, scalar, or register (deducible)            
@@ -200,12 +204,14 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired element type (deducible)                   
    ///   @attention may generate additional convert/store instructions in     
    ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
+   template<class LHS, class RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
    constexpr void Multiply(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
       IF_CONSTEXPR() {
-         StoreConstexpr(MultiplyConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
+      StoreConstexpr(
+         Inner::MultiplyConstexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
       }
-      else Store(MultiplyDynamic<LHS, RHS, OUT>(lhs, rhs), out);
+      else Store(
+         Inner::MultiplyDynamic<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
    }
       
    /// Multiply numbers                                                       
@@ -214,12 +220,18 @@ namespace Langulus::SIMD
    ///   @tparam OUT - the desired output type (lossless array by default)    
    ///   @attention may generate additional convert/store instructions in     
    ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
+   template<class LHS, class RHS, CT::NotSemantic OUT = LosslessArray<LHS, RHS>>
    LANGULUS(INLINED)
-   constexpr OUT Multiply(const LHS& lhs, const RHS& rhs) noexcept {
+   constexpr auto Multiply(const LHS& lhs, const RHS& rhs) noexcept {
       OUT out;
-      Multiply(lhs, rhs, out);
-      return out;
+      Multiply(DesemCast(lhs), DesemCast(rhs), out);
+
+      if constexpr (CT::Similar<LHS, RHS> or CT::DerivedFrom<LHS, RHS>)
+         return LHS {out};
+      else if constexpr (CT::DerivedFrom<RHS, LHS>)
+         return RHS {out};
+      else
+         return out;
    }
 
 } // namespace Langulus::SIMD

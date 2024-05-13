@@ -114,7 +114,7 @@ void InitOne(T& a, A&& b) noexcept {
 /// Satisfied the CT::Scalar concept when C == 1                              
 ///                                                                           
 #pragma pack(push, 1)
-template<class T, Count C>
+template<CT::Dense T, Count C>
 struct Vector {
    LANGULUS(TYPED) T;
    static constexpr Count MemberCount = C;
@@ -162,76 +162,60 @@ struct Vector {
       static std::mt19937 gen(rd());
 
       for (auto& i : mArray) {
-         if constexpr (CT::Sparse<T>) {
-            using TD = Decay<T>;
-            i = new TD {static_cast<TD>(gen() % 66)};
-            if (*i == TD {0})
-               *i = TD {1};
-         }
-         else {
-            i = static_cast<T>(gen() % 66);
-            if (i == T {0})
-               i = T {1};
-         }
+         i = static_cast<T>(gen() % 66);
+         if (i == T {0})
+            i = T {1};
       }
    }
    
-   Vector(const Vector& v) {
-      for (Count i = 0; i < C; ++i) {
-         if constexpr (CT::Sparse<T>)
-            mArray[i] = new Decay<T> {*v.mArray[i]};
-         else
-            mArray[i] = v.mArray[i];
-      }
+   template<class ALT>
+   constexpr Vector(const std::array<ALT, C>& v) {
+      for (Count i = 0; i < C; ++i)
+         mArray[i] = static_cast<T>(v[i]);
    }
 
-   Vector(const Decay<T>& s) {
-      for (Count i = 0; i < C; ++i) {
-         if constexpr (CT::Sparse<T>)
-            mArray[i] = new Decay<T> {s};
-         else
-            mArray[i] = s;
-      }
+   constexpr Vector(const Vector& v) {
+      for (Count i = 0; i < C; ++i)
+         mArray[i] = v.mArray[i];
    }
 
-   ~Vector() {
-      for (auto& i : mArray) {
-         if constexpr (CT::Sparse<T>)
-            delete i;
-      }
+   constexpr Vector(const Decay<T>& s) {
+      for (Count i = 0; i < C; ++i)
+         mArray[i] = s;
    }
 
-   bool operator == (const Vector& e) const noexcept {
+   constexpr bool operator == (const Vector& e) const noexcept {
       for (Count i = 0; i < C; ++i)
          if (DenseCast(mArray[i]) != DenseCast(e.mArray[i]))
             return false;
       return true;
    }
 
-   Vector& operator = (const Vector& b) noexcept {
+   constexpr Vector& operator = (const Vector& b) noexcept {
       for (Count i = 0; i < C; ++i)
          DenseCast(mArray[i]) = DenseCast(b.mArray[i]);
       return *this;
    }
 
-   Vector& operator = (const Decay<T>& b) noexcept {
+   constexpr Vector& operator = (const Decay<T>& b) noexcept {
       for (Count i = 0; i < C; ++i)
          DenseCast(mArray[i]) = b;
       return *this;
    }
 
-   explicit operator const T& () const noexcept requires (C==1) {
-      return mArray[0];
-   }
-   explicit operator T& () noexcept requires (C==1) {
+   constexpr explicit operator const T& () const noexcept requires (C==1) {
       return mArray[0];
    }
 
-   const T& operator [](auto i) const noexcept {
+   constexpr explicit operator T& () noexcept requires (C==1) {
+      return mArray[0];
+   }
+
+   constexpr const T& operator [](auto i) const noexcept {
       return mArray[i];
    }
 
-   T& operator [](auto i) noexcept {
+   constexpr T& operator [](auto i) noexcept {
       return mArray[i];
    }
 };

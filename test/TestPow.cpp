@@ -9,8 +9,8 @@
 #include "Main.hpp"
 #include <catch2/catch.hpp>
 
-template<CT::Dense B, CT::Dense E>
-NOD() LANGULUS(INLINED)
+
+template<CT::Dense B, CT::Dense E> NOD() LANGULUS(INLINED)
 constexpr auto Pow(B base, E exponent) noexcept {
    if (base == B {1})
       return B {1};
@@ -42,14 +42,12 @@ constexpr auto Pow(B base, E exponent) noexcept {
       LANGULUS_ERROR("T must be a number");
 }
 
-template<class LHS, class RHS, class OUT>
-LANGULUS(INLINED)
+template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
 void ControlPow(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
    DenseCast(out) = Pow(DenseCast(lhs), DenseCast(rhs));
 }
 
-template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(INLINED)
+template<class LHS, class RHS, size_t C, class OUT> LANGULUS(INLINED)
 void ControlPow(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
    auto r = out.mArray;
    auto lhs = lhsArray.mArray;
