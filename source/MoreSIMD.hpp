@@ -217,6 +217,30 @@ namespace Langulus::SIMD
       // Repack the 16-bit uints to clamped 8-bit values                
       return simde_mm_packus_epi16(xlo, xhi);
    }
+
+   /// Multiply 16x8bit signed integers by unpacking and packing them again   
+   /// https://stackoverflow.com/questions/57292018                           
+   inline simde__m128i mulhi_epi8(simde__m128i a, simde__m128i b) {
+      simde__m128i mask = simde_mm_set1_epi16(0xff00);
+      // Mask higher bytes                                              
+      simde__m128i a_hi = simde_mm_and_si128(a, mask);
+      simde__m128i b_hi = simde_mm_and_si128(b, mask);
+      simde__m128i r_hi = simde_mm_mulhi_epi16(a_hi, b_hi);
+
+      // Mask out garbage in lower half                                 
+      r_hi = simde_mm_and_si128(r_hi, mask);
+
+      // Shift lower bytes to upper half                                
+      simde__m128i a_lo = simde_mm_slli_epi16(a, 8);
+      simde__m128i b_lo = simde_mm_slli_epi16(b, 8);
+      simde__m128i r_lo = simde_mm_mulhi_epi16(a_lo, b_lo);
+
+      // Shift result to the lower half                                 
+      r_lo = simde_mm_srli_epi16(r_lo, 8);
+
+      // Join result and return                                         
+      return simde_mm_or_si128(r_hi, r_lo);
+   }
 #endif
 
 } // namespace Langulus::SIMD

@@ -69,13 +69,14 @@ namespace Langulus::SIMD
          #if LANGULUS_SIMD(256BIT)
             if constexpr (CT::SIMD256<REGISTER>) {
                if constexpr (CT::Integer8<T>) {
-                  simde__m256i Alo = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(lhs));
+                  /*simde__m256i Alo = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(lhs));
                   simde__m256i Ahi = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(_mm_halfflip(lhs)));
                   simde__m256i Blo = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(rhs));
                   simde__m256i Bhi = simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(_mm_halfflip(rhs)));
                   simde__m256i Clo = simde_mm256_mullo_epi16(Alo, Blo);
                   simde__m256i Chi = simde_mm256_mullo_epi16(Ahi, Bhi);
-                  return lgls_pack_epi16(Clo, Chi);
+                  return lgls_pack_epi16(Clo, Chi);*/
+                  return Unsupported {};
                }
                else if constexpr (CT::Integer16<T>)
                   return simde_mm256_mullo_epi16(lhs, rhs);
@@ -101,7 +102,7 @@ namespace Langulus::SIMD
          #if LANGULUS_SIMD(512BIT)
             if constexpr (CT::SIMD512<REGISTER>) {
                if constexpr (CT::Integer8<T>) {
-                  auto hiLHS = simde_mm512_unpackhi_epi8(lhs, simde_mm512_setzero_si512());
+                  /*auto hiLHS = simde_mm512_unpackhi_epi8(lhs, simde_mm512_setzero_si512());
                   auto hiRHS = simde_mm512_unpackhi_epi8(rhs, simde_mm512_setzero_si512());
                   hiLHS = simde_mm512_mullo_epi16(hiLHS, hiRHS);
 
@@ -112,7 +113,8 @@ namespace Langulus::SIMD
                   if constexpr (CT::SignedInteger8<T>)
                      return simde_mm512_packs_epi16(loLHS, hiLHS);
                   else
-                     return simde_mm512_packus_epi16(loLHS, hiLHS);
+                     return simde_mm512_packus_epi16(loLHS, hiLHS);*/
+                  return Unsupported {};
                }
                else if constexpr (CT::Integer16<T>)
                   return simde_mm512_mullo_epi16(lhs, rhs);
