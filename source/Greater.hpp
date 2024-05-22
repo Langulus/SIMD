@@ -368,7 +368,7 @@ namespace Langulus::SIMD
       // so make sure we operate on Lossless<LHS, RHS>                  
       using DOUT = Decay<TypeOf<Lossless<LHS, RHS>>>;
 
-      return Inner::Evaluate<0, Unsupported, OUT>(
+      return Inner::Evaluate2<0, Unsupported, OUT>(
          lhsOrig, rhsOrig, nullptr,
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> bool {
             return lhs > rhs;
@@ -392,7 +392,7 @@ namespace Langulus::SIMD
       using REGISTER = Inner::Register<LHS, RHS, LOSSLESS>;
       constexpr auto S = OverlapCounts<LHS, RHS>();
 
-      return Inner::Evaluate<0, REGISTER, OUT>(
+      return Inner::Evaluate2<0, REGISTER, OUT>(
          lhsOrig, rhsOrig,
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
             return Inner::Greater<DOUT, S>(lhs, rhs);

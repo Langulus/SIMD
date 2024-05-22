@@ -138,7 +138,7 @@ namespace Langulus::SIMD
    constexpr auto PowerConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
 
-      return Inner::Evaluate<1, Unsupported, OUT>(
+      return Inner::Evaluate2<1, Unsupported, OUT>(
          lhsOrig, rhsOrig, nullptr,
          [](DOUT lhs, DOUT rhs) noexcept -> DOUT {
             if (lhs == DOUT {1})
@@ -185,7 +185,7 @@ namespace Langulus::SIMD
       using DOUT = Decay<TypeOf<OUT>>;
       using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
-      return Inner::Evaluate<1, REGISTER, OUT>(
+      return Inner::Evaluate2<1, REGISTER, OUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
             return Inner::Power<DOUT>(lhs, rhs);

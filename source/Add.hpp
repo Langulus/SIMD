@@ -113,7 +113,7 @@ namespace Langulus::SIMD
       constexpr auto AddConstexpr(const auto& lhsOrig, const auto& rhsOrig) noexcept {
          using DOUT = Decay<TypeOf<OUT>>;
 
-         return Evaluate<0, Unsupported, OUT>(
+         return Evaluate2<0, Unsupported, OUT>(
             lhsOrig, rhsOrig, nullptr,
             [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
                return lhs + rhs;
@@ -130,7 +130,7 @@ namespace Langulus::SIMD
          using DOUT = Decay<TypeOf<OUT>>;
          using REGISTER = Register<decltype(lhsOrig), decltype(rhsOrig), OUT>;
 
-         return Evaluate<0, REGISTER, OUT>(
+         return Evaluate2<0, REGISTER, OUT>(
             lhsOrig, rhsOrig,
             [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
                LANGULUS_SIMD_VERBOSE("Adding (SIMD) as ", NameOf<REGISTER>());

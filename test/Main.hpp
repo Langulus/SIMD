@@ -19,12 +19,15 @@ using namespace Langulus;
 
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
 
+#define NUMBERS_REAL() \
+   float, double
+
 #define NUMBERS_SIGNED() \
    ::std::int8_t,   \
    ::std::int16_t,  \
    ::std::int32_t,  \
    ::std::int64_t,  \
-   float, double
+   NUMBERS_REAL()
 
 #define NUMBERS_UNSIGNED() \
    ::std::uint8_t,  \
@@ -56,13 +59,16 @@ using namespace Langulus;
    NUMBERS_SIGNED(),  \
    NUMBERS_UNSIGNED()
 
+#define VECTORS_REAL(S)         \
+   (Vector<float, S>),          \
+   (Vector<double, S>)
+
 #define VECTORS_SIGNED(S)       \
    (Vector<::std::int8_t, S>),  \
    (Vector<::std::int16_t, S>), \
    (Vector<::std::int32_t, S>), \
    (Vector<::std::int64_t, S>), \
-   (Vector<float, S>),          \
-   (Vector<double, S>)
+   VECTORS_REAL(S)
 
 #define VECTORS_UNSIGNED(S)     \
    (Vector<::std::uint8_t, S>), \

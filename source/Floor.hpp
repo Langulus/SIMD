@@ -16,15 +16,27 @@ namespace Langulus::SIMD
    namespace Inner
    {
 
+      /// Used to detect missing SIMD routine                                 
+      template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
+      constexpr Unsupported FloorSIMD(const T&) noexcept {
+         return {};
+      }
+
       /// Get floored values via SIMD                                         
       ///   @tparam T - the type of the array element                         
       ///   @tparam REGISTER - the register type (deducible)                  
-      ///   @param value - the array                                          
+      ///   @param value - the register                                       
       ///   @return the floored values                                        
       template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto Floor(UNUSED() const REGISTER& value) noexcept {
+      auto FloorSIMD(UNUSED() const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Suboptimal and pointless for whole numbers");
 
+      #if LANGULUS_COMPILER(CLANG) and LANGULUS(DEBUG)
+         // WORKAROUND for a Clang bug, see:                            
+         // https://github.com/simd-everywhere/simde/issues/1014        
+         //TODO hopefully it is fixed in the future                     
+         return Unsupported {};
+      #else
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::Float<T>)
@@ -61,19 +73,80 @@ namespace Langulus::SIMD
          else
       #endif
             LANGULUS_ERROR("Unsupported type");
+      #endif
+      }
+      
+      /// Floor (constexpr, no SIMD)                                          
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return array/scalar                                              
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      constexpr auto FloorConstexpr(const auto& value) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+
+         return Evaluate1<0, Unsupported, OUT>(
+            value, nullptr,
+            [](const DOUT& f) noexcept -> DOUT {
+               static_assert(CT::Real<DOUT>, "Pointless for whole numbers");
+               // std::floor isn't constexpr :(                         
+               //TODO waiting for C++23 support                         
+               const int64_t i = static_cast<int64_t>(f);
+               return f < i ? i - 1 : i;
+            }
+         );
+      }
+   
+      /// Floor (SIMD)                                                        
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///           or array/scalar if no viable SIMD routine exists          
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      auto FloorDynamic(const auto& value) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+         using REGISTER = ToSIMD<decltype(value), OUT>;
+
+         return Evaluate1<0, REGISTER, OUT>(
+            value,
+            [](const REGISTER& v) noexcept {
+               LANGULUS_SIMD_VERBOSE("Flooring (SIMD) as ", NameOf<REGISTER>());
+               return FloorSIMD<DOUT>(v);
+            },
+            [](const DOUT& v) noexcept -> DOUT {
+               static_assert(CT::Real<DOUT>, "Pointless for whole numbers");
+               LANGULUS_SIMD_VERBOSE("Flooring (Fallback) ", v, " (", NameOf<DOUT>(), ")");
+               return std::floor(v);
+            }
+         );
       }
 
    } // namespace Langulus::SIMD::Inner
 
-
-   /// Get the floor values                                                   
-   ///   @param T - type of the data (deducible)                              
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic T> LANGULUS(INLINED)
-   auto Floor(const T& value) noexcept {
-      using DT = Decay<TypeOf<T>>;
-      return Inner::Floor<DT>(Load<0>(value));
+   
+   /// Floor numbers, and force output to desired place                       
+   ///   @tparam VAL - array, scalar, or register (deducible)                 
+   ///   @tparam OUT - the desired element type (deducible)                   
+   ///   @attention may generate additional convert/store instructions in     
+   ///              order to fit the result in desired output                 
+   template<class VAL, CT::NotSemantic OUT> LANGULUS(INLINED)
+   constexpr void Floor(const VAL& val, OUT& out) noexcept {
+      IF_CONSTEXPR() {
+      StoreConstexpr(
+         Inner::FloorConstexpr<OUT>(DesemCast(val)), out);
+      }
+      else Store(
+         Inner::FloorDynamic<OUT>(DesemCast(val)), out);
+   }
+      
+   /// Floor numbers                                                          
+   ///   @tparam VAL - array, scalar, or register (deducible)                 
+   ///   @tparam OUT - the desired output type (lossless array by default)    
+   ///   @attention may generate additional convert/store instructions in     
+   ///              order to fit the result in desired output                 
+   template<class VAL, CT::NotSemantic OUT = LosslessArray<VAL, VAL>>
+   LANGULUS(INLINED)
+   constexpr auto Floor(const VAL& val) noexcept {
+      OUT out;
+      Floor(DesemCast(val), out);
+      return out;
    }
 
 } // namespace Langulus::SIMD
