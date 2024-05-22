@@ -218,7 +218,7 @@ namespace Langulus::SIMD
    constexpr auto DivideConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) {
       using DOUT = Decay<TypeOf<Desem<OUT>>>;
 
-      return Inner::Evaluate<1, Unsupported, OUT>(
+      return Inner::Evaluate2<1, Unsupported, OUT>(
          lhsOrig, rhsOrig, nullptr,
          [](const DOUT& lhs, const DOUT& rhs) -> DOUT {
             if (rhs == DOUT {0})
@@ -240,7 +240,7 @@ namespace Langulus::SIMD
       using DOUT = Decay<TypeOf<Desem<OUT>>>;
       using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
-      return Inner::Evaluate<1, REGISTER, OUT>(
+      return Inner::Evaluate2<1, REGISTER, OUT>(
          lhsOrig, rhsOrig,
          [](const REGISTER& lhs, const REGISTER& rhs) {
             return Inner::Divide<DOUT>(lhs, rhs);

@@ -147,7 +147,7 @@ namespace Langulus::SIMD
       constexpr auto MultiplyConstexpr(const auto& lhsOrig, const auto& rhsOrig) noexcept {
          using DOUT = TypeOf<SIMD::LosslessArray<OUT, OUT>>;
 
-         return Evaluate<0, Unsupported, OUT>(
+         return Evaluate2<0, Unsupported, OUT>(
             lhsOrig, rhsOrig, nullptr,
             [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
                if constexpr (CT::Same<DOUT, uint8_t>) {
@@ -174,7 +174,7 @@ namespace Langulus::SIMD
          using DOUT = TypeOf<SIMD::LosslessArray<OUT, OUT>>;
          using REGISTER = Register<decltype(lhsOrig), decltype(rhsOrig), OUT>;
 
-         return Evaluate<0, REGISTER, OUT>(
+         return Evaluate2<0, REGISTER, OUT>(
             lhsOrig, rhsOrig,
             [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
                LANGULUS_SIMD_VERBOSE("Multiplying (SIMD)");

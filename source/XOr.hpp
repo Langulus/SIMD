@@ -88,7 +88,7 @@ namespace Langulus::SIMD
    constexpr auto XOrConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
       using DOUT = Decay<TypeOf<OUT>>;
 
-      return Inner::Evaluate<0, Unsupported, OUT>(
+      return Inner::Evaluate2<0, Unsupported, OUT>(
          lhsOrig, rhsOrig, nullptr,
          [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
             return lhs ^ rhs;
@@ -108,7 +108,7 @@ namespace Langulus::SIMD
       using DOUT = Decay<TypeOf<OUT>>;
       using REGISTER = Inner::Register<LHS, RHS, OUT>;
 
-      return Inner::Evaluate<0, REGISTER, OUT>(
+      return Inner::Evaluate2<0, REGISTER, OUT>(
          lhsOrig, rhsOrig, 
          [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
             return Inner::XOr<DOUT>(lhs, rhs);

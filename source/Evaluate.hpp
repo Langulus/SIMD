@@ -6,6 +6,78 @@
 namespace Langulus::SIMD::Inner
 {
 
+   /// Fallback OP with one argument                                          
+   ///   @tparam OUT - the desired output array/vector/scalar                 
+   ///   @tparam VAL - array/vector/scalar  (deducible)                       
+   ///   @tparam FFALL - the operation to invoke on fallback (deducible)      
+   ///   @param val - argument                                                
+   ///   @param op - the fallback function to invoke                          
+   ///   @return the resulting number/bool/std::array of numbers/bools        
+   template<class OUT, class VAL, class FFALL>
+   NOD() LANGULUS(INLINED)
+   constexpr auto Fallback1(VAL& val, FFALL&& op) {
+      using RETURN = SIMD::LosslessArray<VAL, VAL>;
+      using LOSSLESS = TypeOf<RETURN>;
+      constexpr auto S = CountOf<RETURN>;
+
+      if constexpr (CT::Vector<VAL>) {
+         // Vector OP                                                   
+         RETURN output;
+         for (Count i = 0; i < S; ++i) {
+            output[i] = static_cast<LOSSLESS>(op(
+               static_cast<LOSSLESS>(DenseCast(val[i]))
+            ));
+         }
+
+         return output;
+      }
+      else {
+         // Scalar OP                                                   
+         // Casts are no-op if types are the same                       
+         return static_cast<LOSSLESS>(op(
+            static_cast<LOSSLESS>(DenseCast(GetFirst(val)))
+         ));
+      }
+   }
+
+   /// Attempt register encapsulation of LHS and RHS arrays                   
+   /// Check if result of opSIMD is supported and return it, otherwise        
+   /// fallback to opFALL and calculate conventionally                        
+   ///   @tparam DEF - default value to fill empty register regions           
+   ///                 useful against division-by-zero cases                  
+   ///   @tparam REGISTER - the register to use for the SIMD operation        
+   ///   @tparam OUT - the type of data we want as a result                   
+   ///   @tparam VAL - number type (deducible)                                
+   ///   @tparam FSIMD - the SIMD operation to invoke (deducible)             
+   ///   @tparam FFALL - the fallback operation to invoke (deducible)         
+   ///   @param val - argument                                                
+   ///   @param opSIMD - the function to invoke                               
+   ///   @param opFALL - the function to invoke                               
+   ///   @return the result (either std::array, number, or register)          
+   template<auto DEF, class REGISTER, class OUT, class VAL, class FSIMD, class FFALL>
+   NOD() LANGULUS(INLINED)
+   constexpr auto Evaluate1(const VAL& val, FSIMD&& opSIMD, FFALL&& opFALL) {
+      using OUTSIMD = InvocableResult1<FSIMD, REGISTER>;
+      constexpr auto S = CountOf<VAL>;
+      LANGULUS_SIMD_VERBOSE_TAB("Evaluated to count of ", S);
+
+      if constexpr (S < 2 or CT::NotSIMD<REGISTER> or CT::NotSIMD<OUTSIMD>) {
+         // Call the fallback routine if unsupported, or size 1         
+         return Fallback1<OUT>(val, ::std::move(opFALL));
+      }
+      else if constexpr (CT::Vector<VAL>) {
+         // VAL is vector, so wrap in a register                        
+         LANGULUS_SIMD_VERBOSE("Both sides are vectors");
+         return opSIMD(Convert<DEF, OUT>(val));
+      }
+      else {
+         // VAL is scalar (or anything else)                            
+         // Just fallback and use the appropriate operator              
+         return Fallback1<OUT>(val, ::std::move(opFALL));
+      }
+   }
+
+   
    /// Fallback OP on a single pair of dense numbers                          
    /// It converts LHS and RHS to the most lossless of the two                
    ///   @tparam OUT - the desired output array/vector/scalar                 
@@ -18,7 +90,7 @@ namespace Langulus::SIMD::Inner
    ///   @return the resulting number/bool/std::array of numbers/bools        
    template<class OUT, class LHS, class RHS, class FFALL>
    NOD() LANGULUS(INLINED)
-   constexpr auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) {
+   constexpr auto Fallback2(LHS& lhs, RHS& rhs, FFALL&& op) {
       using RETURN = SIMD::LosslessArray<LHS, RHS>;
       using LOSSLESS = TypeOf<RETURN>;
       //using RESULT = InvocableResult<FFALL, LOSSLESS>;
@@ -90,14 +162,14 @@ namespace Langulus::SIMD::Inner
    ///   @return the result (either std::array, number, or register)          
    template<auto DEF, class REGISTER, class OUT, class LHS, class RHS, class FSIMD, class FFALL>
    NOD() LANGULUS(INLINED)
-   constexpr auto Evaluate(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) {
-      using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
+   constexpr auto Evaluate2(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) {
+      using OUTSIMD = InvocableResult2<FSIMD, REGISTER>;
       constexpr auto S = OverlapCounts<LHS, RHS>();
       LANGULUS_SIMD_VERBOSE_TAB("Evaluated to overlapped count of ", S);
 
       if constexpr (S < 2 or CT::NotSIMD<REGISTER> or CT::NotSIMD<OUTSIMD>) {
          // Call the fallback routine if unsupported, or size 1         
-         return Fallback<OUT>(lhs, rhs, ::std::move(opFALL));
+         return Fallback2<OUT>(lhs, rhs, ::std::move(opFALL));
       }
       else if constexpr (CT::Vector<LHS> and CT::Vector<RHS>) {
          // Both LHS and RHS are vectors, so wrap in registers          
@@ -124,7 +196,7 @@ namespace Langulus::SIMD::Inner
       else {
          // Both LHS and RHS are scalars (or anything else)             
          // Just fallback and use the appropriate operator              
-         return Fallback<OUT>(lhs, rhs, ::std::move(opFALL));
+         return Fallback2<OUT>(lhs, rhs, ::std::move(opFALL));
       }
    }
 

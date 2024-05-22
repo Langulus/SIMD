@@ -768,7 +768,15 @@ namespace Langulus::SIMD
    namespace Inner
    {
       template<class F, class T>
-      consteval auto InvocableResultInner() noexcept {
+      consteval auto InvocableResultInner1() noexcept {
+         if constexpr (CT::Nullptr<F>)
+            return Unsupported {};
+         else
+            return ::std::invoke_result_t<F, T> {};
+      }
+
+      template<class F, class T>
+      consteval auto InvocableResultInner2() noexcept {
          if constexpr (CT::Nullptr<F>)
             return Unsupported {};
          else
@@ -777,7 +785,10 @@ namespace Langulus::SIMD
    }
 
    template<class F, class T>
-   using InvocableResult = decltype(Inner::InvocableResultInner<F, T>());
+   using InvocableResult1 = decltype(Inner::InvocableResultInner1<F, T>());
+
+   template<class F, class T>
+   using InvocableResult2 = decltype(Inner::InvocableResultInner2<F, T>());
 
 } // namespace Langulus::SIMD
 
