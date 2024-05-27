@@ -60,42 +60,42 @@ TEMPLATE_TEST_CASE("Floor", "[floor]"
 
       WHEN("Floored as constexpr") {
          {
-            constexpr T lhs {-1.0};
-            constexpr T res {-1.0};
+            constexpr T lhs = static_cast<T>(-1.0f);
+            constexpr T res = static_cast<T>(-1.0f);
             static_assert(SIMD::Floor(lhs) == res);
          }
 
          {
-            constexpr T lhs {-0.5};
-            constexpr T res {-1.0};
+            constexpr T lhs = static_cast<T>(-0.5f);
+            constexpr T res = static_cast<T>(-1.0f);
             static_assert(SIMD::Floor(lhs) == res);
          }
 
          {
-            constexpr T lhs {0.0};
-            constexpr T res {0.0};
+            constexpr T lhs = 0;
+            constexpr T res = 0;
             static_assert(SIMD::Floor(lhs) == res);
          }
 
          {
-            constexpr T lhs {1.0};
-            constexpr T res {1.0};
+            constexpr T lhs = static_cast<T>(1.0f);
+            constexpr T res = static_cast<T>(1.0f);
             static_assert(SIMD::Floor(lhs) == res);
          }
 
          {
-            constexpr T lhs {1.2};
-            constexpr T res {1.0};
+            constexpr T lhs = static_cast<T>(1.2f);
+            constexpr T res = static_cast<T>(1.0f);
             static_assert(SIMD::Floor(lhs) == res);
          }
          {
-            constexpr T lhs {1.5};
-            constexpr T res {1.0};
+            constexpr T lhs = static_cast<T>(1.5f);
+            constexpr T res = static_cast<T>(1.0f);
             static_assert(SIMD::Floor(lhs) == res);
          }
          {
-            constexpr T lhs {2.0};
-            constexpr T res {2.0};
+            constexpr T lhs = static_cast<T>(2.0f);
+            constexpr T res = static_cast<T>(2.0f);
             static_assert(SIMD::Floor(lhs) == res);
          }
       }
