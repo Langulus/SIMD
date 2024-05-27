@@ -90,7 +90,7 @@ namespace Langulus::SIMD
                // std::floor isn't constexpr :(                         
                //TODO waiting for C++23 support                         
                const int64_t i = static_cast<int64_t>(f);
-               return f < i ? i - 1 : i;
+               return static_cast<DOUT>(f < i ? i - 1 : i);
             }
          );
       }
