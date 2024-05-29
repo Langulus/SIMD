@@ -3,8 +3,7 @@
 /// Copyright (c) 2019 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #include "Main.hpp"
 #include <catch2/catch.hpp>
@@ -60,42 +59,42 @@ TEMPLATE_TEST_CASE("Ceil", "[ceil]"
 
       WHEN("Ceiled as constexpr") {
          {
-            constexpr T lhs {-1.0};
-            constexpr T res {-1.0};
+            constexpr T lhs = static_cast<T>(-1.0f);
+            constexpr T res = static_cast<T>(-1.0f);
             static_assert(SIMD::Ceil(lhs) == res);
          }
 
          {
-            constexpr T lhs {-0.5};
-            constexpr T res { 0.0};
+            constexpr T lhs = static_cast<T>(-0.5f);
+            constexpr T res = static_cast<T>( 0.0f);
             static_assert(SIMD::Ceil(lhs) == res);
          }
 
          {
-            constexpr T lhs {0.0};
-            constexpr T res {0.0};
+            constexpr T lhs = 0;
+            constexpr T res = 0;
             static_assert(SIMD::Ceil(lhs) == res);
          }
 
          {
-            constexpr T lhs {1.0};
-            constexpr T res {1.0};
+            constexpr T lhs = static_cast<T>(1.0f);
+            constexpr T res = static_cast<T>(1.0f);
             static_assert(SIMD::Ceil(lhs) == res);
          }
 
          {
-            constexpr T lhs {1.2};
-            constexpr T res {2.0};
+            constexpr T lhs = static_cast<T>(1.2f);
+            constexpr T res = static_cast<T>(2.0f);
             static_assert(SIMD::Ceil(lhs) == res);
          }
          {
-            constexpr T lhs {1.5};
-            constexpr T res {2.0};
+            constexpr T lhs = static_cast<T>(1.5f);
+            constexpr T res = static_cast<T>(2.0f);
             static_assert(SIMD::Ceil(lhs) == res);
          }
          {
-            constexpr T lhs {2.0};
-            constexpr T res {2.0};
+            constexpr T lhs = static_cast<T>(2.0f);
+            constexpr T res = static_cast<T>(2.0f);
             static_assert(SIMD::Ceil(lhs) == res);
          }
       }

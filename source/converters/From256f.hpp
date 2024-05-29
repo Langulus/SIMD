@@ -3,8 +3,7 @@
 /// Copyright (c) 2019 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
 #include "From256f_To128f.hpp"
