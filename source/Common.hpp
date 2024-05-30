@@ -44,15 +44,16 @@ LANGULUS_EXCEPTION(DivisionByZero);
 
 #define LANGULUS_SIMD(a) LANGULUS_SIMD_##a()
 
+/// Make the rest of the code aware, that Langulus::SIMD has been included    
+#define LANGULUS_LIBRARY_SIMD() 1
+
 #ifndef LANGULUS_SIMD_VERBOSE
-   #define LANGULUS_SIMD_VERBOSE(...)
-   #define LANGULUS_SIMD_VERBOSE_TAB(...)
+   #define LANGULUS_SIMD_VERBOSE(...)     LANGULUS(NOOP)
+   #define LANGULUS_SIMD_VERBOSE_TAB(...) LANGULUS(NOOP)
 #else
    #undef LANGULUS_SIMD_VERBOSE
-   #define LANGULUS_SIMD_VERBOSE(...) \
-      Logger::Info(__VA_ARGS__)
-   #define LANGULUS_SIMD_VERBOSE_TAB(...) \
-      const auto scoped = Logger::Info(__VA_ARGS__, Logger::Tabs {})
+   #define LANGULUS_SIMD_VERBOSE(...)     Logger::Info(__VA_ARGS__)
+   #define LANGULUS_SIMD_VERBOSE_TAB(...) const auto scoped = Logger::Info(__VA_ARGS__, Logger::Tabs {})
 #endif
 
 
@@ -203,12 +204,12 @@ LANGULUS_EXCEPTION(DivisionByZero);
 
 #if LANGULUS_SIMD(128BIT) or LANGULUS_SIMD(256BIT) or LANGULUS_SIMD(512BIT)
    #undef LANGULUS_SIMD_ENABLED
-   #define LANGULUS_SIMD_ENABLED() 1
-   #define IF_LANGULUS_SIMD(a) a
-   #define IF_NOT_LANGULUS_SIMD(a)
+   #define LANGULUS_SIMD_ENABLED()  1
+   #define IF_LANGULUS_SIMD(a)      a
+   #define IF_NOT_LANGULUS_SIMD(a)  LANGULUS(NOOP)
 #else
-   #define IF_LANGULUS_SIMD(a) 
-   #define IF_NOT_LANGULUS_SIMD(a) a
+   #define IF_LANGULUS_SIMD(a)      LANGULUS(NOOP)
+   #define IF_NOT_LANGULUS_SIMD(a)  a
 #endif
 
 #include "IgnoreWarningsPush.inl"
@@ -793,5 +794,3 @@ namespace Langulus::SIMD
 
 #include "IgnoreWarningsPop.inl"
 
-/// Make the rest of the code aware, that Langulus::SIMD has been included    
-#define LANGULUS_LIBRARY_SIMD() 1
