@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.28)
 project(LangulusSIMD
     VERSION         1.0.0
     DESCRIPTION     "Langulus SIMD templates layer based on SIMDe library"
