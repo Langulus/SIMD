@@ -22,7 +22,7 @@ namespace Langulus::SIMD
       ///   @param from - the source register                                 
       ///   @param to - the destination array                                 
       template<CT::SIMD FROM, CT::NotSIMD TO> LANGULUS(INLINED)
-      void Store(UNUSED() const FROM& from, UNUSED() TO& to) noexcept {
+      void StoreSIMD(UNUSED() const FROM& from, UNUSED() TO& to) noexcept {
          constexpr auto S = CountOf<TO>;
          static_assert(S > 1, 
             "Storing less than two elements is suboptimal "
@@ -329,91 +329,91 @@ namespace Langulus::SIMD
       #endif
          LANGULUS_ERROR("Unsupported FROM register for SIMD::Store");
       }
-   
-   } // namespace Langulus::SIMD::Inner
 
-
-   /// Fallback store routine, doesn't use SIMD                               
-   ///   @tparam FROM - any source type, SIMD register, std::array,           
-   ///                  boolvector, or scalar                                 
-   ///   @tparam TO - any destination type, array or scalar                   
-   ///   @param from - what to store                                          
-   ///   @param to - where to store it                                        
-   template<CT::NotSIMD FROM, CT::NotSIMD TO> LANGULUS(INLINED)
-   constexpr void StoreConstexpr(const FROM& from, TO& to) noexcept {
-      if constexpr (CT::Bitmask<FROM>) {
-         // Extract from bitmask (produced from SIMD compare routine)   
-         if constexpr (CT::Bitmask<TO>) {
-            // Store in another bitmask                                 
-            DenseCast(to) = from;
-         }
-         else if constexpr (CountOf<TO> == 1) {
-            if constexpr (CT::Bool<TypeOf<TO>>) {
+      /// Fallback store routine, doesn't use SIMD                            
+      ///   @tparam FROM - any source type, SIMD register, std::array,        
+      ///                  boolvector, or scalar                              
+      ///   @tparam TO - any destination type, array or scalar                
+      ///   @param from - what to store                                       
+      ///   @param to - where to store it                                     
+      template<CT::NotSIMD FROM, CT::NotSIMD TO> LANGULUS(INLINED)
+      constexpr void StoreConstexpr(const FROM& from, TO& to) noexcept {
+         if constexpr (CT::Bitmask<FROM>) {
+            // Extract from bitmask (produced from SIMD compare routine)
+            if constexpr (CT::Bitmask<TO>) {
+               // Store in another bitmask                              
+               DenseCast(to) = from;
+            }
+            else if constexpr (CountOf<TO> == 1) {
+               if constexpr (CT::Bool<TypeOf<TO>>) {
+                  // Convert each bit to a boolean inside an array      
+                  to = static_cast<bool>(from);
+               }
+               else LANGULUS_ERROR("Bad output to store a bitmask");
+            }
+            else if constexpr (CT::Bool<TypeOf<TO>>) {
                // Convert each bit to a boolean inside an array         
-               to = static_cast<bool>(from);
+               static_assert(CountOf<FROM> == CountOf<TO>, "Counts must match");
+               for (Offset i = 0; i < CountOf<TO>; ++i)
+                  DenseCast(to[i]) = from[i];
             }
             else LANGULUS_ERROR("Bad output to store a bitmask");
          }
-         else if constexpr (CT::Bool<TypeOf<TO>>) {
-            // Convert each bit to a boolean inside an array            
-            static_assert(CountOf<FROM> == CountOf<TO>, "Counts must match");
-            for (Offset i = 0; i < CountOf<TO>; ++i)
-               DenseCast(to[i]) = from[i];
-         }
-         else LANGULUS_ERROR("Bad output to store a bitmask");
-      }
-      else if constexpr (::std::ranges::range<FROM>) {
-         // Extract from anything that has begin() and end() methods    
-         if constexpr (CT::Bitmask<TO>) {
-            // Store as bitmask                                         
-            using T = typename Decay<TO>::Type;
-            for (decltype(from.size()) i = 0; i < from.size(); ++i)
-               DenseCast(to) |= (static_cast<T>(from[i]) << static_cast<T>(i));
-         }
-         else if constexpr (CountOf<TO> == 1) {
-            // Store as a single number (produced from fallback)        
-            if constexpr (CT::Bool<TypeOf<TO>>) {
-               // Short-circuit on first false flag (AND logic)         
-               for (auto& it : from) {
-                  if (not it) {
-                     to = false;
-                     return;
-                  }
-               }
-
-               to = true;
-            }
-            else {
-               // Otherwise just copy first element                     
-               DenseCast(GetFirst(to)) = from[0];
-            }
-         }
-         else {
-            // Store to a sparse/dense output array                     
-            static_assert(CountOf<FROM> == CountOf<TO>, "Counts must match");
-            for (Count i = 0; i < CountOf<TO>; ++i)
-               DenseCast(to[i]) = from[i];
-         }
-      }
-      else {
-         // Extract from a scalar                                       
-         if constexpr (CountOf<TO> == 1) {
+         else if constexpr (::std::ranges::range<FROM>) {
+            // Extract from anything that has begin() and end() methods 
             if constexpr (CT::Bitmask<TO>) {
-               // Store to a single-bit bitmask                         
-               DenseCast(to) = from;
+               // Store as bitmask                                      
+               using T = typename Decay<TO>::Type;
+               for (decltype(from.size()) i = 0; i < from.size(); ++i)
+                  DenseCast(to) |= (static_cast<T>(from[i]) << static_cast<T>(i));
+            }
+            else if constexpr (CountOf<TO> == 1) {
+               // Store as a single number (produced from fallback)     
+               if constexpr (CT::Bool<TypeOf<TO>>) {
+                  // Short-circuit on first false flag (AND logic)      
+                  for (auto& it : from) {
+                     if (not it) {
+                        to = false;
+                        return;
+                     }
+                  }
+
+                  to = true;
+               }
+               else {
+                  // Otherwise just copy first element                  
+                  DenseCast(GetFirst(to)) = from[0];
+               }
             }
             else {
-               // Store to an output array of size 1, or scalar         
-               DenseCast(Inner::GetFirst(to)) = from;
+               // Store to a sparse/dense output array                  
+               static_assert(CountOf<FROM> == CountOf<TO>, "Counts must match");
+               for (Count i = 0; i < CountOf<TO>; ++i)
+                  DenseCast(to[i]) = from[i];
             }
          }
          else {
-            // Multicast only result to an output array                 
-            for (Count i = 0; i < CountOf<TO>; ++i)
-               DenseCast(to[i]) = from;
+            // Extract from a scalar                                    
+            if constexpr (CountOf<TO> == 1) {
+               if constexpr (CT::Bitmask<TO>) {
+                  // Store to a single-bit bitmask                      
+                  DenseCast(to) = from;
+               }
+               else {
+                  // Store to an output array of size 1, or scalar      
+                  DenseCast(Inner::GetFirst(to)) = from;
+               }
+            }
+            else {
+               // Multicast only result to an output array              
+               for (Count i = 0; i < CountOf<TO>; ++i)
+                  DenseCast(to[i]) = from;
+            }
          }
       }
-   }
+
+   } // namespace Langulus::SIMD::Inner
+
 
    /// Generalized store routine                                              
    /// Can be either constexpr or not, using SIMD or not                      
@@ -425,11 +425,66 @@ namespace Langulus::SIMD
    template<CT::NotSemantic FROM, CT::NotSIMD TO> LANGULUS(INLINED)
    constexpr void Store(const FROM& from, TO& to) noexcept {
       if constexpr (CT::SIMD<FROM>)
-         Inner::Store(from, to);
+         Inner::StoreSIMD(from, to);
       else
-         StoreConstexpr(from, to);
+         Inner::StoreConstexpr(from, to);
    }
 
 } // namespace Langulus::SIMD
+
+
+#define LANGULUS_SIMD_ARITHMETHIC_API(OP) \
+   template<class LHS, class RHS, CT::NotSemantic OUT> LANGULUS(INLINED) \
+   constexpr void OP(const LHS& lhs, const RHS& rhs, OUT& out) noexcept { \
+      if constexpr (CT::SIMD<OUT>) \
+         out = Inner::OP<OUT>(lhs, rhs); \
+      else if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>) \
+         Store(Inner::OP<OUT>(lhs, rhs), out); \
+      else { \
+         if consteval { \
+            Store(Inner::OP##Constexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out); \
+         } \
+         else { \
+            Store(Inner::OP<OUT>(DesemCast(lhs), DesemCast(rhs)), out); \
+         } \
+      } \
+   } \
+   template<class LHS, class RHS, CT::NotSemantic OUT = LosslessArray<LHS, RHS>> \
+   LANGULUS(INLINED) \
+   constexpr auto OP(const LHS& lhs, const RHS& rhs) noexcept { \
+      OUT out; \
+      OP(DesemCast(lhs), DesemCast(rhs), out); \
+      if constexpr (CT::Similar<LHS, RHS> or CT::DerivedFrom<LHS, RHS>) \
+         return LHS {out}; \
+      else if constexpr (CT::DerivedFrom<RHS, LHS>) \
+         return RHS {out}; \
+      else \
+         return out; \
+   }
+
+#define LANGULUS_SIMD_ARITHMETHIC_UNARY_API(OP) \
+   template<class VAL, CT::NotSemantic OUT> LANGULUS(INLINED) \
+   constexpr void OP(const VAL& val, OUT& out) noexcept { \
+      if constexpr (CT::SIMD<OUT>) \
+         out = Inner::OP<OUT>(val); \
+      else if constexpr (CT::SIMD<VAL>) \
+         Store(Inner::OP<OUT>(val), out); \
+      else { \
+         if consteval { \
+            Store(Inner::OP##Constexpr<OUT>(DesemCast(val)), out); \
+         } \
+         else { \
+            Store(Inner::OP<OUT>(DesemCast(val)), out); \
+         } \
+      } \
+   } \
+   template<class VAL, CT::NotSemantic OUT = LosslessArray<VAL, VAL>> \
+   LANGULUS(INLINED) \
+   constexpr auto OP(const VAL& val) noexcept { \
+      OUT out; \
+      OP(DesemCast(val), out); \
+      return out; \
+   }
+
 
 #include "IgnoreWarningsPop.inl"

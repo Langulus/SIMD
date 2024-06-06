@@ -17,7 +17,7 @@ namespace Langulus::SIMD
 
       /// Used to detect missing SIMD routine                                 
       template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
-      constexpr Unsupported ShiftLeft(const T&, const T&) noexcept {
+      constexpr Unsupported ShiftLeftSIMD(const T&, const T&) noexcept {
          return {};
       }
 
@@ -34,7 +34,7 @@ namespace Langulus::SIMD
       ///   @param rhs - the right-hand-side array                            
       ///   @return the shifted elements as a register                        
       template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto ShiftLeft(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
+      auto ShiftLeftSIMD(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
          static_assert(CT::IntegerX<Decay<T>>, "Can only shift integers");
 
          #if LANGULUS_SIMD(128BIT)
@@ -214,107 +214,68 @@ namespace Langulus::SIMD
             LANGULUS_ERROR("Unsupported type");
       }
 
+      /// Shift bits left                                                     
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///      or array/scalar if no viable SIMD routine exists               
+      ///   @attention this differs from C++'s undefined behavior when        
+      ///      shifting by less than zero, or by a number larger than the     
+      ///      bitcount. The SIMD operations define this behavior very well,  
+      ///      by just defaulting to zero. It is our responsibility to keep   
+      ///      this behavior consistent across C++ and SIMD, so the fallback  
+      ///      routine has additional overhead for checking the rhs range and 
+      ///      zeroing.                                                       
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      constexpr auto ShiftLeftConstexpr(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = TypeOf<SIMD::LosslessArray<OUT, OUT>>;
+         static_assert(CT::IntegerX<Decay<TypeOf<DOUT>>>,
+            "Can only shift integers");
+
+         return Inner::Evaluate2<0, Unsupported, OUT>(
+            lhsOrig, rhsOrig, nullptr,
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+               // Well defined condition in SIMD calls, that is         
+               // otherwise undefined behavior by C++ standard          
+               return rhs < DOUT {sizeof(DOUT) * 8} and rhs >= 0
+                  ? lhs << rhs : 0;
+            }
+         );
+      }
+
+      /// Shift bits left                                                     
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///      or array/scalar if no viable SIMD routine exists               
+      ///   @attention this differs from C++'s undefined behavior when        
+      ///      shifting by less than zero, or by a number larger than the     
+      ///      bitcount. The SIMD operations define this behavior very well,  
+      ///      by just defaulting to zero. It is our responsibility to keep   
+      ///      this behavior consistent across C++ and SIMD, so the fallback  
+      ///      routine has additional overhead for checking the rhs range and 
+      ///      zeroing.                                                       
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      auto ShiftLeft(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = TypeOf<SIMD::LosslessArray<OUT, OUT>>;
+         using REGISTER = Register<decltype(lhsOrig), decltype(rhsOrig), OUT>;
+         static_assert(CT::IntegerX<Decay<TypeOf<DOUT>>>,
+            "Can only shift integers");
+
+         return Inner::Evaluate2<0, REGISTER, OUT>(
+            lhsOrig, rhsOrig,
+            [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+               return ShiftLeftSIMD<DOUT>(lhs, rhs);
+            },
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+               // Well defined condition in SIMD calls, that is         
+               // otherwise undefined behavior by C++ standard          
+               return rhs < DOUT {sizeof(DOUT) * 8} and rhs >= 0
+                  ? lhs << rhs : 0;
+            }
+         );
+      }
+
    } // namespace Langulus::SIMD::Inner
 
-
-   /// Shift bits left                                                        
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   ///   @attention this differs from C++'s undefined behavior when shifting  
-   ///      by less than zero, or by a number larger than the bitcount.       
-   ///      the SIMD operations define this behavior very well, by just       
-   ///      defaulting to zero. It is our responsibility to keep this         
-   ///      behavior consistent across C++ and SIMD, so the fallback routine  
-   ///      has additional overhead for checking the rhs range and zeroing.   
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   constexpr auto ShiftLeftConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      static_assert(CT::IntegerX<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>,
-         "Can only shift integers");
-
-      using DOUT = Decay<TypeOf<OUT>>;
-
-      return Inner::Evaluate2<0, Unsupported, OUT>(
-         lhsOrig, rhsOrig, nullptr,
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            // Well defined condition in SIMD calls, that is otherwise  
-            // undefined behavior by C++ standard                       
-            return rhs < DOUT {sizeof(DOUT) * 8} and rhs >= 0
-               ? lhs << rhs : 0;
-         }
-      );
-   }
-   
-   /// Shift bits left                                                        
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   ///   @attention this differs from C++'s undefined behavior when shifting  
-   ///      by less than zero, or by a number larger than the bitcount.       
-   ///      the SIMD operations define this behavior very well, by just       
-   ///      defaulting to zero. It is our responsibility to keep this         
-   ///      behavior consistent across C++ and SIMD, so the fallback routine  
-   ///      has additional overhead for checking the rhs range and zeroing.   
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   auto ShiftLeftDynamic(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      static_assert(CT::IntegerX<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>,
-         "Can only shift integers");
-
-      using DOUT = Decay<TypeOf<OUT>>;
-      using REGISTER = Inner::Register<LHS, RHS, OUT>;
-
-      return Inner::Evaluate2<0, REGISTER, OUT>(
-         lhsOrig, rhsOrig, 
-         [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::ShiftLeft<DOUT>(lhs, rhs);
-         },
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            // Well defined condition in SIMD calls, that is otherwise  
-            // undefined behavior by C++ standard                       
-            return rhs < DOUT {sizeof(DOUT) * 8} and rhs >= 0
-               ? lhs << rhs : 0;
-         }
-      );
-   }
-
-   /// Shift bits left, and force output to desired place                     
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (deducible)                   
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   ///   @attention this differs from C++'s undefined behavior when shifting  
-   ///      by less than zero, or by a number larger than the bitcount.       
-   ///      The SIMD operations define this behavior very well, by just       
-   ///      defaulting to zero. It is our responsibility to keep this         
-   ///      behavior consistent across C++ and SIMD, so the fallback routine  
-   ///      has additional overhead for checking the rhs range and zeroing.   
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
-   constexpr void ShiftLeft(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
-      IF_CONSTEXPR() {
-         StoreConstexpr(ShiftLeftConstexpr<LHS, RHS, OUT>(lhs, rhs), output);
-      }
-      else Store(ShiftLeftDynamic<LHS, RHS, OUT>(lhs, rhs), output);
-   }
-
-   /// Shift bits left                                                        
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired output type (lossless array by default)    
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
-   LANGULUS(INLINED)
-   constexpr OUT ShiftLeft(const LHS& lhs, const RHS& rhs) noexcept {
-      OUT out;
-      ShiftLeft(lhs, rhs, out);
-      return out;
-   }
+   LANGULUS_SIMD_ARITHMETHIC_API(ShiftLeft)
 
 } // namespace Langulus::SIMD

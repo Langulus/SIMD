@@ -17,7 +17,7 @@ namespace Langulus::SIMD
 
       /// Used to detect missing SIMD routine                                 
       template<CT::Decayed, Count, CT::NotSIMD T> LANGULUS(INLINED)
-      constexpr Unsupported EqualsOrLesser(const T&, const T&) noexcept {
+      constexpr Unsupported EqualsOrLesserSIMD(const T&, const T&) noexcept {
          return {};
       }
       
@@ -30,7 +30,7 @@ namespace Langulus::SIMD
       ///   @return a bitmask with the results, or Inner::NotSupported        
       /// https://giannitedesco.github.io/2019/03/08/simd-cmp-bitmasks.html   
       template<CT::Decayed T, Count S, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto EqualsOrLesser(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
+      auto EqualsOrLesserSIMD(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::SignedInteger8<T>) {
@@ -350,83 +350,79 @@ namespace Langulus::SIMD
       #endif
          LANGULUS_ERROR("Unsupported type");
       }
+      
+      /// Compare numbers for equal-or-less at compile-time, if possible      
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return array/scalar                                              
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      constexpr auto EqualsOrLesserConstexpr(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         // Output will likely contain a bool vector, or a bitmask      
+         // so make sure we operate on Lossless<LHS, RHS>               
+         using DOUT = Decay<TypeOf<Lossless<decltype(lhsOrig), decltype(rhsOrig)>>>;
+
+         return Inner::Evaluate2<0, Unsupported, OUT>(
+            lhsOrig, rhsOrig, nullptr,
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> bool {
+               return lhs <= rhs;
+            }
+         );
+      }
+   
+      /// Compare numbers for equal-or-less and return a bitmask              
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///      or array/scalar if no viable SIMD routine exists               
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      auto EqualsOrLesser(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using LOSSLESS = Lossless<decltype(lhsOrig), decltype(rhsOrig)>;
+         using DOUT = Decay<TypeOf<LOSSLESS>>;
+         using REGISTER = Inner::Register<decltype(lhsOrig), decltype(rhsOrig), LOSSLESS>;
+         constexpr auto S = OverlapCounts<decltype(lhsOrig), decltype(rhsOrig)>();
+
+         return Evaluate2<0, REGISTER, OUT>(
+            lhsOrig, rhsOrig,
+            [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+               LANGULUS_SIMD_VERBOSE("Comparing for equal-or-lesser (SIMD) as ", NameOf<REGISTER>());
+               return EqualsOrLesserSIMD<DOUT, S>(lhs, rhs);
+            },
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> bool {
+               LANGULUS_SIMD_VERBOSE("Comparing for equal-or-lesser (Fallback) ", lhs, " <= ", rhs, " (", NameOf<DOUT>(), ")");
+               return lhs <= rhs;
+            }
+         );
+      }
 
    } // namespace Langulus::SIMD::Inner
 
-
-   /// Compare numbers for equality or lesser                                 
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (bitmask by default)          
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
-   NOD() LANGULUS(INLINED)
-   constexpr auto EqualsOrLesserConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      // Output will likely contain a bool vector, or a bitmask         
-      // so make sure we operate on Lossless<LHS, RHS>                  
-      using DOUT = Decay<TypeOf<Lossless<LHS, RHS>>>;
-
-      return Inner::Evaluate2<0, Unsupported, OUT>(
-         lhsOrig, rhsOrig, nullptr,
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> bool {
-            return lhs <= rhs;
-         }
-      );
-   }
-
-   /// Compare numbers for equality or lesser                                 
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (bitmask by default)          
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
-   NOD() LANGULUS(INLINED)
-   auto EqualsOrLesserDynamic(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      // Output will likely contain a bool vector, or a bitmask         
-      // so make sure we operate on Lossless<LHS, RHS>                  
-      using LOSSLESS = Lossless<LHS, RHS>;
-      using DOUT = Decay<TypeOf<LOSSLESS>>;
-      using REGISTER = Inner::Register<LHS, RHS, LOSSLESS>;
-      constexpr auto S = OverlapCounts<LHS, RHS>();
-
-      return Inner::Evaluate2<0, REGISTER, OUT>(
-         lhsOrig, rhsOrig,
-         [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::EqualsOrLesser<DOUT, S>(lhs, rhs);
-         },
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> bool {
-            return lhs <= rhs;
-         }
-      );
-   }
-
-   /// Compare numbers for equal-or-less, and force to desired output         
+   /// Compare numbers for equal-or-less, force output to desired place       
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
    ///   @tparam OUT - the desired element type (deducible)                   
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
+   ///   @attention will generate additional store (and convert) instructions 
+   ///      in order to fit the result in 'out'. Use Inner::EqualsOrGreater   
+   ///      if you don't want this.                                           
+   template<class LHS, class RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
    constexpr void EqualsOrLesser(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-      IF_CONSTEXPR() {
-         StoreConstexpr(EqualsOrLesserConstexpr(lhs, rhs), out);
+      if consteval {
+         Store(Inner::EqualsOrLesserConstexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
       }
-      else Store(EqualsOrLesserDynamic(lhs, rhs), out);
+      else {
+         Store(Inner::EqualsOrLesser<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
+      }
    }
 
    /// Compare numbers for equal-or-less                                      
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (defaults to bitmask)         
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
+   ///   @tparam OUT - the desired output type (lossless array by default)    
+   ///   @attention will generate additional store (and convert) instructions 
+   ///      in order to fit the result in an instance of 'OUT'. Use           
+   ///      Inner::EqualsOrGreater if you don't want this.                    
+   template<class LHS, class RHS, CT::NotSemantic OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
    LANGULUS(INLINED)
    constexpr OUT EqualsOrLesser(const LHS& lhs, const RHS& rhs) noexcept {
       OUT out;
-      EqualsOrLesser(lhs, rhs, out);
+      EqualsOrLesser(DesemCast(lhs), DesemCast(rhs), out);
       return out;
    }
 

@@ -18,7 +18,7 @@ namespace Langulus::SIMD
 
       /// Used to detect missing SIMD routine                                 
       template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
-      constexpr Unsupported Power(const T&, const T&) noexcept {
+      constexpr Unsupported PowerSIMD(const T&, const T&) noexcept {
          return {};
       }
 
@@ -29,7 +29,7 @@ namespace Langulus::SIMD
       ///   @param rhs - the right-hand-side array                            
       ///   @return the raised values                                         
       template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto Power(UNUSED() REGISTER lhs, UNUSED() REGISTER rhs) noexcept {
+      auto PowerSIMD(UNUSED() REGISTER lhs, UNUSED() REGISTER rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<REGISTER>) {
                if constexpr (CT::Float<T>)
@@ -122,132 +122,100 @@ namespace Langulus::SIMD
          #endif
             LANGULUS_ERROR("Unsupported type");
       }
+      
+      /// Exponentiate numbers at compile-time, if possible                   
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return array/scalar                                              
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      constexpr auto PowerConstexpr(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+
+         return Evaluate2<0, Unsupported, OUT>(
+            lhsOrig, rhsOrig, nullptr,
+            [](DOUT lhs, DOUT rhs) noexcept -> DOUT {
+               if (lhs == DOUT {1})
+                  return DOUT {1};
+
+               if constexpr (CT::IntegerX<DOUT>) {
+                  if constexpr (CT::Unsigned<DOUT>) {
+                     DOUT result {1};
+                     while (rhs != DOUT {0}) {
+                        if ((rhs & DOUT {1}) != DOUT {0})
+                           result *= lhs;
+                        rhs >>= DOUT {1};
+                        lhs *= lhs;
+                     }
+                     return result;
+                  }
+                  else if (rhs > 0) {
+                     DOUT result {1};
+                     while (rhs != DOUT {0}) {
+                        result *= lhs;
+                        --rhs;
+                     }
+                     return result;
+                  }
+                  else return DOUT {0};
+               }
+               else if constexpr (CT::Real<DOUT>)
+                  return ::std::pow(lhs, rhs);
+               else
+                  LANGULUS_ERROR("T must be a number");
+            }
+         );
+      }
+   
+      /// Exponentiate numbers and return a register, if possible             
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///           or array/scalar if no viable SIMD routine exists          
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      auto Power(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+         using REGISTER = Register<decltype(lhsOrig), decltype(rhsOrig), OUT>;
+
+         return Evaluate2<0, REGISTER, OUT>(
+            lhsOrig, rhsOrig,
+            [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+               LANGULUS_SIMD_VERBOSE("Exponentiating (SIMD) as ", NameOf<REGISTER>());
+               return PowerSIMD<DOUT>(lhs, rhs);
+            },
+            [](DOUT lhs, DOUT rhs) noexcept -> DOUT {
+               LANGULUS_SIMD_VERBOSE("Exponentiating (Fallback) ", lhs, " ^ ", rhs, " (", NameOf<DOUT>(), ")");
+               if (lhs == DOUT {1})
+                  return DOUT {1};
+
+               if constexpr (CT::IntegerX<DOUT>) {
+                  if constexpr (CT::Unsigned<DOUT>) {
+                     DOUT result {1};
+                     while (rhs != DOUT {0}) {
+                        if ((rhs & DOUT {1}) != DOUT {0})
+                           result *= lhs;
+                        rhs >>= DOUT {1};
+                        lhs *= lhs;
+                     }
+                     return result;
+                  }
+                  else if (rhs > 0) {
+                     DOUT result {1};
+                     while (rhs != DOUT {0}) {
+                        result *= lhs;
+                        --rhs;
+                     }
+                     return result;
+                  }
+                  else return DOUT {0};
+               }
+               else if constexpr (CT::Real<DOUT>)
+                  return ::std::pow(lhs, rhs);
+               else
+                  LANGULUS_ERROR("T must be a number");
+            }
+         );
+      }
 
    } // namespace Langulus::SIMD::Inner
 
-
-   /// Raise numbers to a power                                               
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   constexpr auto PowerConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<TypeOf<OUT>>;
-
-      return Inner::Evaluate2<1, Unsupported, OUT>(
-         lhsOrig, rhsOrig, nullptr,
-         [](DOUT lhs, DOUT rhs) noexcept -> DOUT {
-            if (lhs == DOUT {1})
-               return DOUT {1};
-
-            if constexpr (CT::IntegerX<DOUT>) {
-               if constexpr (CT::Unsigned<DOUT>) {
-                  DOUT result {1};
-                  while (rhs != DOUT {0}) {
-                     if ((rhs & DOUT {1}) != DOUT {0})
-                        result *= lhs;
-                     rhs >>= DOUT {1};
-                     lhs *= lhs;
-                  }
-                  return result;
-               }
-               else if (rhs > 0) {
-                  DOUT result {1};
-                  while (rhs != DOUT {0}) {
-                     result *= lhs;
-                     --rhs;
-                  }
-                  return result;
-               }
-               else return DOUT {0};
-            }
-            else if constexpr (CT::Real<DOUT>)
-               return ::std::pow(lhs, rhs);
-            else
-               LANGULUS_ERROR("T must be a number");
-         }
-      );
-   }
-   
-   /// Raise numbers to a power                                               
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   auto PowerDynamic(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<TypeOf<OUT>>;
-      using REGISTER = Inner::Register<LHS, RHS, OUT>;
-
-      return Inner::Evaluate2<1, REGISTER, OUT>(
-         lhsOrig, rhsOrig, 
-         [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::Power<DOUT>(lhs, rhs);
-         },
-         [](DOUT lhs, DOUT rhs) noexcept -> DOUT {
-            if (lhs == DOUT {1})
-               return DOUT {1};
-
-            if constexpr (CT::IntegerX<DOUT>) {
-               if constexpr (CT::Unsigned<DOUT>) {
-                  DOUT result {1};
-                  while (rhs != DOUT {0}) {
-                     if ((rhs & DOUT {1}) != DOUT {0})
-                        result *= lhs;
-                     rhs >>= DOUT {1};
-                     lhs *= lhs;
-                  }
-                  return result;
-               }
-               else if (rhs > 0) {
-                  DOUT result {1};
-                  while (rhs != DOUT {0}) {
-                     result *= lhs;
-                     --rhs;
-                  }
-                  return result;
-               }
-               else return DOUT {0};
-            }
-            else if constexpr (CT::Real<DOUT>)
-               return ::std::pow(lhs, rhs);
-            else
-               LANGULUS_ERROR("T must be a number");
-         }
-      );
-   }
-
-   /// Raise numbers to a power, and force output to desired place            
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (deducible)                   
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
-   constexpr void Power(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-      IF_CONSTEXPR() {
-         StoreConstexpr(PowerConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
-      }
-      else Store(PowerDynamic<LHS, RHS, OUT>(lhs, rhs), out);
-   }
-
-   /// Raise numbers to a power                                               
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired output type (lossless array by default)    
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
-   LANGULUS(INLINED)
-   constexpr OUT Power(const LHS& lhs, const RHS& rhs) noexcept {
-      OUT out;
-      Power(lhs, rhs, out);
-      return out;
-   }
+   LANGULUS_SIMD_ARITHMETHIC_API(Power)
 
 } // namespace Langulus::SIMD

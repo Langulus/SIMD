@@ -18,7 +18,7 @@ namespace Langulus::SIMD
 
       /// Used to detect missing SIMD routine                                 
       template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
-      constexpr Unsupported XOr(const T&, const T&) noexcept {
+      constexpr Unsupported XOrSIMD(const T&, const T&) noexcept {
          return {};
       }
 
@@ -29,7 +29,7 @@ namespace Langulus::SIMD
       ///   @param rhs - the right-hand-side array                            
       ///   @return the xor'd elements as a register                          
       template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto XOr(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
+      auto XOrSIMD(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::SIMD128i<REGISTER>)
@@ -74,77 +74,46 @@ namespace Langulus::SIMD
             LANGULUS_ERROR("Unsupported type");
       }
 
+      /// XOr numbers at compile-time, if possible                            
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return array/scalar                                              
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      constexpr auto XOrConstexpr(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+
+         return Evaluate2<0, Unsupported, OUT>(
+            lhsOrig, rhsOrig, nullptr,
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+               return lhs ^ rhs;
+            }
+         );
+      }
+   
+      /// XOr numbers and return a register, if possible                      
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///           or array/scalar if no viable SIMD routine exists          
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      auto XOr(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+         using REGISTER = Register<decltype(lhsOrig), decltype(rhsOrig), OUT>;
+
+         return Evaluate2<0, REGISTER, OUT>(
+            lhsOrig, rhsOrig,
+            [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+               LANGULUS_SIMD_VERBOSE("Xoring (SIMD) as ", NameOf<REGISTER>());
+               return XOrSIMD<DOUT>(lhs, rhs);
+            },
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+               LANGULUS_SIMD_VERBOSE("Xoring (Fallback) ", lhs, " ^ ", rhs, " (", NameOf<DOUT>(), ")");
+               return lhs ^ rhs;
+            }
+         );
+      }
+
    } // namespace Langulus::SIMD::Inner
 
-
-   /// XOR numbers                                                            
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return array/scalar                                                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   constexpr auto XOrConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<TypeOf<OUT>>;
-
-      return Inner::Evaluate2<0, Unsupported, OUT>(
-         lhsOrig, rhsOrig, nullptr,
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            return lhs ^ rhs;
-         }
-      );
-   }
-
-   /// XOR numbers                                                            
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   auto XOrDynamic(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-      using DOUT = Decay<TypeOf<OUT>>;
-      using REGISTER = Inner::Register<LHS, RHS, OUT>;
-
-      return Inner::Evaluate2<0, REGISTER, OUT>(
-         lhsOrig, rhsOrig, 
-         [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::XOr<DOUT>(lhs, rhs);
-         },
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            return lhs ^ rhs;
-         }
-      );
-   }
-
-   /// XOR numbers, and force output to desired place                         
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (deducible)                   
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
-   constexpr void XOr(LHS& lhs, RHS& rhs, OUT& out) noexcept {
-      IF_CONSTEXPR() {
-         StoreConstexpr(XOrConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
-      }
-      else Store(XOrDynamic<LHS, RHS, OUT>(lhs, rhs), out);
-   }
-
-   /// XOR numbers                                                            
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired output type (lossless array by default)    
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
-   LANGULUS(INLINED)
-   constexpr OUT XOr(const LHS& lhs, const RHS& rhs) noexcept {
-      OUT out;
-      XOr(lhs, rhs, out);
-      return out;
-   }
+   LANGULUS_SIMD_ARITHMETHIC_API(XOr)
 
 } // namespace Langulus::SIMD
 

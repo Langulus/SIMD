@@ -19,7 +19,7 @@ namespace Langulus::SIMD
 
       /// Used to detect missing SIMD routine                                 
       template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
-      constexpr Unsupported Add(const T&, const T&) noexcept {
+      constexpr Unsupported AddSIMD(const T&, const T&) noexcept {
          return {};
       }
 
@@ -30,7 +30,7 @@ namespace Langulus::SIMD
       ///   @param rhs - the right-hand-side array                            
       ///   @return the added elements as a register                          
       template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto Add(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
+      auto AddSIMD(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<REGISTER>) {
                if constexpr (CT::SignedInteger8<T>)
@@ -105,7 +105,7 @@ namespace Langulus::SIMD
             LANGULUS_ERROR("Unsupported type");
       }
 
-      /// Add numbers                                                         
+      /// Add numbers at compile-time, if possible                            
       ///   @tparam OUT - the desired element type (lossless by default)      
       ///   @return array/scalar                                              
       template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
@@ -120,12 +120,12 @@ namespace Langulus::SIMD
          );
       }
    
-      /// Add numbers                                                         
+      /// Add numbers and return a register, if possible                      
       ///   @tparam OUT - the desired element type (lossless by default)      
       ///   @return a register, if viable SIMD routine exists                 
       ///           or array/scalar if no viable SIMD routine exists          
       template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
-      auto AddDynamic(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+      auto Add(const auto& lhsOrig, const auto& rhsOrig) noexcept {
          using DOUT = Decay<TypeOf<OUT>>;
          using REGISTER = Register<decltype(lhsOrig), decltype(rhsOrig), OUT>;
 
@@ -133,7 +133,7 @@ namespace Langulus::SIMD
             lhsOrig, rhsOrig,
             [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
                LANGULUS_SIMD_VERBOSE("Adding (SIMD) as ", NameOf<REGISTER>());
-               return Add<DOUT>(lhs, rhs);
+               return AddSIMD<DOUT>(lhs, rhs);
             },
             [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
                LANGULUS_SIMD_VERBOSE("Adding (Fallback) ", lhs, " + ", rhs, " (", NameOf<DOUT>(), ")");
@@ -144,36 +144,7 @@ namespace Langulus::SIMD
 
    } // namespace Langulus::SIMD::Inner
 
-
-   /// Add numbers, and force output to desired place                         
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (deducible)                   
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<class LHS, class RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
-   constexpr void Add(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-      IF_CONSTEXPR() {
-      StoreConstexpr(
-         Inner::AddConstexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
-      }
-      else Store(
-         Inner::AddDynamic<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
-   }
-
-   /// Add numbers                                                            
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired output type (lossless array by default)    
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<class LHS, class RHS, CT::NotSemantic OUT = LosslessArray<LHS, RHS>>
-   LANGULUS(INLINED)
-   constexpr OUT Add(const LHS& lhs, const RHS& rhs) noexcept {
-      OUT out;
-      Add(DesemCast(lhs), DesemCast(rhs), out);
-      return out;
-   }
+   LANGULUS_SIMD_ARITHMETHIC_API(Add)
 
 } // namespace Langulus::SIMD
 

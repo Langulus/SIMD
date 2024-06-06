@@ -18,7 +18,7 @@ namespace Langulus::SIMD
 
       /// Used to detect missing SIMD routine                                 
       template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
-      constexpr Unsupported Divide(const T&, const T&) noexcept {
+      constexpr Unsupported DivideSIMD(const T&, const T&) noexcept {
          return {};
       }
 
@@ -29,7 +29,7 @@ namespace Langulus::SIMD
       ///   @param rhs - the right-hand-side array                            
       ///   @return the divided elements as a register                        
       template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto Divide(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) {
+      auto DivideSIMD(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) {
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::UnsignedInteger8<T>) {
@@ -204,80 +204,92 @@ namespace Langulus::SIMD
          LANGULUS_ERROR("Unsupported type");
       }
 
+      /// Divide numbers at compile-time, if possible                         
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return array/scalar                                              
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      constexpr auto DivideConstexpr(const auto& lhsOrig, const auto& rhsOrig) {
+         using DOUT = Decay<TypeOf<OUT>>;
+
+         return Evaluate2<1, Unsupported, OUT>(
+            lhsOrig, rhsOrig, nullptr,
+            [](const DOUT& lhs, const DOUT& rhs) -> DOUT {
+               if (rhs == DOUT {0})
+                  LANGULUS_THROW(DivisionByZero, "Division by zero");
+               return lhs / rhs;
+            }
+         );
+      }
+
+      /// Divide numbers and return a register, if possible                   
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///           or array/scalar if no viable SIMD routine exists          
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      auto Divide(const auto& lhsOrig, const auto& rhsOrig) {
+         using DOUT = Decay<TypeOf<Desem<OUT>>>;
+         using REGISTER = Register<decltype(lhsOrig), decltype(rhsOrig), OUT>;
+
+         return Evaluate2<1, REGISTER, OUT>(
+            lhsOrig, rhsOrig,
+            [](const REGISTER& lhs, const REGISTER& rhs) {
+               LANGULUS_SIMD_VERBOSE("Dividing (SIMD) as ", NameOf<REGISTER>());
+               return DivideSIMD<DOUT>(lhs, rhs);
+            },
+            [](const DOUT& lhs, const DOUT& rhs) -> DOUT {
+               LANGULUS_SIMD_VERBOSE("Dividing (Fallback) ", lhs, " / ", rhs, " (", NameOf<DOUT>(), ")");
+               if (rhs == DOUT {0})
+                  LANGULUS_THROW(DivisionByZero, "Division by zero");
+               return lhs / rhs;
+            }
+         );
+      }
+
    } // namespace Langulus::SIMD::Inner
 
-
-   /// Divide numbers                                                         
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return array/scalar                                                 
-   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   constexpr auto DivideConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) {
-      using DOUT = Decay<TypeOf<Desem<OUT>>>;
-
-      return Inner::Evaluate2<1, Unsupported, OUT>(
-         lhsOrig, rhsOrig, nullptr,
-         [](const DOUT& lhs, const DOUT& rhs) -> DOUT {
-            if (rhs == DOUT {0})
-               LANGULUS_THROW(DivisionByZero, "Division by zero");
-            return lhs / rhs;
-         }
-      );
-   }
-
-   /// Divide numbers                                                         
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<class LHS, class RHS, class OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   auto DivideDynamic(const LHS& lhsOrig, const RHS& rhsOrig) {
-      using DOUT = Decay<TypeOf<Desem<OUT>>>;
-      using REGISTER = Inner::Register<LHS, RHS, OUT>;
-
-      return Inner::Evaluate2<1, REGISTER, OUT>(
-         lhsOrig, rhsOrig,
-         [](const REGISTER& lhs, const REGISTER& rhs) {
-            return Inner::Divide<DOUT>(lhs, rhs);
-         },
-         [](const DOUT& lhs, const DOUT& rhs) -> DOUT {
-            if (rhs == DOUT {0})
-               LANGULUS_THROW(DivisionByZero, "Division by zero");
-            return lhs / rhs;
-         }
-      );
-   }
 
    /// Divide numbers, and force output to desired place                      
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
    ///   @tparam OUT - the desired element type (deducible)                   
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
+   ///   @attention will generate additional store (and convert) instructions 
+   ///      in order to fit the result in 'out'. Use Inner::Divide if you     
+   ///      don't want this.                                                  
+   template<class LHS, class RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
    constexpr void Divide(const LHS& lhs, const RHS& rhs, OUT& out) {
-      IF_CONSTEXPR() {
-         StoreConstexpr(DivideConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
+      if constexpr (CT::SIMD<OUT>)
+         out = Inner::Divide<OUT>(lhs, rhs);
+      else if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>)
+         Store(Inner::Divide<OUT>(lhs, rhs), out);
+      else {
+         if consteval {
+            Store(Inner::DivideConstexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
+         }
+         else {
+            Store(Inner::Divide<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
+         }
       }
-      else Store(DivideDynamic<LHS, RHS, OUT>(lhs, rhs), out);
    }
 
    /// Divide numbers                                                         
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
    ///   @tparam OUT - the desired output type (lossless array by default)    
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<class LHS, class RHS, class OUT = LosslessArray<LHS, RHS>>
+   ///   @attention will generate additional store (and convert) instructions 
+   ///      in order to fit the result in an instance of 'OUT'. Use           
+   ///      Inner::Divide if you don't want this.                             
+   template<class LHS, class RHS, CT::NotSemantic OUT = LosslessArray<LHS, RHS>>
    LANGULUS(INLINED)
-   constexpr OUT Divide(const LHS& lhs, const RHS& rhs) {
+   constexpr auto Divide(const LHS& lhs, const RHS& rhs) {
       OUT out;
-      Divide(lhs, rhs, out);
-      return out;
+      Divide(DesemCast(lhs), DesemCast(rhs), out);
+
+      if constexpr (CT::Similar<LHS, RHS> or CT::DerivedFrom<LHS, RHS>)
+         return LHS {out};
+      else if constexpr (CT::DerivedFrom<RHS, LHS>)
+         return RHS {out};
+      else
+         return out;
    }
 
 } // namespace Langulus::SIMD
