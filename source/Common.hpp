@@ -314,13 +314,16 @@ namespace Langulus::CT
 
 namespace Langulus::SIMD
 {
-   
+
+   using ::Langulus::Inner::Unsupported;
+
    namespace Inner
    {
 
       template<CT::NotSIMD T>
       NOD() constexpr decltype(auto) GetFirst(const T& a) noexcept {
-         if constexpr (CT::Array<T> or CT::Sparse<T> or (CT::Dense<T> and requires { a[0]; }))
+         if constexpr (CT::Array<T> or CT::Sparse<T>
+         or (CT::Dense<T> and requires { a[0]; }))
             return (a[0]);
          else
             return (a);
@@ -328,7 +331,8 @@ namespace Langulus::SIMD
 
       template<CT::NotSIMD T>
       NOD() constexpr decltype(auto) GetFirst(T& a) noexcept {
-         if constexpr (CT::Array<T> or CT::Sparse<T> or (CT::Dense<T> and requires { a[0]; }))
+         if constexpr (CT::Array<T> or CT::Sparse<T>
+         or (CT::Dense<T> and requires { a[0]; }))
             return (a[0]);
          else
             return (a);
@@ -336,18 +340,62 @@ namespace Langulus::SIMD
 
       template<class LHS, class RHS>
       consteval auto LosslessArray() {
-         constexpr auto C = OverlapCounts<LHS, RHS>();
          using LT = Decay<TypeOf<Desem<LHS>>>;
          using RT = Decay<TypeOf<Desem<RHS>>>;
-         if constexpr (C == 1)
-            return Lossless<LT, RT> {};
-         else
-            return std::array<Lossless<LT, RT>, C> {};
+         constexpr auto C = OverlapCounts<LHS, RHS>();
+
+         if constexpr (CT::Void<LHS, RHS>) {
+            // Both sides are void                                      
+            return Unsupported {};
+         }
+         else if constexpr (CT::Void<LHS>) {
+            // LHS is void, we rely only on RHS, which can be either    
+            // a register, a scalar, or an array                        
+            if constexpr (CT::SIMD<RHS>)
+               return RHS {};
+            else if constexpr (C == 1)
+               return RT {};
+            else
+               return std::array<RT, C> {};
+         }
+         else if constexpr (CT::Void<RHS>) {
+            // RHS is void, we rely only on LHS, which can be either    
+            // a register, a scalar, or an array                        
+            if constexpr (CT::SIMD<LHS>)
+               return LHS {};
+            else if constexpr (C == 1)
+               return LT {};
+            else
+               return std::array<LT, C> {};
+         }
+         else if constexpr (CT::SIMD<LHS> and not CT::SIMD<RHS>) {
+            // Both sides are known, LHS is a register, so we rely only 
+            // on RHS, which can be either scalar, or an array          
+            if constexpr (CountOf<RHS> == 1)
+               return RT {};
+            else
+               return std::array<RT, CountOf<RHS>> {};
+         }
+         else if constexpr (not CT::SIMD<LHS> and CT::SIMD<RHS>) {
+            // Both sides are known, RHS is a register, so we rely only 
+            // on LHS, which can be either scalar, or an array          
+            if constexpr (CountOf<LHS> == 1)
+               return LT {};
+            else
+               return std::array<LT, CountOf<LHS>> {};
+         }
+         else {
+            // Both sides are known, and none are registers, so pick    
+            // the most lossless of the two                             
+            if constexpr (C == 1)
+               return Lossless<LT, RT> {};
+            else
+               return std::array<Lossless<LT, RT>, C> {};
+         }
       }
       
    } // namespace Langulus::SIMD::Inner
 
-   using ::Langulus::Inner::Unsupported;
 
    /// Useful tool for auto-deducing operation return type based on arguments 
    ///   @tparam LHS - left operand                                           

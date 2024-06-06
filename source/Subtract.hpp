@@ -18,7 +18,7 @@ namespace Langulus::SIMD
 
       /// Used to detect missing SIMD routine                                 
       template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
-      constexpr Unsupported Subtract(const T&, const T&) noexcept {
+      constexpr Unsupported SubtractSIMD(const T&, const T&) noexcept {
          return {};
       }
 
@@ -29,7 +29,7 @@ namespace Langulus::SIMD
       ///   @param rhs - the right-hand-side array                            
       ///   @return the subtracted elements as a register                     
       template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto Subtract(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
+      auto SubtractSIMD(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<REGISTER>) {
                if constexpr (CT::Integer8<T>)
@@ -91,79 +91,47 @@ namespace Langulus::SIMD
          #endif
             LANGULUS_ERROR("Unsupported type");
       }
+      
+      /// Subtract numbers at compile-time, if possible                       
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return array/scalar                                              
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      constexpr auto SubtractConstexpr(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+
+         return Evaluate2<0, Unsupported, OUT>(
+            lhsOrig, rhsOrig, nullptr,
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+               return lhs - rhs;
+            }
+         );
+      }
+   
+      /// Subtract numbers and return a register, if possible                 
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///           or array/scalar if no viable SIMD routine exists          
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      auto Subtract(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+         using REGISTER = Register<decltype(lhsOrig), decltype(rhsOrig), OUT>;
+
+         return Evaluate2<0, REGISTER, OUT>(
+            lhsOrig, rhsOrig,
+            [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+               LANGULUS_SIMD_VERBOSE("Subtracting (SIMD) as ", NameOf<REGISTER>());
+               return SubtractSIMD<DOUT>(lhs, rhs);
+            },
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+               LANGULUS_SIMD_VERBOSE("Subtracting (Fallback) ", lhs, " - ", rhs, " (", NameOf<DOUT>(), ")");
+               return lhs - rhs;
+            }
+         );
+      }
 
    } // namespace Langulus::SIMD::Inner
 
-
-   /// Subtract numbers                                                       
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   constexpr auto SubtractConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<TypeOf<OUT>>;
-
-      return Inner::Evaluate2<0, Unsupported, OUT>(
-         lhsOrig, rhsOrig, nullptr,
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            return lhs - rhs;
-         }
-      );
-   }
-
-   /// Subtract numbers                                                       
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   auto SubtractDynamic(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<TypeOf<OUT>>;
-      using REGISTER = Inner::Register<LHS, RHS, OUT>;
-
-      return Inner::Evaluate2<0, REGISTER, OUT>(
-         lhsOrig, rhsOrig,
-         [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::Subtract<DOUT>(lhs, rhs);
-         },
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            return lhs - rhs;
-         }
-      );
-   }
-
-   /// Subtract numbers, and force output to desired place                    
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (deducible)                   
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
-   constexpr void Subtract(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-      IF_CONSTEXPR() {
-         StoreConstexpr(SubtractConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
-      }
-      else Store(SubtractDynamic<LHS, RHS, OUT>(lhs, rhs), out);
-   }
-
-   /// Subtract numbers                                                       
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired output type (lossless array by default)    
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
-   LANGULUS(INLINED)
-   constexpr OUT Subtract(const LHS& lhs, const RHS& rhs) noexcept {
-      OUT out;
-      Subtract(lhs, rhs, out);
-      return out;
-   }
+   LANGULUS_SIMD_ARITHMETHIC_API(Subtract)
 
 } // namespace Langulus::SIMD
 

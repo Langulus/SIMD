@@ -100,7 +100,6 @@ namespace Langulus::SIMD::Inner
    constexpr auto Fallback2(LHS& lhs, RHS& rhs, FFALL&& op) {
       using RETURN = SIMD::LosslessArray<LHS, RHS>;
       using LOSSLESS = TypeOf<RETURN>;
-      //using RESULT = InvocableResult<FFALL, LOSSLESS>;
       constexpr auto S = CountOf<RETURN>;
 
       if constexpr (CT::Vector<LHS> and CT::Vector<RHS>) {
@@ -158,14 +157,11 @@ namespace Langulus::SIMD::Inner
    ///                 useful against division-by-zero cases                  
    ///   @tparam REGISTER - the register to use for the SIMD operation        
    ///   @tparam OUT - the type of data we want as a result                   
-   ///   @tparam LHS - left number type (deducible)                           
-   ///   @tparam RHS - right number type (deducible)                          
-   ///   @tparam FSIMD - the SIMD operation to invoke (deducible)             
-   ///   @tparam FFALL - the fallback operation to invoke (deducible)         
    ///   @param lhs - left argument                                           
    ///   @param rhs - right argument                                          
-   ///   @param opSIMD - the function to invoke                               
-   ///   @param opFALL - the function to invoke                               
+   ///   @param opSIMD - the SIMD function to invoke                          
+   ///   @param opFALL - the fallback function to invoke, if SIMD is not      
+   ///      supported                                                         
    ///   @return the result (either std::array, number, or register)          
    template<auto DEF, class REGISTER, class OUT, class LHS, class RHS, class FSIMD, class FFALL>
    NOD() LANGULUS(INLINED)
@@ -187,18 +183,38 @@ namespace Langulus::SIMD::Inner
          );
       }
       else if constexpr (CT::Vector<LHS>) {
-         // LHS is vector, RHS is scalar                                
-         return opSIMD(
-            Convert<DEF, OUT>(lhs),
-            Fill<REGISTER, OUT>(rhs)
-         );
+         // LHS is vector, RHS is either already register, or scalar    
+         if constexpr (CT::SIMD<RHS>) {
+            return opSIMD(
+               Convert<DEF, OUT>(lhs),
+               rhs
+            );
+         }
+         else {
+            return opSIMD(
+               Convert<DEF, OUT>(lhs),
+               Fill<REGISTER, OUT>(rhs)
+            );
+         }
       }
       else if constexpr (CT::Vector<RHS>) {
-         // LHS is scalar, RHS is vector                                
-         return opSIMD(
-            Fill<REGISTER, OUT>(lhs),
-            Convert<DEF, OUT>(rhs)
-         );
+         // LHS is either scalar or register, RHS is vector             
+         if constexpr (CT::SIMD<LHS>) {
+            return opSIMD(
+               lhs,
+               Convert<DEF, OUT>(rhs)
+            );
+         }
+         else {
+            return opSIMD(
+               Fill<REGISTER, OUT>(lhs),
+               Convert<DEF, OUT>(rhs)
+            );
+         }
+      }
+      else if constexpr (CT::SIMD<LHS, RHS>) {
+         // Both LHS and RHS are already registers                      
+         return opSIMD(lhs, rhs);
       }
       else {
          // Both LHS and RHS are scalars (or anything else)             

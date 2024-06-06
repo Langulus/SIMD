@@ -15,13 +15,19 @@ namespace Langulus::SIMD
    namespace Inner
    {
 
+      /// Used to detect missing SIMD routine                                 
+      template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
+      constexpr Unsupported AbsSIMD(const T&) noexcept {
+         return {};
+      }
+
       /// Get absolute values via SIMD                                        
       ///   @tparam T - the type of the array element                         
       ///   @tparam REGISTER - the register to operate on (deducible)         
       ///   @param v - the array                                              
       ///   @return the absolute values                                       
       template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto Abs(UNUSED() const REGISTER& v) noexcept {
+      auto AbsSIMD(UNUSED() const REGISTER& v) noexcept {
          static_assert(CT::Signed<T>, "Suboptimal and pointless for unsigned values");
 
          #if LANGULUS_SIMD(128BIT)
@@ -83,18 +89,48 @@ namespace Langulus::SIMD
 
          LANGULUS_ERROR("Unsupported type");
       }
+      
+      /// Get absolute values as constexpr, if possible                       
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return array/scalar                                              
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      constexpr auto AbsConstexpr(const auto& value) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+
+         return Evaluate1<0, Unsupported, OUT>(
+            value, nullptr,
+            [](const DOUT& f) noexcept -> DOUT {
+               static_assert(CT::Signed<DOUT>, "Pointless for unsigned numbers");
+               return f < DOUT {0} ? -f : f;
+            }
+         );
+      }
+   
+      /// Get absolute values as a register, if possible                      
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///           or array/scalar if no viable SIMD routine exists          
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      auto Abs(const auto& value) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+         using REGISTER = ToSIMD<decltype(value), OUT>;
+
+         return Evaluate1<0, REGISTER, OUT>(
+            value,
+            [](const REGISTER& v) noexcept {
+               LANGULUS_SIMD_VERBOSE("Absolute (SIMD) as ", NameOf<REGISTER>());
+               return AbsSIMD<DOUT>(v);
+            },
+            [](const DOUT& v) noexcept -> DOUT {
+               static_assert(CT::Signed<DOUT>, "Pointless for unsigned numbers");
+               LANGULUS_SIMD_VERBOSE("Absolute (Fallback) |", v, "| (", NameOf<DOUT>(), ")");
+               return std::abs(v);
+            }
+         );
+      }
 
    } // namespace Langulus::SIMD::Inner
 
-
-   /// Get the absolute values                                                
-   ///   @param T - data to make absolute                                     
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   LANGULUS(INLINED)
-   auto Abs(const auto& value) noexcept {
-      using DT = Decay<TypeOf<Desem<decltype(value)>>>;
-      return Inner::Abs<DT>(Load<0>(value));
-   }
+   LANGULUS_SIMD_ARITHMETHIC_UNARY_API(Abs)
 
 } // namespace Langulus::SIMD

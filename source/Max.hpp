@@ -18,7 +18,7 @@ namespace Langulus::SIMD
 
       /// Used to detect missing SIMD routine                                 
       template<CT::Decayed, CT::NotSIMD T> LANGULUS(INLINED)
-      constexpr Unsupported Max(const T&, const T&) noexcept {
+      constexpr Unsupported MaxSIMD(const T&, const T&) noexcept {
          return {};
       }
 
@@ -29,7 +29,7 @@ namespace Langulus::SIMD
       ///   @param rhs - the right-hand-side array                            
       ///   @return the maxed values                                          
       template<CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
-      auto Max(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
+      auto MaxSIMD(UNUSED() const REGISTER& lhs, UNUSED() const REGISTER& rhs) noexcept {
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::SignedInteger8<T>)
@@ -133,77 +133,46 @@ namespace Langulus::SIMD
             LANGULUS_ERROR("Unsupported type");
       }
 
+      /// Pick the biggest numbers at compile-time, if possible               
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return array/scalar                                              
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      constexpr auto MaxConstexpr(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+
+         return Evaluate2<0, Unsupported, OUT>(
+            lhsOrig, rhsOrig, nullptr,
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+               return ::std::max(lhs, rhs);
+            }
+         );
+      }
+   
+      /// Pick the biggest numbers and return a register, if possible         
+      ///   @tparam OUT - the desired element type (lossless by default)      
+      ///   @return a register, if viable SIMD routine exists                 
+      ///           or array/scalar if no viable SIMD routine exists          
+      template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
+      auto Max(const auto& lhsOrig, const auto& rhsOrig) noexcept {
+         using DOUT = Decay<TypeOf<OUT>>;
+         using REGISTER = Register<decltype(lhsOrig), decltype(rhsOrig), OUT>;
+
+         return Evaluate2<0, REGISTER, OUT>(
+            lhsOrig, rhsOrig,
+            [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+               LANGULUS_SIMD_VERBOSE("Max (SIMD) as ", NameOf<REGISTER>());
+               return MaxSIMD<DOUT>(lhs, rhs);
+            },
+            [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
+               LANGULUS_SIMD_VERBOSE("Max (Fallback) Max(", lhs, ", ", rhs, ") (", NameOf<DOUT>(), ")");
+               return ::std::max(lhs, rhs);
+            }
+         );
+      }
+
    } // namespace Langulus::SIMD::Inner
 
-   
-   /// Max numbers                                                            
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return array/scalar                                                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   constexpr auto MaxConstexpr(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
-      using DOUT = Decay<TypeOf<OUT>>;
-
-      return Inner::Evaluate2<0, Unsupported, OUT>(
-         lhsOrig, rhsOrig, nullptr,
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            return ::std::max(lhs, rhs);
-         }
-      );
-   }
-
-   /// Max numbers                                                            
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (lossless by default)         
-   ///   @return a register, if viable SIMD routine exists                    
-   ///           or array/scalar if no viable SIMD routine exists             
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = Lossless<LHS, RHS>>
-   NOD() LANGULUS(INLINED)
-   auto MaxDynamic(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-      using DOUT = Decay<TypeOf<OUT>>;
-      using REGISTER = Inner::Register<LHS, RHS, OUT>;
-
-      return Inner::Evaluate2<0, REGISTER, OUT>(
-         lhsOrig, rhsOrig, 
-         [](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-            return Inner::Max<DOUT>(lhs, rhs);
-         },
-         [](const DOUT& lhs, const DOUT& rhs) noexcept -> DOUT {
-            return ::std::max(lhs, rhs);
-         }
-      );
-   }
-
-   /// Max numbers, and force output to desired place                         
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (deducible)                   
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
-   constexpr void Max(LHS& lhs, RHS& rhs, OUT& out) noexcept {
-      IF_CONSTEXPR() {
-         StoreConstexpr(MaxConstexpr<LHS, RHS, OUT>(lhs, rhs), out);
-      }
-      else Store(MaxDynamic<LHS, RHS, OUT>(lhs, rhs), out);
-   }
-
-   /// Max numbers                                                            
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired output type (lossless array by default)    
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<CT::NotSemantic LHS, CT::NotSemantic RHS, CT::NotSemantic OUT = std::array<Lossless<Decay<TypeOf<LHS>>, Decay<TypeOf<RHS>>>, OverlapCounts<LHS, RHS>()>>
-   LANGULUS(INLINED)
-   constexpr OUT Max(const LHS& lhs, const RHS& rhs) noexcept {
-      OUT out;
-      Max(lhs, rhs, out);
-      return out;
-   }
+   LANGULUS_SIMD_ARITHMETHIC_API(Max)
 
 } // namespace Langulus::SIMD
 

@@ -99,7 +99,7 @@ namespace Langulus::SIMD
       ///   @return a register, if viable SIMD routine exists                 
       ///           or array/scalar if no viable SIMD routine exists          
       template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
-      auto CeilDynamic(const auto& value) noexcept {
+      auto Ceil(const auto& value) noexcept {
          using DOUT = Decay<TypeOf<OUT>>;
          using REGISTER = ToSIMD<decltype(value), OUT>;
 
@@ -119,33 +119,6 @@ namespace Langulus::SIMD
 
    } // namespace Langulus::SIMD::Inner
 
-   
-   /// Ceil numbers, and force output to desired place                        
-   ///   @tparam VAL - array, scalar, or register (deducible)                 
-   ///   @tparam OUT - the desired element type (deducible)                   
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<class VAL, CT::NotSemantic OUT> LANGULUS(INLINED)
-   constexpr void Ceil(const VAL& val, OUT& out) noexcept {
-      IF_CONSTEXPR() {
-      StoreConstexpr(
-         Inner::CeilConstexpr<OUT>(DesemCast(val)), out);
-      }
-      else Store(
-         Inner::CeilDynamic<OUT>(DesemCast(val)), out);
-   }
-      
-   /// Ceil numbers                                                           
-   ///   @tparam VAL - array, scalar, or register (deducible)                 
-   ///   @tparam OUT - the desired output type (lossless array by default)    
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<class VAL, CT::NotSemantic OUT = LosslessArray<VAL, VAL>>
-   LANGULUS(INLINED)
-   constexpr auto Ceil(const VAL& val) noexcept {
-      OUT out;
-      Ceil(DesemCast(val), out);
-      return out;
-   }
+   LANGULUS_SIMD_ARITHMETHIC_UNARY_API(Ceil)
 
 } // namespace Langulus::SIMD

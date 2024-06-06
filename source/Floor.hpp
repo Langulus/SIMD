@@ -99,7 +99,7 @@ namespace Langulus::SIMD
       ///   @return a register, if viable SIMD routine exists                 
       ///           or array/scalar if no viable SIMD routine exists          
       template<CT::NotSemantic OUT> NOD() LANGULUS(INLINED)
-      auto FloorDynamic(const auto& value) noexcept {
+      auto Floor(const auto& value) noexcept {
          using DOUT = Decay<TypeOf<OUT>>;
          using REGISTER = ToSIMD<decltype(value), OUT>;
 
@@ -119,33 +119,6 @@ namespace Langulus::SIMD
 
    } // namespace Langulus::SIMD::Inner
 
-   
-   /// Floor numbers, and force output to desired place                       
-   ///   @tparam VAL - array, scalar, or register (deducible)                 
-   ///   @tparam OUT - the desired element type (deducible)                   
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<class VAL, CT::NotSemantic OUT> LANGULUS(INLINED)
-   constexpr void Floor(const VAL& val, OUT& out) noexcept {
-      IF_CONSTEXPR() {
-      StoreConstexpr(
-         Inner::FloorConstexpr<OUT>(DesemCast(val)), out);
-      }
-      else Store(
-         Inner::FloorDynamic<OUT>(DesemCast(val)), out);
-   }
-      
-   /// Floor numbers                                                          
-   ///   @tparam VAL - array, scalar, or register (deducible)                 
-   ///   @tparam OUT - the desired output type (lossless array by default)    
-   ///   @attention may generate additional convert/store instructions in     
-   ///              order to fit the result in desired output                 
-   template<class VAL, CT::NotSemantic OUT = LosslessArray<VAL, VAL>>
-   LANGULUS(INLINED)
-   constexpr auto Floor(const VAL& val) noexcept {
-      OUT out;
-      Floor(DesemCast(val), out);
-      return out;
-   }
+   LANGULUS_SIMD_ARITHMETHIC_UNARY_API(Floor)
 
 } // namespace Langulus::SIMD
