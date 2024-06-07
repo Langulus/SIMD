@@ -262,7 +262,7 @@ namespace Langulus::SIMD
       else if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>)
          Store(Inner::Divide<OUT>(lhs, rhs), out);
       else {
-         if consteval {
+         IF_CONSTEXPR() {
             Store(Inner::DivideConstexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
          }
          else {

@@ -441,7 +441,7 @@ namespace Langulus::SIMD
       else if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>) \
          Store(Inner::OP<OUT>(lhs, rhs), out); \
       else { \
-         if consteval { \
+         IF_CONSTEXPR() { \
             Store(Inner::OP##Constexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out); \
          } \
          else { \
@@ -470,7 +470,7 @@ namespace Langulus::SIMD
       else if constexpr (CT::SIMD<VAL>) \
          Store(Inner::OP<OUT>(val), out); \
       else { \
-         if consteval { \
+         IF_CONSTEXPR() { \
             Store(Inner::OP##Constexpr<OUT>(DesemCast(val)), out); \
          } \
          else { \

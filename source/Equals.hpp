@@ -404,7 +404,7 @@ namespace Langulus::SIMD
    ///      don't want this.                                                  
    template<class LHS, class RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
    constexpr void Equals(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-      if consteval {
+      IF_CONSTEXPR() {
          Store(Inner::EqualsConstexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
       }
       else {
