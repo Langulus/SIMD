@@ -93,11 +93,19 @@ namespace Langulus::SIMD
       }
 
       Bitmask& operator = (const Bitmask&) noexcept = default;
+
+      Bitmask& operator = (const Type& a) noexcept {
+         mValue = a & Mask;
+         return *this;
+      }
+
       Bitmask& operator = (const ::std::array<bool, C>& a) noexcept {
+         mValue = {};
          for (Type i = 0; i < Type {C}; ++i)
             mValue |= (static_cast<Type>(a[i]) << i);
          return *this;
       }
+
       Bitmask& operator = (bool a) noexcept requires (C == 1) {
          mValue = a;
          return *this;
@@ -144,26 +152,20 @@ namespace Langulus::SIMD
          LANGULUS_ASSUME(UserAssumes, idx < C, "Index out of limits");
          return BitSwitcher {*this, Type {1} << idx};
       }
+
+      constexpr void AsVector (CT::Vector auto& result) const noexcept {
+         static_assert(C == CountOf<decltype(result)>);
+         for (Type i = 0; i < Type {C}; ++i)
+            result[i] = (*this)[i];
+      }
    };
 
-   namespace Inner
-   {
-      
-      template<class LHS, class RHS>
-      consteval auto BitmaskArray() {
-         constexpr auto C = OverlapCounts<LHS, RHS>();
-         if constexpr (C == 1)
-            return bool {};
-         else
-            return Bitmask<C> {};
-      }
-
-   } // namespace Langulus::SIMD::Inner
-
-   /// Useful tool for auto-deducing operation return type based on arguments 
-   ///   @tparam LHS - left operand                                           
-   ///   @tparam RHS - right operand                                          
-   template<class LHS, class RHS>
-   using BitmaskArray = decltype(Inner::BitmaskArray<LHS, RHS>());
-
 } // namespace Langulus::SIMD
+
+namespace Langulus::CT
+{
+
+   template<class...T>
+   concept Bitmask = (Deref<T>::IsBitmask and ...);
+
+} // namespace Langulus::CT

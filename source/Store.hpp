@@ -7,8 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Common.hpp"
-#include "IgnoreWarningsPush.inl"
-#include <ranges>
+#include "Bitmask.hpp"
 
 
 namespace Langulus::SIMD
@@ -16,415 +15,331 @@ namespace Langulus::SIMD
    namespace Inner
    {
 
-      /// Save a register to memory                                           
-      ///   @tparam FROM - the register to save                               
-      ///   @tparam TO - the type of data to write (deducible)                
+      /// Save a register to a bitmask in memory                              
       ///   @param from - the source register                                 
-      ///   @param to - the destination array                                 
-      template<CT::SIMD FROM, CT::NotSIMD TO> LANGULUS(INLINED)
-      void StoreSIMD(UNUSED() const FROM& from, UNUSED() TO& to) noexcept {
-         constexpr auto S = CountOf<TO>;
-         static_assert(S > 1, 
-            "Storing less than two elements is suboptimal "
-            "- avoid SIMD operations on such arrays as a whole"
-         );
-         using T = TypeOf<TO>;
-         using DT = Decay<T>;
-         UNUSED() constexpr Offset denseSize = sizeof(DT) * S;
+      ///   @param to - the destination vector                                
+      LANGULUS(INLINED)
+      void StoreSIMD(const CT::SIMD auto& from, CT::Bitmask auto& to) noexcept {
+         using R  = Deref<decltype(from)>;
+         using T  = TypeOf<R>;
 
-      #if LANGULUS_SIMD(128BIT)
-         //                                                             
-         // __m128*                                                     
-         //                                                             
-         if constexpr (CT::SIMD128f<FROM>) {
-            if constexpr (CT::Dense<T> and denseSize == 16) {
-               // Save to a dense array                                 
-               if constexpr (alignof(TO) % 16 == 0) {
-                  LANGULUS_SIMD_VERBOSE("Storing full 128f to aligned ", denseSize, " bytes");
-                  auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
-                  simde_mm_store_ps(to_ps, from);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing full 128f to unaligned ", denseSize, " bytes");
-                  simde_mm_storeu_ps(&Inner::GetFirst(to), from);
-               }
-            }
-            else if constexpr (denseSize <= 16) {
-               // Save to a sparse array, or a differently sized array  
-               alignas(16) simde_float32 temp[4];
-               simde_mm_store_ps(temp, from);
-
-               if constexpr (CT::Dense<T>) {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 128f to ", denseSize, " bytes");
-                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 128f to sparse array of size ", S);
-                  auto toIt = reinterpret_cast<T*>(&to);
-                  auto fromIt = temp;
-                  const auto toItEnd = toIt + S;
-                  while (toIt != toItEnd)
-                     **(toIt++) = DenseCast(fromIt++);
-               }
-            }
-            else LANGULUS_ERROR("Output size too big");
+         if constexpr (CT::SIMD128<R>) {
+            if      constexpr (CT::Integer8<T>)    to = simde_mm_movemask_epi8(from);
+            else if constexpr (CT::Integer16<T>)   to = simde_mm_movemask_epi8(simde_mm_packs_epi16(from, from.Zero()));
+            else if constexpr (CT::Integer32<T>)   to = simde_mm_movemask_ps(simde_mm_castsi128_ps(from));
+            else if constexpr (CT::Integer64<T>)   to = simde_mm_movemask_pd(simde_mm_castsi128_pd(from));
+            else if constexpr (CT::Float<T>)       to = simde_mm_movemask_ps(from);
+            else if constexpr (CT::Double<T>)      to = simde_mm_movemask_pd(from);
+            else LANGULUS_ERROR("Unsupported type");
          }
-         else if constexpr (CT::SIMD128d<FROM>) {
-            if constexpr (CT::Dense<T> and denseSize == 16) {
-               // Save to a dense array                                 
-               if constexpr (alignof(TO) % 16 == 0) {
-                  LANGULUS_SIMD_VERBOSE("Storing full 128d to aligned ", denseSize, " bytes");
-                  auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
-                  simde_mm_store_pd(to_pd, from);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing full 128d to unaligned ", denseSize, " bytes");
-                  simde_mm_storeu_pd(&Inner::GetFirst(to), from);
-               }
-            }
-            else if constexpr (denseSize <= 16) {
-               if constexpr (CT::Dense<T>) {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 128d to ", denseSize, " bytes");
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 128d to sparse array of size ", S);
-               }
-
-               // Save to a sparse array, or a differently sized array  
-               simde_mm_storel_pd(SparseCast(to[0]), from);
-               if constexpr (S > 1)
-                  simde_mm_storeh_pd(SparseCast(to[1]), from);
-            }
-            else LANGULUS_ERROR("Output size too big");
+         else if constexpr (CT::SIMD256<R>) {
+            if      constexpr (CT::Integer8<T>)    to = simde_mm256_movemask_epi8(from);
+            else if constexpr (CT::Integer16<T>)   to = simde_mm256_movemask_epi8(simde_mm256_packs_epi16(from, from.Zero()));
+            else if constexpr (CT::Integer32<T>)   to = simde_mm256_movemask_ps(simde_mm256_castsi256_ps(from));
+            else if constexpr (CT::Integer64<T>)   to = simde_mm256_movemask_pd(simde_mm256_castsi256_pd(from));
+            else if constexpr (CT::Float<T>)       to = simde_mm256_movemask_ps(from);
+            else if constexpr (CT::Double<T>)      to = simde_mm256_movemask_pd(from);
+            else LANGULUS_ERROR("Unsupported type");
          }
-         else if constexpr (CT::SIMD128i<FROM>) {
-            if constexpr (CT::Dense<T> and denseSize == 16) {
-               // Save to a dense array                                 
-               if constexpr (alignof(TO) % 16 == 0) {
-                  LANGULUS_SIMD_VERBOSE("Storing full 128i to aligned ", denseSize, " bytes");
-                  auto to_si = reinterpret_cast<simde__m128i*>(&Inner::GetFirst(to));
-                  simde_mm_store_si128(to_si, from);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing full 128i to unaligned ", denseSize, " bytes");
-                  simde_mm_storeu_si128(&Inner::GetFirst(to), from);
-               }
-            }
-            else if constexpr (denseSize <= 16) {
-               // Save to a sparse array, or a differently sized array  
-               alignas(16) DT temp[16 / sizeof(DT)];
-               simde_mm_store_si128(reinterpret_cast<simde__m128i*>(temp), from);
-
-               if constexpr (CT::Dense<T>) {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 128i to ", denseSize, " bytes");
-                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 128d to sparse array of size ", S);
-                  auto toIt = reinterpret_cast<T*>(&to);
-                  auto fromIt = temp;
-                  const auto toItEnd = toIt + S;
-                  while (toIt != toItEnd)
-                     **(toIt++) = *(fromIt++);
-               }
-            }
-            else LANGULUS_ERROR("Output size too big");
+         else if constexpr (CT::SIMD512<R>) {
+            if      constexpr (CT::Integer8<T>)    to = simde_mm512_movemask_epi8(from);
+            else if constexpr (CT::Integer16<T>)   to = simde_mm512_movemask_epi8(simde_mm512_packs_epi16(from, from.Zero()));
+            else if constexpr (CT::Integer32<T>)   to = simde_mm512_movemask_ps(simde_mm512_castsi256_ps(from));
+            else if constexpr (CT::Integer64<T>)   to = simde_mm512_movemask_pd(simde_mm512_castsi256_pd(from));
+            else if constexpr (CT::Float<T>)       to = simde_mm512_movemask_ps(from);
+            else if constexpr (CT::Double<T>)      to = simde_mm512_movemask_pd(from);
+            else LANGULUS_ERROR("Unsupported type");
          }
-         else
-      #endif
-
-      #if LANGULUS_SIMD(256BIT)
-         //                                                             
-         // __m256*                                                     
-         //                                                             
-         if constexpr (CT::SIMD256f<FROM>) {
-            if constexpr (CT::Dense<T> and denseSize == 32) {
-               // Save to a dense array                                 
-               if constexpr (alignof(TO) % 32 == 0) {
-                  LANGULUS_SIMD_VERBOSE("Storing full 256f to aligned ", denseSize, " bytes");
-                  auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
-                  simde_mm256_store_ps(to_ps, from);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing full 256f to unaligned ", denseSize, " bytes");
-                  simde_mm256_storeu_ps(&Inner::GetFirst(to), from);
-               }
-            }
-            else if constexpr (denseSize <= 32) {
-               // Save to a sparse array, or a differently sized array  
-               alignas(32) simde_float32 temp[8];
-               simde_mm256_store_ps(temp, from);
-
-               if constexpr (CT::Dense<T>) {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 256f to ", denseSize, " bytes");
-                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 256f to sparse array of size ", S);
-                  auto toIt = reinterpret_cast<T*>(&to);
-                  auto fromIt = temp;
-                  const auto toItEnd = toIt + S;
-                  while (toIt != toItEnd)
-                     **(toIt++) = DenseCast(fromIt++);
-               }
-            }
-            else LANGULUS_ERROR("Output size too big");
-         }
-         else if constexpr (CT::SIMD256d<FROM>) {
-            if constexpr (CT::Dense<T> and denseSize == 32) {
-               // Save to a dense array                                 
-               if constexpr (alignof(TO) % 32 == 0) {
-                  LANGULUS_SIMD_VERBOSE("Storing full 256d to aligned ", denseSize, " bytes");
-                  auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
-                  simde_mm256_store_pd(to_pd, from);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing full 256d to unaligned ", denseSize, " bytes");
-                  simde_mm256_storeu_pd(&Inner::GetFirst(to), from);
-               }
-            }
-            else if constexpr (denseSize <= 32) {
-               // Save to a sparse array, or a differently sized array  
-               alignas(32) simde_float64 temp[4];
-               simde_mm256_store_pd(temp, from);
-
-               if constexpr (CT::Dense<T>) {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 256d to ", denseSize, " bytes");
-                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 256d to sparse array of size ", S);
-                  auto toIt = reinterpret_cast<T*>(&to);
-                  auto fromIt = temp;
-                  const auto toItEnd = toIt + S;
-                  while (toIt != toItEnd)
-                     **(toIt++) = DenseCast(fromIt++);
-               }
-            }
-            else LANGULUS_ERROR("Output size too big");
-         }
-         else if constexpr (CT::SIMD256i<FROM>) {
-            if constexpr (CT::Dense<T> and denseSize == 32) {
-               // Save to a dense array                                 
-               if constexpr (alignof(TO) % 32 == 0) {
-                  LANGULUS_SIMD_VERBOSE("Storing full 256i to aligned ", denseSize, " bytes");
-                  auto to_si = reinterpret_cast<simde__m256i*>(&Inner::GetFirst(to));
-                  simde_mm256_store_si256(to_si, from);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing full 256i to unaligned ", denseSize, " bytes");
-                  simde_mm256_storeu_si256(&Inner::GetFirst(to), from);
-               }
-            }
-            else if constexpr (denseSize <= 32) {
-               // Save to a sparse array, or a differently sized array  
-               alignas(32) DT temp[32 / sizeof(DT)];
-               simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(temp), from);
-
-               if constexpr (CT::Dense<T>) {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 256i to ", denseSize, " bytes; "
-                     "from ", NameOf<FROM>(), " of size ", sizeof(FROM), " to ", NameOf<TO>(),
-                     " of size ", sizeof(TO), " (aka ", NameOf<DT>(), "[", S, "] of size ", denseSize,")"
-                  );
-
-                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
-               }
-               else {
-                  LANGULUS_SIMD_VERBOSE("Storing partial 256i to sparse array of size ", S);
-                  auto toIt = reinterpret_cast<T*>(&to);
-                  auto fromIt = temp;
-                  const auto toItEnd = toIt + S;
-                  while (toIt != toItEnd)
-                     **(toIt++) = *(fromIt++);
-               }
-            }
-            else LANGULUS_ERROR("Output size too big");
-         }
-         else
-      #endif
-
-      #if LANGULUS_SIMD(512BIT)
-         //                                                             
-         // __m512*                                                     
-         //                                                             
-         if constexpr (CT::SIMD512f<FROM>) {
-            if constexpr (CT::Dense<T> and denseSize == 64) {
-               // Save to a dense array                                 
-               if constexpr (alignof(TO) % 64 == 0) {
-                  auto to_ps = reinterpret_cast<simde_float32*>(&Inner::GetFirst(to));
-                  simde_mm512_store_ps(to_ps, from);
-               }
-               else simde_mm512_storeu_ps(&Inner::GetFirst(to), from);
-            }
-            else if constexpr (denseSize <= 64) {
-               // Save to a sparse array, or a differently sized array  
-               alignas(64) simde_float32 temp[16];
-               simde_mm512_store_ps(temp, from);
-
-               if constexpr (CT::Dense<T>)
-                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
-               else {
-                  auto toIt = reinterpret_cast<T*>(&to);
-                  auto fromIt = temp;
-                  const auto toItEnd = toIt + S;
-                  while (toIt != toItEnd)
-                     **(toIt++) = DenseCast(fromIt++);
-               }
-            }
-            else LANGULUS_ERROR("Output size too big");
-         }
-         else if constexpr (CT::SIMD512d<FROM>) {
-            if constexpr (CT::Dense<T> and denseSize == 64) {
-               // Save to a dense array                                 
-               if constexpr (alignof(TO) % 64 == 0) {
-                  auto to_pd = reinterpret_cast<simde_float64*>(&Inner::GetFirst(to));
-                  simde_mm512_store_pd(to_pd, from);
-               }
-               else simde_mm512_storeu_pd(&Inner::GetFirst(to), from);
-            }
-            else if constexpr (denseSize <= 64) {
-               // Save to a sparse array, or a differently sized array  
-               alignas(64) simde_float64 temp[8];
-               simde_mm512_store_pd(temp, from);
-
-               if constexpr (CT::Dense<T>)
-                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
-               else {
-                  auto toIt = reinterpret_cast<T*>(&to);
-                  auto fromIt = temp;
-                  const auto toItEnd = toIt + S;
-                  while (toIt != toItEnd)
-                     **(toIt++) = DenseCast(fromIt++);
-               }
-            }
-            else LANGULUS_ERROR("Output size too big");
-         }
-         else if constexpr (CT::SIMD512i<FROM>) {
-            if constexpr (CT::Dense<T> and denseSize == 64) {
-               // Save to a dense array                                 
-               if constexpr (alignof(TO) % 64 == 0) {
-                  auto to_si = reinterpret_cast<simde__m512i*>(&Inner::GetFirst(to));
-                  simde_mm512_store_si512(to_si, from);
-               }
-               else simde_mm512_storeu_si512(&Inner::GetFirst(to), from);
-            }
-            else if constexpr (denseSize <= 64) {
-               // Save to a sparse array, or a differently sized array  
-               alignas(64) DT temp[64 / sizeof(DT)];
-               simde_mm512_store_si512(reinterpret_cast<simde__m512i*>(temp), from);
-
-               if constexpr (CT::Dense<T>)
-                  ::std::memcpy(&Inner::GetFirst(to), temp, denseSize);
-               else {
-                  auto toIt = reinterpret_cast<T*>(&to);
-                  auto fromIt = temp;
-                  const auto toItEnd = toIt + S;
-                  while (toIt != toItEnd)
-                     **(toIt++) = *(fromIt++);
-               }
-            }
-            else LANGULUS_ERROR("Output size too big");
-         }
-         else
-      #endif
-         LANGULUS_ERROR("Unsupported FROM register for SIMD::Store");
+         else LANGULUS_ERROR("Unsupported register");
       }
 
-      /// Fallback store routine, doesn't use SIMD                            
-      ///   @tparam FROM - any source type, SIMD register, std::array,        
-      ///                  boolvector, or scalar                              
-      ///   @tparam TO - any destination type, array or scalar                
-      ///   @param from - what to store                                       
-      ///   @param to - where to store it                                     
-      template<CT::NotSIMD FROM, CT::NotSIMD TO> LANGULUS(INLINED)
-      constexpr void StoreConstexpr(const FROM& from, TO& to) noexcept {
+      /// Save a register to a vector in memory                               
+      ///   @param from - the source register                                 
+      ///   @param to - the destination vector                                
+      LANGULUS(INLINED)
+      void StoreSIMD(const CT::SIMD auto& from, CT::Vector auto& to) noexcept {
+         using TO   = Deref<decltype(to)>;
+         using TO_T = TypeOf<TO>;
+         using R    = Deref<decltype(from)>;
+         using T    = TypeOf<R>;
+
+         static_assert(CountOf<TO> <= CountOf<R>,
+            "Destination array must be smaller or equal of the register size");
+         static_assert(CountOf<TO> > 1,
+            "Storing a single element is suboptimial - don't use SIMD in the first place");
+         static_assert(CT::Similar<T, TO_T> or CT::Bool<TO_T>,
+            "Storing doesn't parform conversion, so destination must be "
+            "of similar type as the register");
+
+         if constexpr (CT::Bool<TO_T>) {
+            // register -> bool array                                   
+            Bitmask<CountOf<TO>> mask;
+            StoreSIMD(from, mask);
+            mask.AsVector(to);
+         }
+         else if constexpr (CT::SIMD128<R>) {
+            if constexpr (CT::Float<T>) {
+               // To float array                                        
+               if constexpr (sizeof(to) == sizeof(from)) {
+                  if constexpr (alignof(TO) % 16 == 0) {
+                     LANGULUS_SIMD_VERBOSE("Storing 128f to aligned");
+                     simde_mm_store_ps(&GetFirst(to), from);
+                  }
+                  else {
+                     LANGULUS_SIMD_VERBOSE("Storing 128f to unaligned");
+                     simde_mm_storeu_ps(&GetFirst(to), from);
+                  }
+               }
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing 128f to partial");
+                  alignas(16) T temp[CountOf<R>];
+                  simde_mm_store_ps(temp, from);
+                  memcpy(&GetFirst(to), temp, sizeof(to));
+               }
+            }
+            else if constexpr (CT::Double<T>) {
+               // To double array                                       
+               if constexpr (sizeof(to) == sizeof(from)) {
+                  if constexpr (alignof(TO) % 16 == 0) {
+                     LANGULUS_SIMD_VERBOSE("Storing 128d to aligned");
+                     simde_mm_store_pd(&GetFirst(to), from);
+                  }
+                  else {
+                     LANGULUS_SIMD_VERBOSE("Storing 128d to unaligned");
+                     simde_mm_storeu_pd(&GetFirst(to), from);
+                  }
+               }
+               else LANGULUS_ERROR("Shouldn't be reached (storing one double)");
+            }
+            else if constexpr (CT::Integer<T>) {
+               // To integer array                                      
+               if constexpr (sizeof(to) == sizeof(from)) {
+                  if constexpr (alignof(TO) % 16 == 0) {
+                     LANGULUS_SIMD_VERBOSE("Storing 128i to aligned");
+                     simde_mm_store_si128(reinterpret_cast<simde__m128i*>(&GetFirst(to)), from);
+                  }
+                  else {
+                     LANGULUS_SIMD_VERBOSE("Storing 128i to unaligned");
+                     simde_mm_storeu_si128(&GetFirst(to), from);
+                  }
+               }
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing 128i to partial");
+                  alignas(16) T temp[CountOf<R>];
+                  simde_mm_store_si128(reinterpret_cast<simde__m128i*>(temp), from);
+                  memcpy(&GetFirst(to), temp, sizeof(to));
+               }
+            }
+            else LANGULUS_ERROR("Unsupported output");
+         }
+         else if constexpr (CT::SIMD256<R>) {
+            if constexpr (CT::Float<T>) {
+               // To float array                                        
+               if constexpr (sizeof(to) == sizeof(from)) {
+                  if constexpr (alignof(TO) % 32 == 0) {
+                     LANGULUS_SIMD_VERBOSE("Storing 256f to aligned");
+                     simde_mm256_store_ps(&GetFirst(to), from);
+                  }
+                  else {
+                     LANGULUS_SIMD_VERBOSE("Storing 256f to unaligned");
+                     simde_mm256_storeu_ps(&GetFirst(to), from);
+                  }
+               }
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing 256f to partial");
+                  alignas(32) T temp[CountOf<R>];
+                  simde_mm256_store_ps(temp, from);
+                  memcpy(&GetFirst(to), temp, sizeof(to));
+               }
+            }
+            else if constexpr (CT::Double<T>) {
+               // To double array                                       
+               if constexpr (sizeof(to) == sizeof(from)) {
+                  if constexpr (alignof(TO) % 32 == 0) {
+                     LANGULUS_SIMD_VERBOSE("Storing 256d to aligned");
+                     simde_mm256_store_pd(&GetFirst(to), from);
+                  }
+                  else {
+                     LANGULUS_SIMD_VERBOSE("Storing 256d to unaligned");
+                     simde_mm256_storeu_pd(&GetFirst(to), from);
+                  }
+               }
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing 256d to partial");
+                  alignas(32) T temp[CountOf<R>];
+                  simde_mm256_store_pd(temp, from);
+                  memcpy(&GetFirst(to), temp, sizeof(to));
+               }
+            }
+            else if constexpr (CT::Integer<T>) {
+               // To integer array                                      
+               if constexpr (sizeof(to) == sizeof(from)) {
+                  if constexpr (alignof(TO) % 32 == 0) {
+                     LANGULUS_SIMD_VERBOSE("Storing 256i to aligned");
+                     simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(&GetFirst(to)), from);
+                  }
+                  else {
+                     LANGULUS_SIMD_VERBOSE("Storing 256i to unaligned");
+                     simde_mm256_storeu_si256(&GetFirst(to), from);
+                  }
+               }
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing 256i to partial");
+                  alignas(32) T temp[CountOf<R>];
+                  simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(temp), from);
+                  memcpy(&GetFirst(to), temp, sizeof(to));
+               }
+            }
+            else LANGULUS_ERROR("Unsupported output");
+         }
+         else if constexpr (CT::SIMD512<R>) {
+            if constexpr (CT::Float<T>) {
+               // To float array                                        
+               if constexpr (sizeof(to) == sizeof(from)) {
+                  if constexpr (alignof(TO) % 64 == 0) {
+                     LANGULUS_SIMD_VERBOSE("Storing 512f to aligned");
+                     simde_mm512_store_ps(&GetFirst(to), from);
+                  }
+                  else {
+                     LANGULUS_SIMD_VERBOSE("Storing 512f to unaligned");
+                     simde_mm512_storeu_ps(&GetFirst(to), from);
+                  }
+               }
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing 512f to partial");
+                  alignas(64) T temp[CountOf<R>];
+                  simde_mm512_store_ps(temp, from);
+                  memcpy(&GetFirst(to), temp, sizeof(to));
+               }
+            }
+            else if constexpr (CT::Double<T>) {
+               // To double array                                       
+               if constexpr (sizeof(to) == sizeof(from)) {
+                  if constexpr (alignof(TO) % 64 == 0) {
+                     LANGULUS_SIMD_VERBOSE("Storing 512d to aligned");
+                     simde_mm512_store_pd(&GetFirst(to), from);
+                  }
+                  else {
+                     LANGULUS_SIMD_VERBOSE("Storing 512d to unaligned");
+                     simde_mm512_storeu_pd(&GetFirst(to), from);
+                  }
+               }
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing 512d to partial");
+                  alignas(64) T temp[CountOf<R>];
+                  simde_mm512_store_pd(temp, from);
+                  memcpy(&GetFirst(to), temp, sizeof(to));
+               }
+            }
+            else if constexpr (CT::Integer<T>) {
+               // To integer array                                      
+               if constexpr (sizeof(to) == sizeof(from)) {
+                  if constexpr (alignof(TO) % 64 == 0) {
+                     LANGULUS_SIMD_VERBOSE("Storing 512i to aligned");
+                     simde_mm512_store_si512(reinterpret_cast<simde__m512i*>(&GetFirst(to)), from);
+                  }
+                  else {
+                     LANGULUS_SIMD_VERBOSE("Storing 512i to unaligned");
+                     simde_mm512_storeu_si512(&GetFirst(to), from);
+                  }
+               }
+               else {
+                  LANGULUS_SIMD_VERBOSE("Storing 512i to partial");
+                  alignas(64) T temp[CountOf<R>];
+                  simde_mm512_store_si512(reinterpret_cast<simde__m512i*>(temp), from);
+                  memcpy(&GetFirst(to), temp, sizeof(to));
+               }
+            }
+            else LANGULUS_ERROR("Unsupported output");
+         }
+         else LANGULUS_ERROR("Unsupported register");
+      }
+
+      /// Fallback store routine, doesn't use SIMD, hopefully constexpr       
+      ///   @param from - scalar/vector/bitmask to store                      
+      ///   @param to - scalar/vector/bitmask to write                        
+      LANGULUS(INLINED)
+      constexpr void StoreConstexpr(const CT::NotSIMD auto& from, CT::NotSIMD auto& to) noexcept {
+         using FROM = Deref<decltype(from)>;
+         using TO   = Deref<decltype(to)>;
+         using E    = TypeOf<TO>;
+         constexpr auto S = OverlapCounts<FROM, TO>();
+         static_assert(S > 0);
+
          if constexpr (CT::Bitmask<FROM>) {
-            // Extract from bitmask (produced from SIMD compare routine)
+            // Extract from bitmask                                     
             if constexpr (CT::Bitmask<TO>) {
                // Store in another bitmask                              
-               DenseCast(to) = from;
+               to = from;
             }
-            else if constexpr (CountOf<TO> == 1) {
-               if constexpr (CT::Bool<TypeOf<TO>>) {
+            else if constexpr (CT::Vector<TO>) {
+               // Store each bit into an array of different type        
+               if constexpr (CT::Bool<E>) {
                   // Convert each bit to a boolean inside an array      
-                  to = static_cast<bool>(from);
+                  for (Offset i = 0; i < S; ++i)
+                     to[i] = from[i];
                }
                else LANGULUS_ERROR("Bad output to store a bitmask");
             }
-            else if constexpr (CT::Bool<TypeOf<TO>>) {
-               // Convert each bit to a boolean inside an array         
-               static_assert(CountOf<FROM> == CountOf<TO>, "Counts must match");
-               for (Offset i = 0; i < CountOf<TO>; ++i)
-                  DenseCast(to[i]) = from[i];
+            else if constexpr (CT::Scalar<TO>) {
+               if constexpr (CT::Bool<E>) {
+                  // Collapse the entire bitmask to a single boolean    
+                  GetFirst(to) = from;
+               }
+               else LANGULUS_ERROR("Bad output to store a bitmask");
             }
-            else LANGULUS_ERROR("Bad output to store a bitmask");
+            else LANGULUS_ERROR("Unsupported destination");
          }
-         else if constexpr (::std::ranges::range<FROM>) {
-            // Extract from anything that has begin() and end() methods 
+         else if constexpr (CT::Vector<FROM>) {
+            // Extract from any range                                   
             if constexpr (CT::Bitmask<TO>) {
-               // Store as bitmask                                      
-               using T = typename Decay<TO>::Type;
-               for (decltype(from.size()) i = 0; i < from.size(); ++i)
-                  DenseCast(to) |= (static_cast<T>(from[i]) << static_cast<T>(i));
+               // Store as bits inside a bitmask                        
+               for (Offset i = 0; i < S; ++i)
+                  to[i] = static_cast<bool>(from[i]);
             }
-            else if constexpr (CountOf<TO> == 1) {
-               // Store as a single number (produced from fallback)     
-               if constexpr (CT::Bool<TypeOf<TO>>) {
-                  // Short-circuit on first false flag (AND logic)      
+            else if constexpr (CT::Vector<TO>) {
+               // Fill a vector, element by element                     
+               for (Offset i = 0; i < S; ++i)
+                  to[i] = from[i];
+            }
+            else if constexpr (CT::Scalar<TO>) {
+               // Store as a scalar                                     
+               if constexpr (CT::Bool<E>) {
+                  // Collect all booleans, so that we don't lose the    
+                  // information. Short-circuit on the first falsum     
                   for (auto& it : from) {
                      if (not it) {
-                        to = false;
+                        GetFirst(to) = false;
                         return;
                      }
                   }
-
-                  to = true;
+                  GetFirst(to) = true;
                }
-               else {
-                  // Otherwise just copy first element                  
-                  DenseCast(GetFirst(to)) = from[0];
-               }
+               else GetFirst(to) = from;
             }
-            else {
-               // Store to a sparse/dense output array                  
-               static_assert(CountOf<FROM> == CountOf<TO>, "Counts must match");
-               for (Count i = 0; i < CountOf<TO>; ++i)
-                  DenseCast(to[i]) = from[i];
-            }
+            else LANGULUS_ERROR("Unsupported destination");
          }
-         else {
+         else if constexpr (CT::Scalar<FROM>) {
             // Extract from a scalar                                    
-            if constexpr (CountOf<TO> == 1) {
-               if constexpr (CT::Bitmask<TO>) {
-                  // Store to a single-bit bitmask                      
-                  DenseCast(to) = from;
-               }
-               else {
-                  // Store to an output array of size 1, or scalar      
-                  DenseCast(Inner::GetFirst(to)) = from;
-               }
+            if constexpr (CT::Vector<TO>) {
+               // Multicast to a vector output                          
+               for (Offset i = 0; i < S; ++i)
+                  to[i] = from;
             }
-            else {
-               // Multicast only result to an output array              
-               for (Count i = 0; i < CountOf<TO>; ++i)
-                  DenseCast(to[i]) = from;
-            }
+            else GetFirst(to) = from;
          }
+         else LANGULUS_ERROR("Unsupported source");
       }
 
    } // namespace Langulus::SIMD::Inner
 
 
-   /// Generalized store routine                                              
-   /// Can be either constexpr or not, using SIMD or not                      
-   ///   @tparam FROM - any source type, SIMD register, std::array,           
-   ///                  boolvector, or scalar                                 
-   ///   @tparam TO - any destination type, array or scalar                   
+   /// Generalized store routine, will attempt constexpr and SIMD execution   
    ///   @param from - what to store                                          
    ///   @param to - where to store it                                        
-   template<CT::NotSemantic FROM, CT::NotSIMD TO> LANGULUS(INLINED)
-   constexpr void Store(const FROM& from, TO& to) noexcept {
-      if constexpr (CT::SIMD<FROM>)
+   LANGULUS(INLINED)
+   constexpr void Store(const CT::NotSemantic auto& from, CT::NotSIMD auto& to) noexcept {
+      if constexpr (CT::SIMD<decltype(from)>)
          Inner::StoreSIMD(from, to);
       else
          Inner::StoreConstexpr(from, to);
@@ -433,24 +348,20 @@ namespace Langulus::SIMD
 } // namespace Langulus::SIMD
 
 
+///                                                                           
 #define LANGULUS_SIMD_ARITHMETHIC_API(OP) \
    template<class LHS, class RHS, CT::NotSemantic OUT> LANGULUS(INLINED) \
    constexpr void OP(const LHS& lhs, const RHS& rhs, OUT& out) noexcept { \
-      if constexpr (CT::SIMD<OUT>) \
-         out = Inner::OP<OUT>(lhs, rhs); \
-      else if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>) \
-         Store(Inner::OP<OUT>(lhs, rhs), out); \
-      else { \
-         IF_CONSTEXPR() { \
-            Store(Inner::OP##Constexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out); \
-         } \
-         else { \
-            Store(Inner::OP<OUT>(DesemCast(lhs), DesemCast(rhs)), out); \
-         } \
+      IF_CONSTEXPR() { \
+         Store(Inner::OP##Constexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out); \
       } \
+      else if constexpr (CT::SIMD<OUT>) \
+         out = Inner::OP<OUT>(lhs, rhs); \
+      else \
+         Store(Inner::OP<OUT>(DesemCast(lhs), DesemCast(rhs)), out); \
    } \
    template<class LHS, class RHS, CT::NotSemantic OUT = LosslessArray<LHS, RHS>> \
-   LANGULUS(INLINED) \
+   NOD() LANGULUS(INLINED) \
    constexpr auto OP(const LHS& lhs, const RHS& rhs) noexcept { \
       OUT out; \
       OP(DesemCast(lhs), DesemCast(rhs), out); \
@@ -462,29 +373,22 @@ namespace Langulus::SIMD
          return out; \
    }
 
+///                                                                           
 #define LANGULUS_SIMD_ARITHMETHIC_UNARY_API(OP) \
    template<class VAL, CT::NotSemantic OUT> LANGULUS(INLINED) \
    constexpr void OP(const VAL& val, OUT& out) noexcept { \
-      if constexpr (CT::SIMD<OUT>) \
-         out = Inner::OP<OUT>(val); \
-      else if constexpr (CT::SIMD<VAL>) \
-         Store(Inner::OP<OUT>(val), out); \
-      else { \
-         IF_CONSTEXPR() { \
-            Store(Inner::OP##Constexpr<OUT>(DesemCast(val)), out); \
-         } \
-         else { \
-            Store(Inner::OP<OUT>(DesemCast(val)), out); \
-         } \
+      IF_CONSTEXPR() { \
+         Store(Inner::OP##Constexpr<OUT>(DesemCast(val)), out); \
       } \
+      else if constexpr (CT::SIMD<OUT>) \
+         out = Inner::OP<OUT>(val); \
+      else \
+         Store(Inner::OP<OUT>(DesemCast(val)), out); \
    } \
-   template<class VAL, CT::NotSemantic OUT = LosslessArray<VAL, VAL>> \
-   LANGULUS(INLINED) \
+   template<class VAL, CT::NotSemantic OUT = LosslessArray<VAL>> \
+   NOD() LANGULUS(INLINED) \
    constexpr auto OP(const VAL& val) noexcept { \
       OUT out; \
       OP(DesemCast(val), out); \
       return out; \
    }
-
-
-#include "IgnoreWarningsPop.inl"

@@ -30,13 +30,6 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
       T r, rCheck;
 
       if constexpr (not CT::Vector<T>) {
-         if constexpr (CT::Sparse<T>) {
-            x = nullptr;
-            y = nullptr;
-            r = new Decay<T>;
-            rCheck = new Decay<T>;
-         }
-
          InitOne(x, 1);
          InitOne(y, -5);
       }
@@ -45,9 +38,7 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          ControlMul(x, y, rCheck);
          SIMD::Multiply(x, y, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
+         REQUIRE(r == rCheck);
 
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Multiply (control)") (timer meter) {
@@ -97,16 +88,7 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          ControlMul(y, x, rCheck);
          SIMD::Multiply(y, x, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
-      }
-
-      if constexpr (CT::Sparse<T>) {
-         delete r;
-         delete rCheck;
-         delete x;
-         delete y;
+         REQUIRE(r == rCheck);
       }
    }
 }

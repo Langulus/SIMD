@@ -15,7 +15,7 @@ using uninitialized = Catch::Benchmark::storage_for<T>;
 
 template<class VAL, class OUT> LANGULUS(INLINED)
 void ControlFloor(const VAL& val, OUT& out) noexcept {
-   DenseCast(out) = std::floor(DenseCast(val));
+   out = std::floor(val);
 }
 
 template<class VAL, size_t C, class OUT> LANGULUS(INLINED)
@@ -47,15 +47,8 @@ TEMPLATE_TEST_CASE("Floor", "[floor]"
       T x;
       T r, rCheck;
 
-      if constexpr (not CT::Vector<T>) {
-         if constexpr (CT::Sparse<T>) {
-            x = nullptr;
-            r = new Decay<T>;
-            rCheck = new Decay<T>;
-         }
-
+      if constexpr (not CT::Vector<T>)
          InitOne(x, 1.2);
-      }
 
       WHEN("Floored as constexpr") {
          {
@@ -107,9 +100,7 @@ TEMPLATE_TEST_CASE("Floor", "[floor]"
          else
             SIMD::Floor(x, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
+         REQUIRE(r == rCheck);
 
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Floor (control)") (timer meter) {
@@ -141,12 +132,6 @@ TEMPLATE_TEST_CASE("Floor", "[floor]"
                });
             };
          #endif
-      }
-
-      if constexpr (CT::Sparse<T>) {
-         delete r;
-         delete rCheck;
-         delete x;
       }
    }
 }

@@ -51,13 +51,6 @@ TEMPLATE_TEST_CASE("Add", "[add]"
       T r, rCheck;
 
       if constexpr (not CT::Vector<T>) {
-         if constexpr (CT::Sparse<T>) {
-            x = nullptr;
-            y = nullptr;
-            r = new Decay<T>;
-            rCheck = new Decay<T>;
-         }
-
          InitOne(x, 1);
          InitOne(y, -5);
       }
@@ -70,9 +63,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
          else
             SIMD::Add(x, y, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
+         REQUIRE(r == rCheck);
 
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Add (control)") (timer meter) {
@@ -126,16 +117,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
          else
             SIMD::Add(y, x, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
-      }
-
-      if constexpr (CT::Sparse<T>) {
-         delete r;
-         delete rCheck;
-         delete x;
-         delete y;
+         REQUIRE(r == rCheck);
       }
    }
 }

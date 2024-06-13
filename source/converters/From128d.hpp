@@ -12,89 +12,66 @@
 namespace Langulus::SIMD::Inner
 {
 
-   /// Convert __m128d to any other register                                  
+   /// Convert V128d to any other register                                    
    ///   @tparam TO - the desired element type                                
-   ///   @tparam REGISTER - register to convert to                            
    ///   @param v - the input register                                        
-   ///   @return the resulting register                                       
-   template<CT::Decayed TO, CT::SIMD REGISTER> LANGULUS(INLINED)
-   auto ConvertFrom128d(const simde__m128d& v) noexcept {
-      //                                                                
-      // Converting FROM double[2]                                      
-      //                                                                
-      if constexpr (CT::SIMD128f<REGISTER>) {
-         //                                                             
-         // Converting TO float[2]                                      
-         //                                                             
-         LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to float[2]");
-         return simde_mm_cvtpd_ps(v);
+   ///   @return the converted register                                       
+   template<Element TO> NOD() LANGULUS(INLINED)
+   auto ConvertFrom128d(CT::SIMD128d auto v) noexcept {
+      if constexpr (CT::Double<TO>)
+         return v;
+      else if constexpr (CT::Float<TO>)
+         return V128<TO> {simde_mm_cvtpd_ps(v)};
+      else if constexpr (CT::SignedInteger8<TO>) {
+         const V128i32 t32 {simde_mm_cvtpd_epi32(v)};
+         return t32.Pack().Pack();
       }
-      else if constexpr (CT::SIMD128i<REGISTER>) {
-         //                                                             
-         // Converting TO i8[2],  u8[2],  i16[2], u16[2]                
-         //               i32[2], u32[2], i64[2], u64[2]                
-         //                                                             
-         if constexpr (CT::SignedInteger8<TO>) {
-            LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to i8[2]");
-            auto
-            vi32_16_8 = simde_mm_cvtpd_epi32(v);
-            vi32_16_8 = simde_mm_packs_epi32(vi32_16_8, simde_mm_setzero_si128());
-            vi32_16_8 = simde_mm_packs_epi16(vi32_16_8, simde_mm_setzero_si128());
-            return vi32_16_8;
-         }
-         else if constexpr (CT::UnsignedInteger8<TO>) {
-            LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to u8[2]");
-            auto
-            vi32_16_8 = simde_mm_cvtpd_epi32(v);
-            vi32_16_8 = simde_mm_packus_epi32(vi32_16_8, simde_mm_setzero_si128());
-            vi32_16_8 = simde_mm_packus_epi16(vi32_16_8, simde_mm_setzero_si128());
-            return vi32_16_8;
-         }
-         else if constexpr (CT::SignedInteger16<TO>) {
-            LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to i16[2]");
-            auto
-            vi32_16 = simde_mm_cvtpd_epi32(v);
-            vi32_16 = simde_mm_packs_epi32(vi32_16, simde_mm_setzero_si128());
-            return vi32_16;
-         }
-         else if constexpr (CT::UnsignedInteger16<TO>) {
-            LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to u16[2]");
-            auto
-            vi32_16 = simde_mm_cvtpd_epi32(v);
-            vi32_16 = simde_mm_packus_epi32(vi32_16, simde_mm_setzero_si128());
-            return vi32_16;
-         }
-         else if constexpr (CT::SignedInteger32<TO>) {
-            LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to u/i32[2]");
-            return simde_mm_cvtpd_epi32(v);
-         }
-         else if constexpr (CT::UnsignedInteger32<TO>) {
-            LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to u/i32[2]");
-            #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
-               return simde_mm_cvtpd_epu32(v);
-            #else
-               return Unsupported {};
-            #endif
-         }
-         else if constexpr (CT::SignedInteger64<TO>) {
-            LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to i64[2]");
-            #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
-               return simde_mm_cvtpd_epi64(v);
-            #else
-               return Unsupported {};
-            #endif
-         }
-         else if constexpr (CT::UnsignedInteger64<TO>) {
-            LANGULUS_SIMD_VERBOSE("Converting 128bit register from double[2] to u64[2]");
-            #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
-               return simde_mm_cvtpd_epu64(v);
-            #else
-               return Unsupported {};
-            #endif
-         }
-         else LANGULUS_ERROR("Can't convert from __m128d to __m128i");
+      else if constexpr (CT::UnsignedInteger8<TO>) {
+         #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
+            const V128u32 t32 {simde_mm_cvtpd_epu32(v)};
+         #else
+            const V128u32 t32 {simde_mm_cvtpd_epi32(v)};
+         #endif
+         return t32.Pack().Pack();
       }
-      else LANGULUS_ERROR("Can't convert from __m128d to unsupported");
+      else if constexpr (CT::SignedInteger16<TO>) {
+         const V128i32 t32 {simde_mm_cvtpd_epi32(v)};
+         return t32.Pack();
+      }
+      else if constexpr (CT::UnsignedInteger16<TO>) {
+         #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
+            const V128u32 t32 {simde_mm_cvtpd_epu32(v)};
+         #else
+            const V128u32 t32 {simde_mm_cvtpd_epi32(v)};
+         #endif
+         return t32.Pack();
+      }
+      else if constexpr (CT::SignedInteger32<TO>)
+         return V128<TO> {simde_mm_cvtpd_epi32(v)};
+      else if constexpr (CT::UnsignedInteger32<TO>) {
+         #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
+            return V128<TO> {simde_mm_cvtpd_epu32(v)};
+         #else
+            return V128<TO> {simde_mm_cvtpd_epi32(v)};
+         #endif
+      }
+      else if constexpr (CT::SignedInteger64<TO>) {
+         #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
+            return V128<TO> {simde_mm_cvtpd_epi64(v)};
+         #else
+            const V128i32 t32 {simde_mm_cvtpd_epi32(v)};
+            return t32.UnpackLo();
+         #endif
+      }
+      else if constexpr (CT::UnsignedInteger64<TO>) {
+         #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
+            return V128<TO> {simde_mm_cvtpd_epu64(v)};
+         #else
+            const V128u32 t32 {simde_mm_cvtpd_epi32(v)};
+            return t32.UnpackLo();
+         #endif
+      }
+      else LANGULUS_ERROR("Unsupported register");
    }
 
 } // namespace Langulus::SIMD

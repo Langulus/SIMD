@@ -33,12 +33,10 @@ TEST_CASE("Strange msvc bug (simde equivalent)", "[bug]") {
          simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(rr), r);
          simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(ctrl), control);
 
-         THEN("The result should be correct") {
-            REQUIRE(0 == memcmp(xx,    xsrc,    24));
-            REQUIRE(0 == memcmp(yy,    ysrc,    24));
-            REQUIRE(0 == memcmp(ctrl,  ctrlsrc, 24));
-            REQUIRE(0 == memcmp(rr,    ctrl,    24));
-         }
+         REQUIRE(0 == memcmp(xx,    xsrc,    24));
+         REQUIRE(0 == memcmp(yy,    ysrc,    24));
+         REQUIRE(0 == memcmp(ctrl,  ctrlsrc, 24));
+         REQUIRE(0 == memcmp(rr,    ctrl,    24));
       }
    }
 }
@@ -49,12 +47,12 @@ TEST_CASE("Strange msvc bug (langulus equivalent)", "[bug]") {
       const std::int64_t ysrc[3] {7,8,9};
       const std::int64_t ctrlsrc[3] {8,10,12};
 
-      const simde__m256i x = SIMD::Set(xsrc);
-      const simde__m256i y = SIMD::Set(ysrc);
-      const simde__m256i control = SIMD::Set(ctrlsrc);
+      const SIMD::V256i64 x = SIMD::Set(xsrc);
+      const SIMD::V256i64 y = SIMD::Set(ysrc);
+      const SIMD::V256i64 control = SIMD::Set(ctrlsrc);
 
       WHEN("Added") {
-         const simde__m256i r  = SIMD::Inner::Add<std::int64_t>(x, y);
+         const SIMD::V256i64 r = SIMD::Inner::Add(x, y);
 
          std::int64_t xx[3];
          std::int64_t yy[3];
@@ -69,13 +67,11 @@ TEST_CASE("Strange msvc bug (langulus equivalent)", "[bug]") {
          std::int64_t rr2[3];
          SIMD::Add(xsrc, ysrc, rr2);
 
-         THEN("The result should be correct") {
-            REQUIRE(0 == memcmp(xx,    xsrc,    24));
-            REQUIRE(0 == memcmp(yy,    ysrc,    24));
-            REQUIRE(0 == memcmp(ctrl,  ctrlsrc, 24));
-            REQUIRE(0 == memcmp(rr,    ctrl,    24));
-            REQUIRE(0 == memcmp(rr2,   rr,      24));
-         }
+         REQUIRE(0 == memcmp(xx,    xsrc,    24));
+         REQUIRE(0 == memcmp(yy,    ysrc,    24));
+         REQUIRE(0 == memcmp(ctrl,  ctrlsrc, 24));
+         REQUIRE(0 == memcmp(rr,    ctrl,    24));
+         REQUIRE(0 == memcmp(rr2,   rr,      24));
       }
    }
 }
@@ -90,21 +86,17 @@ TEST_CASE("Strange msvc bug (langulus vector equivalent)", "[bug]") {
       WHEN("Added as array") {
          SIMD::Add(xsrc.mArray, ysrc.mArray, ctrlsrc1.mArray);
 
-         THEN("The result should be correct") {
-            REQUIRE(ctrlsrc1[0] == xsrc[0] + ysrc[0]);
-            REQUIRE(ctrlsrc1[1] == xsrc[1] + ysrc[1]);
-            REQUIRE(ctrlsrc1[2] == xsrc[2] + ysrc[2]);
-         }
+         REQUIRE(ctrlsrc1[0] == xsrc[0] + ysrc[0]);
+         REQUIRE(ctrlsrc1[1] == xsrc[1] + ysrc[1]);
+         REQUIRE(ctrlsrc1[2] == xsrc[2] + ysrc[2]);
       }
 
       WHEN("Added as vector") {
          SIMD::Add(xsrc, ysrc, ctrlsrc2);
 
-         THEN("The result should be correct") {
-            REQUIRE(ctrlsrc2[0] == xsrc[0] + ysrc[0]);
-            REQUIRE(ctrlsrc2[1] == xsrc[1] + ysrc[1]);
-            REQUIRE(ctrlsrc2[2] == xsrc[2] + ysrc[2]);
-         }
+         REQUIRE(ctrlsrc2[0] == xsrc[0] + ysrc[0]);
+         REQUIRE(ctrlsrc2[1] == xsrc[1] + ysrc[1]);
+         REQUIRE(ctrlsrc2[2] == xsrc[2] + ysrc[2]);
       }
    }
 }
