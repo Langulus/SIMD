@@ -588,8 +588,8 @@ namespace Langulus::SIMD
             #else
                // Grab the 32-bit low halves of 64-bit elements         
                auto combined = _mm256_shuffle_ps(
-                  _mm256_castsi256_ps(a.m),
-                  _mm256_castsi256_ps(b.m),
+                  _mm256_castsi256_ps(m),
+                  _mm256_castsi256_ps(m),
                   _MM_SHUFFLE(2, 0, 2, 0)
                );
 
@@ -610,8 +610,8 @@ namespace Langulus::SIMD
             #else
                // Grab the 32-bit low halves of 64-bit elements         
                auto combined = _mm256_shuffle_ps(
-                  _mm256_castsi256_ps(a.m),
-                  _mm256_castsi256_ps(b.m),
+                  _mm256_castsi256_ps(m),
+                  _mm256_castsi256_ps(m),
                   _MM_SHUFFLE(2, 0, 2, 0)
                );
 
