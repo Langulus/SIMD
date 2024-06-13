@@ -24,30 +24,30 @@ namespace Langulus::SIMD
          using T  = TypeOf<R>;
 
          if constexpr (CT::SIMD128<R>) {
-            if      constexpr (CT::Integer8<T>)    to = simde_mm_movemask_epi8(from);
-            else if constexpr (CT::Integer16<T>)   to = simde_mm_movemask_epi8(simde_mm_packs_epi16(from, from.Zero()));
-            else if constexpr (CT::Integer32<T>)   to = simde_mm_movemask_ps(simde_mm_castsi128_ps(from));
-            else if constexpr (CT::Integer64<T>)   to = simde_mm_movemask_pd(simde_mm_castsi128_pd(from));
-            else if constexpr (CT::Float<T>)       to = simde_mm_movemask_ps(from);
-            else if constexpr (CT::Double<T>)      to = simde_mm_movemask_pd(from);
+            if      constexpr (CT::Integer8<T>)    to = simde_mm_movemask_epi8   (from);
+            else if constexpr (CT::Integer16<T>)   to = simde_mm_movemask_epi8   (simde_mm_packs_epi16(from, from.Zero()));
+            else if constexpr (CT::Integer32<T>)   to = simde_mm_movemask_ps     (simde_mm_castsi128_ps(from));
+            else if constexpr (CT::Integer64<T>)   to = simde_mm_movemask_pd     (simde_mm_castsi128_pd(from));
+            else if constexpr (CT::Float<T>)       to = simde_mm_movemask_ps     (from);
+            else if constexpr (CT::Double<T>)      to = simde_mm_movemask_pd     (from);
             else LANGULUS_ERROR("Unsupported type");
          }
          else if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::Integer8<T>)    to = simde_mm256_movemask_epi8(from);
             else if constexpr (CT::Integer16<T>)   to = simde_mm256_movemask_epi8(simde_mm256_packs_epi16(from, from.Zero()));
-            else if constexpr (CT::Integer32<T>)   to = simde_mm256_movemask_ps(simde_mm256_castsi256_ps(from));
-            else if constexpr (CT::Integer64<T>)   to = simde_mm256_movemask_pd(simde_mm256_castsi256_pd(from));
-            else if constexpr (CT::Float<T>)       to = simde_mm256_movemask_ps(from);
-            else if constexpr (CT::Double<T>)      to = simde_mm256_movemask_pd(from);
+            else if constexpr (CT::Integer32<T>)   to = simde_mm256_movemask_ps  (simde_mm256_castsi256_ps(from));
+            else if constexpr (CT::Integer64<T>)   to = simde_mm256_movemask_pd  (simde_mm256_castsi256_pd(from));
+            else if constexpr (CT::Float<T>)       to = simde_mm256_movemask_ps  (from);
+            else if constexpr (CT::Double<T>)      to = simde_mm256_movemask_pd  (from);
             else LANGULUS_ERROR("Unsupported type");
          }
          else if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::Integer8<T>)    to = simde_mm512_movemask_epi8(from);
             else if constexpr (CT::Integer16<T>)   to = simde_mm512_movemask_epi8(simde_mm512_packs_epi16(from, from.Zero()));
-            else if constexpr (CT::Integer32<T>)   to = simde_mm512_movemask_ps(simde_mm512_castsi256_ps(from));
-            else if constexpr (CT::Integer64<T>)   to = simde_mm512_movemask_pd(simde_mm512_castsi256_pd(from));
-            else if constexpr (CT::Float<T>)       to = simde_mm512_movemask_ps(from);
-            else if constexpr (CT::Double<T>)      to = simde_mm512_movemask_pd(from);
+            else if constexpr (CT::Integer32<T>)   to = simde_mm512_movemask_ps  (simde_mm512_castsi256_ps(from));
+            else if constexpr (CT::Integer64<T>)   to = simde_mm512_movemask_pd  (simde_mm512_castsi256_pd(from));
+            else if constexpr (CT::Float<T>)       to = simde_mm512_movemask_ps  (from);
+            else if constexpr (CT::Double<T>)      to = simde_mm512_movemask_pd  (from);
             else LANGULUS_ERROR("Unsupported type");
          }
          else LANGULUS_ERROR("Unsupported register");

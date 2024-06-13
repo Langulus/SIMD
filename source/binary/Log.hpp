@@ -36,7 +36,7 @@ namespace Langulus::SIMD
 
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::Float<T>) {
-               if constexpr (STYLE == LogStyle::Natural)             return simde_mm_log_ps(value);
+               if      constexpr (STYLE == LogStyle::Natural)        return simde_mm_log_ps(value);
                else if constexpr (STYLE == LogStyle::Base10)         return simde_mm_log10_ps(value);
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm_log1p_ps(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm_log2_ps(value);
@@ -44,7 +44,7 @@ namespace Langulus::SIMD
                else LANGULUS_ERROR("Unsupported style for float[4] package");
             }
             else if constexpr (CT::Double<T>) {
-               if constexpr (STYLE == LogStyle::Natural)             return simde_mm_log_pd(value);
+               if      constexpr (STYLE == LogStyle::Natural)        return simde_mm_log_pd(value);
                else if constexpr (STYLE == LogStyle::Base10)         return simde_mm_log10_pd(value);
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm_log1p_pd(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm_log2_pd(value);
@@ -55,7 +55,7 @@ namespace Langulus::SIMD
          }
          else if constexpr (CT::SIMD256<REGISTER>) {
             if constexpr (CT::Float<T>) {
-               if constexpr (STYLE == LogStyle::Natural)             return simde_mm256_log_ps(value);
+               if      constexpr (STYLE == LogStyle::Natural)        return simde_mm256_log_ps(value);
                else if constexpr (STYLE == LogStyle::Base10)         return simde_mm256_log10_ps(value);
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm256_log1p_ps(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm256_log2_ps(value);
@@ -63,7 +63,7 @@ namespace Langulus::SIMD
                else LANGULUS_ERROR("Unsupported style for float[8] package");
             }
             else if constexpr (CT::Double<T>) {
-               if constexpr (STYLE == LogStyle::Natural)             return simde_mm256_log_pd(value);
+               if      constexpr (STYLE == LogStyle::Natural)        return simde_mm256_log_pd(value);
                else if constexpr (STYLE == LogStyle::Base10)         return simde_mm256_log10_pd(value);
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm256_log1p_pd(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm256_log2_pd(value);
@@ -74,7 +74,7 @@ namespace Langulus::SIMD
          }
          else if constexpr (CT::SIMD512<REGISTER>) {
             if constexpr (CT::Float<T>) {
-               if constexpr (STYLE == LogStyle::Natural)             return simde_mm512_log_ps(value);
+               if      constexpr (STYLE == LogStyle::Natural)        return simde_mm512_log_ps(value);
                else if constexpr (STYLE == LogStyle::Base10)         return simde_mm512_log10_ps(value);
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm512_log1p_ps(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm512_log2_ps(value);
@@ -82,7 +82,7 @@ namespace Langulus::SIMD
                else LANGULUS_ERROR("Unsupported style for float[16] package");
             }
             else if constexpr (CT::Double<T>) {
-               if constexpr (STYLE == LogStyle::Natural)             return simde_mm512_log_pd(value);
+               if      constexpr (STYLE == LogStyle::Natural)        return simde_mm512_log_pd(value);
                else if constexpr (STYLE == LogStyle::Base10)         return simde_mm512_log10_pd(value);
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm512_log1p_pd(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm512_log2_pd(value);
