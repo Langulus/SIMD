@@ -30,7 +30,7 @@ namespace Langulus::SIMD
          (void)lhs; (void)rhs;
 
          if constexpr (CT::SIMD128<R>) {
-            if constexpr (CT::SignedInteger8<T>)         return R {simde_mm_max_epi8(lhs, rhs)};
+            if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm_max_epi8(lhs, rhs)};
             else if constexpr (CT::UnsignedInteger8<T>)  return R {simde_mm_max_epu8(lhs, rhs)};
             else if constexpr (CT::SignedInteger16<T>)   return R {simde_mm_max_epi16(lhs, rhs)};
             else if constexpr (CT::UnsignedInteger16<T>) return R {simde_mm_max_epu16(lhs, rhs)};
@@ -55,7 +55,7 @@ namespace Langulus::SIMD
             else LANGULUS_ERROR("Unsupported type for 16-byte package");
          }
          else if constexpr (CT::SIMD256<R>) {
-            if constexpr (CT::SignedInteger8<T>)         return R {simde_mm256_max_epi8(lhs, rhs)};
+            if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm256_max_epi8(lhs, rhs)};
             else if constexpr (CT::UnsignedInteger8<T>)  return R {simde_mm256_max_epu8(lhs, rhs)};
             else if constexpr (CT::SignedInteger16<T>)   return R {simde_mm256_max_epi16(lhs, rhs)};
             else if constexpr (CT::UnsignedInteger16<T>) return R {simde_mm256_max_epu16(lhs, rhs)};
@@ -80,7 +80,7 @@ namespace Langulus::SIMD
             else LANGULUS_ERROR("Unsupported type for 32-byte package");
          }
          else if constexpr (CT::SIMD512<R>) {
-            if constexpr (CT::SignedInteger8<T>)         return R {simde_mm512_max_epi8(lhs, rhs)};
+            if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm512_max_epi8(lhs, rhs)};
             else if constexpr (CT::UnsignedInteger8<T>)  return R {simde_mm512_max_epu8(lhs, rhs)};
             else if constexpr (CT::SignedInteger16<T>)   return R {simde_mm512_max_epi16(lhs, rhs)};
             else if constexpr (CT::UnsignedInteger16<T>) return R {simde_mm512_max_epu16(lhs, rhs)};

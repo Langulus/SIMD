@@ -51,28 +51,19 @@ namespace Langulus::SIMD
             return in;
          }
          else if constexpr (CT::SIMD128<R>) {
-            if constexpr (CT::Float<T>)
-               return ConvertFrom128f<TO>(in);
-            else if constexpr (CT::Double<T>)
-               return ConvertFrom128d<TO>(in);
-            else if constexpr (CT::Integer<T>)
-               return ConvertFrom128i<TO>(in);
+            if      constexpr (CT::Float<T>)    return ConvertFrom128f<TO>(in);
+            else if constexpr (CT::Double<T>)   return ConvertFrom128d<TO>(in);
+            else if constexpr (CT::Integer<T>)  return ConvertFrom128i<TO>(in);
          }
          else if constexpr (CT::SIMD256<R>) {
-            if constexpr (CT::Float<T>)
-               return ConvertFrom256f<TO>(in);
-            else if constexpr (CT::Double<T>)
-               return ConvertFrom256d<TO>(in);
-            else if constexpr (CT::Integer<T>)
-               return ConvertFrom256i<TO>(in);
+            if      constexpr (CT::Float<T>)    return ConvertFrom256f<TO>(in);
+            else if constexpr (CT::Double<T>)   return ConvertFrom256d<TO>(in);
+            else if constexpr (CT::Integer<T>)  return ConvertFrom256i<TO>(in);
          }
          else if constexpr (CT::SIMD512<R>) {
-            if constexpr (CT::Float<T>)
-               return ConvertFrom512f<TO>(in);
-            else if constexpr (CT::Double<T>)
-               return ConvertFrom512d<TO>(in);
-            else if constexpr (CT::Integer<T>)
-               return ConvertFrom512i<TO>(in);
+            if      constexpr (CT::Float<T>)    return ConvertFrom512f<TO>(in);
+            else if constexpr (CT::Double<T>)   return ConvertFrom512d<TO>(in);
+            else if constexpr (CT::Integer<T>)  return ConvertFrom512i<TO>(in);
          }
          else LANGULUS_ERROR("Can't convert from unsupported");
       }
