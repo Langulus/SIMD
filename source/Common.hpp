@@ -601,7 +601,7 @@ namespace Langulus::SIMD
                   SIMDE_MM_SHUFFLE(3, 1, 2, 0)
                );
 
-               return V128<std::int32_t>  {simde_mm256_castpd_si256(ordered)};
+               return V256<std::int32_t>  {simde_mm256_castpd_si256(ordered)};
             #endif
          }
          else if constexpr (CT::UnsignedInteger64<T>) {
@@ -623,7 +623,7 @@ namespace Langulus::SIMD
                   SIMDE_MM_SHUFFLE(3, 1, 2, 0)
                );
 
-               return V128<std::uint32_t>  {simde_mm256_castpd_si256(ordered)};
+               return V256<std::uint32_t>  {simde_mm256_castpd_si256(ordered)};
             #endif
          }
          else LANGULUS_ERROR("Can't unpack this type");
