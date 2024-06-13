@@ -43,7 +43,7 @@ constexpr auto Pow(B base, E exponent) noexcept {
 
 template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
 void ControlPow(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-   DenseCast(out) = Pow(DenseCast(lhs), DenseCast(rhs));
+   out = Pow(lhs, rhs);
 }
 
 template<class LHS, class RHS, size_t C, class OUT> LANGULUS(INLINED)
@@ -77,13 +77,6 @@ TEMPLATE_TEST_CASE("Power", "[power]"
       T r, rCheck;
 
       if constexpr (not CT::Vector<T>) {
-         if constexpr (CT::Sparse<T>) {
-            x = nullptr;
-            y = nullptr;
-            r = new Decay<T>;
-            rCheck = new Decay<T>;
-         }
-
          InitOne(x, 1);
          InitOne(y, -5);
       }
@@ -96,9 +89,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
          else
             SIMD::Power(x, y, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
+         REQUIRE(r == rCheck);
 
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Power (control)") (timer meter) {
@@ -152,16 +143,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
          else
             SIMD::Power(y, x, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
-      }
-
-      if constexpr (CT::Sparse<T>) {
-         delete r;
-         delete rCheck;
-         delete x;
-         delete y;
+         REQUIRE(r == rCheck);
       }
    }
 }

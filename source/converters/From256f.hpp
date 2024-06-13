@@ -6,39 +6,72 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include "From256f_To128f.hpp"
-#include "From256f_To128d.hpp"
-#include "From256f_To128i.hpp"
-#include "From256f_To256d.hpp"
-#include "From256f_To256i.hpp"
+#include "../Common.hpp"
 
-#if LANGULUS_SIMD(512BIT)
-   #include "From256f_To512d.hpp"
-   #include "From256f_To512i.hpp"
-#endif
 
 namespace Langulus::SIMD::Inner
 {
 
-   /// Convert __m256 to any other register                                   
+   /// Convert V256f to any other register                                    
    ///   @tparam TO - the desired element type                                
-   ///   @tparam REGISTER - register to convert to                            
    ///   @param v - the input register                                        
-   ///   @return the resulting register                                       
-   template<CT::Decayed TO, CT::SIMD REGISTER> LANGULUS(INLINED)
-   auto ConvertFrom256f(const simde__m256& v) noexcept {
-      if constexpr (CT::SIMD128f<REGISTER>)
-         return ConvertFrom256f_To128f(v);
-      else if constexpr (CT::SIMD128d<REGISTER>)
-         return ConvertFrom256f_To128d(v);
-      else if constexpr (CT::SIMD128i<REGISTER>)
-         return ConvertFrom256f_To128i<TO>(v);
-      else if constexpr (CT::SIMD256i<REGISTER>)
-         return ConvertFrom256f_To256i<TO>(v);
-      else if constexpr (CT::SIMD256d<REGISTER>)
-         return ConvertFrom256f_To256d(v);
-      else
-         LANGULUS_ERROR("Can't convert from __m256 to unsupported");
+   ///   @return the converted register                                       
+   template<Element TO> NOD() LANGULUS(INLINED)
+   auto ConvertFrom256f(CT::SIMD256f auto v) noexcept {
+      if constexpr (CT::Double<TO>)
+         return V256<TO> {simde_mm256_cvtps_pd(v)};
+      else if constexpr (CT::Float<TO>)
+         return v;
+      else if constexpr (CT::SignedInteger8<TO>) {
+         const V256i32 t32 {simde_mm256_cvtps_epi32(v)};
+         return t32.Pack().Pack();
+      }
+      else if constexpr (CT::UnsignedInteger8<TO>) {
+         #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
+            const V256u32 t32 {simde_mm256_cvtps_epu32(v)};
+         #else
+            const V256u32 t32 {simde_mm256_cvtps_epi32(v)};
+         #endif
+         return t32.Pack().Pack();
+      }
+      else if constexpr (CT::SignedInteger16<TO>) {
+         const V256i32 t32 {simde_mm256_cvtps_epi32(v)};
+         return t32.Pack();
+      }
+      else if constexpr (CT::UnsignedInteger16<TO>) {
+         #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
+            const V256u32 t32 {simde_mm256_cvtps_epu32(v)};
+         #else
+            const V256u32 t32 {simde_mm256_cvtps_epi32(v)};
+         #endif
+         return t32.Pack();
+      }
+      else if constexpr (CT::SignedInteger32<TO>)
+         return V256<TO> {simde_mm256_cvtps_epi32(v)};
+      else if constexpr (CT::UnsignedInteger32<TO>) {
+         #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
+            return V256<TO> {simde_mm256_cvtps_epu32(v)};
+         #else
+            return V256<TO> {simde_mm256_cvtps_epi32(v)};
+         #endif
+      }
+      else if constexpr (CT::SignedInteger64<TO>) {
+         #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
+            return V256<TO> {simde_mm256_cvtps_epi64(v)};
+         #else
+            const V256i32 t32 {simde_mm256_cvtps_epi32(v)};
+            return t32.UnpackLo();
+         #endif
+      }
+      else if constexpr (CT::UnsignedInteger64<TO>) {
+         #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
+            return V256<TO> {simde_mm256_cvtps_epu64(v)};
+         #else
+            const V256u32 t32 {simde_mm256_cvtps_epi32(v)};
+            return t32.UnpackLo();
+         #endif
+      }
+      else LANGULUS_ERROR("Unsupported register");
    }
 
 } // namespace Langulus::SIMD

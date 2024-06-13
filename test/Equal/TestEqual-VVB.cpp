@@ -11,8 +11,6 @@
 
 ///                                                                           
 TEMPLATE_TEST_CASE("Vector == Vector -> Bool", "[compare]"
-   , NUMBERS_ALL()
-   , VECTORS_ALL(1)
    , VECTORS_ALL(2)
    , VECTORS_ALL(3)
    , VECTORS_ALL(4)
@@ -23,6 +21,8 @@ TEMPLATE_TEST_CASE("Vector == Vector -> Bool", "[compare]"
    , VECTORS_ALL(17)
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
+   , NUMBERS_ALL()
+   , VECTORS_ALL(1)
 ) {
    using T = TestType;
 
@@ -31,55 +31,44 @@ TEMPLATE_TEST_CASE("Vector == Vector -> Bool", "[compare]"
       BooleanEquivalentTo<T> r, rCheck;
 
       if constexpr (not CT::Vector<T>) {
-         if constexpr (CT::Sparse<T>) {
-            x = nullptr;
-            y = nullptr;
-            r = new Decay<BooleanEquivalentTo<T>>;
-            rCheck = new Decay<BooleanEquivalentTo<T>>;
-         }
-
-         InitOne(x, 1);
+         InitOne(x,  1);
          InitOne(y, -5);
       }
 
       WHEN("Compared for equality as booleans, when guaranteed to be the same") {
-         DenseCast(x) = DenseCast(y);
+         x = y;
 
          ControlEqualV(x, y, rCheck);
          SIMD::Equals(x, y, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-            if constexpr (not CT::Vector<T>)
-               REQUIRE(DenseCast(r));
-            else for (auto it : r)
-               REQUIRE(DenseCast(it));
-         }
+         REQUIRE(r == rCheck);
+
+         if constexpr (not CT::Vector<T>)
+            REQUIRE(r);
+         else for (auto it : r)
+            REQUIRE(it);
       }
 
       WHEN("Compared for equality as booleans, when guaranteed to be different") {
-         DenseCast(x) = DenseCast(y);
+         x = y;
          SIMD::Add(x, 1, y);
 
          ControlEqualV(x, y, rCheck);
          SIMD::Equals(x, y, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-            if constexpr (not CT::Vector<T>)
-               REQUIRE_FALSE(DenseCast(r));
-            else for (auto it : r)
-               REQUIRE_FALSE(DenseCast(it));
-         }
+         REQUIRE(r == rCheck);
+
+         if constexpr (not CT::Vector<T>)
+            REQUIRE_FALSE(r);
+         else for (auto it : r)
+            REQUIRE_FALSE(it);
       }
 
       WHEN("Compared for equality as booleans") {
          ControlEqualV(x, y, rCheck);
          SIMD::Equals(x, y, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
+         REQUIRE(r == rCheck);
 
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Equals as booleans (control)") (timer meter) {
@@ -126,16 +115,7 @@ TEMPLATE_TEST_CASE("Vector == Vector -> Bool", "[compare]"
          ControlEqualV(y, x, rCheck);
          SIMD::Equals(y, x, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
-      }
-
-      if constexpr (CT::Sparse<T>) {
-         delete r;
-         delete rCheck;
-         delete x;
-         delete y;
+         REQUIRE(r == rCheck);
       }
    }
 }

@@ -47,15 +47,8 @@ TEMPLATE_TEST_CASE("Ceil", "[ceil]"
       T x;
       T r, rCheck;
 
-      if constexpr (not CT::Vector<T>) {
-         if constexpr (CT::Sparse<T>) {
-            x = nullptr;
-            r = new Decay<T>;
-            rCheck = new Decay<T>;
-         }
-
+      if constexpr (not CT::Vector<T>)
          InitOne(x, 1.2);
-      }
 
       WHEN("Ceiled as constexpr") {
          {
@@ -107,9 +100,7 @@ TEMPLATE_TEST_CASE("Ceil", "[ceil]"
          else
             SIMD::Ceil(x, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
+         REQUIRE(r == rCheck);
 
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Ceil (control)") (timer meter) {
@@ -141,12 +132,6 @@ TEMPLATE_TEST_CASE("Ceil", "[ceil]"
                });
             };
          #endif
-      }
-
-      if constexpr (CT::Sparse<T>) {
-         delete r;
-         delete rCheck;
-         delete x;
       }
    }
 }

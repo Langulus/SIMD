@@ -31,47 +31,36 @@ TEMPLATE_TEST_CASE("Vector == Vector -> Bitmask", "[compare]"
       MaskEquivalentTo<T> r, rCheck;
 
       if constexpr (not CT::Vector<T>) {
-         if constexpr (CT::Sparse<T>) {
-            x = nullptr;
-            y = nullptr;
-         }
-
          InitOne(x, 1);
          InitOne(y, -5);
       }
 
       WHEN("Compared for equality as bitmask, when guaranteed to be the same") {
-         DenseCast(x) = DenseCast(y);
+         x = y;
 
          ControlEqualM(x, y, rCheck);
          SIMD::Equals(x, y, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-            REQUIRE(static_cast<bool>(DenseCast(r)) == true);
-         }
+         REQUIRE(r == rCheck);
+         REQUIRE(static_cast<bool>(r));
       }
 
       WHEN("Compared for equality as bitmask, when guaranteed to be different") {
-         DenseCast(x) = DenseCast(y);
+         x = y;
          SIMD::Add(x, 1, y);
 
          ControlEqualM(x, y, rCheck);
          SIMD::Equals(x, y, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-            REQUIRE(static_cast<bool>(DenseCast(r)) == false);
-         }
+         REQUIRE(r == rCheck);
+         REQUIRE(not static_cast<bool>(r));
       }
 
       WHEN("Compared for equality as bitmask, at random") {
          ControlEqualM(x, y, rCheck);
          SIMD::Equals(x, y, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
+         REQUIRE(r == rCheck);
 
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Equals as bitmask (control)") (timer meter) {
@@ -118,14 +107,7 @@ TEMPLATE_TEST_CASE("Vector == Vector -> Bitmask", "[compare]"
          ControlEqualM(y, x, rCheck);
          SIMD::Equals(y, x, r);
 
-         THEN("The result should be correct") {
-            REQUIRE(DenseCast(r) == DenseCast(rCheck));
-         }
-      }
-
-      if constexpr (CT::Sparse<T>) {
-         delete x;
-         delete y;
+         REQUIRE(r == rCheck);
       }
    }
 }
