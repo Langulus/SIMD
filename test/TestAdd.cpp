@@ -5,22 +5,15 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "Main.hpp"
-#include <catch2/catch.hpp>
+#include "Common.hpp"
 
-using timer = Catch::Benchmark::Chronometer;
 
-template<class T>
-using uninitialized = Catch::Benchmark::storage_for<T>;
-
-template<class LHS, class RHS, class OUT>
-LANGULUS(INLINED)
+template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
 void ControlAdd(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-   DenseCast(out) = DenseCast(lhs) + DenseCast(rhs);
+   out = lhs + rhs;
 }
 
-template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(INLINED)
+template<class LHS, class RHS, size_t C, class OUT> LANGULUS(INLINED)
 void ControlAdd(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
    auto r = out.mArray;
    auto lhs = lhsArray.mArray;
@@ -57,11 +50,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 
       WHEN("Added") {
          ControlAdd(x, y, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::Add(x.mArray, y.mArray, r.mArray);
-         else
-            SIMD::Add(x, y, r);
+         SIMD::Add(x, y, r);
 
          REQUIRE(r == rCheck);
 
@@ -100,10 +89,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Vector<T>)
-                     SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
-                  else
-                     SIMD::Add(nx[i], ny[i], nr[i]);
+                  SIMD::Add(nx[i], ny[i], nr[i]);
                });
             };
          #endif
@@ -111,11 +97,7 @@ TEMPLATE_TEST_CASE("Add", "[add]"
 
       WHEN("Added in reverse") {
          ControlAdd(y, x, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::Add(y.mArray, x.mArray, r.mArray);
-         else
-            SIMD::Add(y, x, r);
+         SIMD::Add(y, x, r);
 
          REQUIRE(r == rCheck);
       }

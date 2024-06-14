@@ -342,10 +342,6 @@ namespace Langulus::SIMD
             return V128<std::int64_t>  {simde_mm_unpacklo_epi32(m, Zero())};
          else if constexpr (CT::UnsignedInteger32<T>)
             return V128<std::uint64_t> {simde_mm_unpacklo_epi32(m, Zero())};
-         else if constexpr (CT::SignedInteger64<T>)
-            return V128<std::int64_t>  {simde_mm_unpacklo_epi64(m, Zero())};
-         else if constexpr (CT::UnsignedInteger64<T>)
-            return V128<std::uint64_t> {simde_mm_unpacklo_epi64(m, Zero())};
          else
             LANGULUS_ERROR("Can't unpack this type");
       }
@@ -364,10 +360,6 @@ namespace Langulus::SIMD
             return V128<std::int64_t>  {simde_mm_unpackhi_epi32(m, Zero())};
          else if constexpr (CT::UnsignedInteger32<T>)
             return V128<std::uint64_t> {simde_mm_unpackhi_epi32(m, Zero())};
-         else if constexpr (CT::SignedInteger64<T>)
-            return V128<std::int64_t>  {simde_mm_unpackhi_epi64(m, Zero())};
-         else if constexpr (CT::UnsignedInteger64<T>)
-            return V128<std::uint64_t> {simde_mm_unpackhi_epi64(m, Zero())};
          else
             LANGULUS_ERROR("Can't unpack this type");
       }
@@ -400,7 +392,7 @@ namespace Langulus::SIMD
                // (or vpermq if you want)                               
                auto ordered = simde_mm_permute_pd(
                   simde_mm_castps_pd(combined),
-                  SIMDE_MM_SHUFFLE(1, 0, 1, 0)
+                  SIMDE_MM_SHUFFLE(0, 0, 0, 1)
                );
                return V128<std::int32_t> {simde_mm_castpd_si128(ordered)};
             #endif
@@ -421,7 +413,7 @@ namespace Langulus::SIMD
                // (or vpermq if you want)                               
                auto ordered = simde_mm_permute_pd(
                   simde_mm_castps_pd(combined),
-                  SIMDE_MM_SHUFFLE(1, 0, 1, 0)
+                  SIMDE_MM_SHUFFLE(0, 0, 0, 1)
                );
                return V128<std::uint32_t> {simde_mm_castpd_si128(ordered)};
             #endif
@@ -529,21 +521,17 @@ namespace Langulus::SIMD
       NOD() LANGULUS(INLINED)
       auto UnpackLo() const noexcept {
          if constexpr (CT::SignedInteger8<T>)
-            return V256<std::int16_t>  {simde_mm256_unpacklo_epi8 (m, Zero())};
+            return V256<std::int16_t>  {simde_mm256_cvtepi8_epi16 (simde_mm256_extractf128_si256(m, 0))};
          else if constexpr (CT::UnsignedInteger8<T>)
-            return V256<std::uint16_t> {simde_mm256_unpacklo_epi8 (m, Zero())};
+            return V256<std::uint16_t> {simde_mm256_cvtepu8_epi16 (simde_mm256_extractf128_si256(m, 0))};
          else if constexpr (CT::SignedInteger16<T>)
-            return V256<std::int32_t>  {simde_mm256_unpacklo_epi16(m, Zero())};
+            return V256<std::int32_t>  {simde_mm256_cvtepi16_epi32(simde_mm256_extractf128_si256(m, 0))};
          else if constexpr (CT::UnsignedInteger16<T>)
-            return V256<std::uint32_t> {simde_mm256_unpacklo_epi16(m, Zero())};
+            return V256<std::uint32_t> {simde_mm256_cvtepu16_epi32(simde_mm256_extractf128_si256(m, 0))};
          else if constexpr (CT::SignedInteger32<T>)
-            return V256<std::int64_t>  {simde_mm256_unpacklo_epi32(m, Zero())};
+            return V256<std::int64_t>  {simde_mm256_cvtepi32_epi64(simde_mm256_extractf128_si256(m, 0))};
          else if constexpr (CT::UnsignedInteger32<T>)
-            return V256<std::uint64_t> {simde_mm256_unpacklo_epi32(m, Zero())};
-         else if constexpr (CT::SignedInteger64<T>)
-            return V256<std::int64_t>  {simde_mm256_unpacklo_epi64(m, Zero())};
-         else if constexpr (CT::UnsignedInteger64<T>)
-            return V256<std::uint64_t> {simde_mm256_unpacklo_epi64(m, Zero())};
+            return V256<std::uint64_t> {simde_mm256_cvtepu32_epi64(simde_mm256_extractf128_si256(m, 0))};
          else
             LANGULUS_ERROR("Can't unpack this type");
       }
@@ -551,21 +539,17 @@ namespace Langulus::SIMD
       NOD() LANGULUS(INLINED)
       auto UnpackHi() const noexcept {
          if constexpr (CT::SignedInteger8<T>)
-            return V256<std::int16_t>  {simde_mm256_unpackhi_epi8 (m, Zero())};
+            return V256<std::int16_t>  {simde_mm256_cvtepi8_epi16 (simde_mm256_extractf128_si256(m, 1))};
          else if constexpr (CT::UnsignedInteger8<T>)
-            return V256<std::uint16_t> {simde_mm256_unpackhi_epi8 (m, Zero())};
+            return V256<std::uint16_t> {simde_mm256_cvtepu8_epi16 (simde_mm256_extractf128_si256(m, 1))};
          else if constexpr (CT::SignedInteger16<T>)
-            return V256<std::int32_t>  {simde_mm256_unpackhi_epi16(m, Zero())};
+            return V256<std::int32_t>  {simde_mm256_cvtepi16_epi32(simde_mm256_extractf128_si256(m, 1))};
          else if constexpr (CT::UnsignedInteger16<T>)
-            return V256<std::uint32_t> {simde_mm256_unpackhi_epi16(m, Zero())};
+            return V256<std::uint32_t> {simde_mm256_cvtepu16_epi32(simde_mm256_extractf128_si256(m, 1))};
          else if constexpr (CT::SignedInteger32<T>)
-            return V256<std::int64_t>  {simde_mm256_unpackhi_epi32(m, Zero())};
+            return V256<std::int64_t>  {simde_mm256_cvtepi32_epi64(simde_mm256_extractf128_si256(m, 1))};
          else if constexpr (CT::UnsignedInteger32<T>)
-            return V256<std::uint64_t> {simde_mm256_unpackhi_epi32(m, Zero())};
-         else if constexpr (CT::SignedInteger64<T>)
-            return V256<std::int64_t>  {simde_mm256_unpackhi_epi64(m, Zero())};
-         else if constexpr (CT::UnsignedInteger64<T>)
-            return V256<std::uint64_t> {simde_mm256_unpackhi_epi64(m, Zero())};
+            return V256<std::uint64_t> {simde_mm256_cvtepu32_epi64(simde_mm256_extractf128_si256(m, 1))};
          else
             LANGULUS_ERROR("Can't unpack this type");
       }
@@ -574,10 +558,16 @@ namespace Langulus::SIMD
       auto Pack() const noexcept {
          if constexpr (CT::Integer8<T>)
             return *this;
-         else if constexpr (CT::SignedInteger16<T>)
-            return V256<std::int8_t>      {simde_mm256_packs_epi16 (m, Zero())};
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return V256<std::uint8_t>     {simde_mm256_packus_epi16(m, Zero())};
+         else if constexpr (CT::SignedInteger16<T>) {
+            const auto lo_lane = simde_mm256_castsi256_si128(m);
+            const auto hi_lane = simde_mm256_extracti128_si256(m, 1);
+            return V128<std::int8_t> {simde_mm_packs_epi16(lo_lane, hi_lane)};
+         }
+         else if constexpr (CT::UnsignedInteger16<T>) {
+            const auto lo_lane = simde_mm256_castsi256_si128(m);
+            const auto hi_lane = simde_mm256_extracti128_si256(m, 1);
+            return V128<std::uint8_t> {simde_mm_packus_epi16(lo_lane, hi_lane)};
+         }
          else if constexpr (CT::SignedInteger32<T>)
             return V256<std::int16_t>     {simde_mm256_packs_epi32 (m, Zero())};
          else if constexpr (CT::UnsignedInteger32<T>)
@@ -740,10 +730,6 @@ namespace Langulus::SIMD
             return V512<std::int64_t>  {simde_mm512_unpacklo_epi32(m, Zero())};
          else if constexpr (CT::UnsignedInteger32<T>)
             return V512<std::uint64_t> {simde_mm512_unpacklo_epi32(m, Zero())};
-         else if constexpr (CT::SignedInteger64<T>)
-            return V512<std::int64_t>  {simde_mm512_unpacklo_epi64(m, Zero())};
-         else if constexpr (CT::UnsignedInteger64<T>)
-            return V512<std::uint64_t> {simde_mm512_unpacklo_epi64(m, Zero())};
          else
             LANGULUS_ERROR("Can't unpack this type");
       }
@@ -762,10 +748,6 @@ namespace Langulus::SIMD
             return V512<std::int64_t>  {simde_mm512_unpackhi_epi32(m, Zero())};
          else if constexpr (CT::UnsignedInteger32<T>)
             return V512<std::uint64_t> {simde_mm512_unpackhi_epi32(m, Zero())};
-         else if constexpr (CT::SignedInteger64<T>)
-            return V512<std::int64_t>  {simde_mm512_unpackhi_epi64(m, Zero())};
-         else if constexpr (CT::UnsignedInteger64<T>)
-            return V512<std::uint64_t> {simde_mm512_unpackhi_epi64(m, Zero())};
          else
             LANGULUS_ERROR("Can't unpack this type");
       }
@@ -774,10 +756,20 @@ namespace Langulus::SIMD
       auto Pack() const noexcept {
          if constexpr (CT::Integer8<T>)
             return *this;
-         else if constexpr (CT::SignedInteger16<T>)
-            return V512<std::int8_t>   {simde_mm512_packs_epi16 (m, Zero())};
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return V512<std::uint8_t>  {simde_mm512_packus_epi16(m, Zero())};
+         else if constexpr (CT::SignedInteger16<T>) {
+            const auto lo_lane = simde_mm512_castsi512_si256(m);
+            const auto hi_lane = simde_mm512_extracti256_si512(m, 1);
+            return V256<std::int8_t> {
+               simde_mm256_packs_epi16(lo_lane, hi_lane)
+            }.Pack();
+         }
+         else if constexpr (CT::UnsignedInteger16<T>) {
+            const auto lo_lane = simde_mm512_castsi512_si256(m);
+            const auto hi_lane = simde_mm512_extracti256_si512(m, 1);
+            return V256<std::uint8_t> {
+               simde_mm256_packus_epi16(lo_lane, hi_lane)
+            }.Pack();
+         }
          else if constexpr (CT::SignedInteger32<T>)
             return V512<std::int16_t>  {simde_mm512_packs_epi32 (m, Zero())};
          else if constexpr (CT::UnsignedInteger32<T>)
@@ -1319,12 +1311,12 @@ namespace Langulus::SIMD
          );
 
          const auto C1 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low.m, 0), maskLo),
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low.m, 1), maskHi)
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 0), maskLo),
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 1), maskHi)
          );
          const auto C2 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high.m, 0), maskLo),
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high.m, 1), maskHi)
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 0), maskLo),
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 1), maskHi)
          );
 
          const auto C = simde_mm256_inserti128_si256(simde_mm256_setzero_si256(), C1, 0);
@@ -1368,8 +1360,8 @@ namespace Langulus::SIMD
          );
 
          const auto r = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(low.m,  maskLo),
-            simde_mm_shuffle_epi8(high.m, maskHi)
+            simde_mm_shuffle_epi8(low,  maskLo),
+            simde_mm_shuffle_epi8(high, maskHi)
          );
       #endif
 
@@ -1403,12 +1395,12 @@ namespace Langulus::SIMD
          );
 
          const auto C1 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low.m, 0), maskLo),
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low.m, 1), maskHi)
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 0), maskLo),
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 1), maskHi)
          );
          const auto C2 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high.m, 0), maskLo),
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high.m, 1), maskHi)
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 0), maskLo),
+            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 1), maskHi)
          );
 
          auto C = simde_mm256_inserti128_si256(simde_mm256_setzero_si256(), C1, 0);

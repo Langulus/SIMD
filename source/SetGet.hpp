@@ -32,7 +32,7 @@ namespace Langulus::SIMD
 
          if constexpr (REVERSE) {
             if constexpr (MAXS - IDX - 1 < S) {
-               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", DenseCast(values[MAXS - IDX - 1]));
+               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", values[MAXS - IDX - 1]);
                return reinterpret_cast<const R&>(values[MAXS - IDX - 1]);
             }
             else {
@@ -42,7 +42,7 @@ namespace Langulus::SIMD
          }
          else {
             if constexpr (IDX < S) {
-               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", DenseCast(values[IDX]));
+               LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", values[IDX]);
                return reinterpret_cast<const R&>(values[IDX]);
             }
             else {
@@ -67,15 +67,13 @@ namespace Langulus::SIMD
 
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CHUNK == 16) {
-               LANGULUS_SIMD_VERBOSE("Setting 128bit register from ",
-                  CountOf<FROM>, " elements");
-
-               if constexpr (CT::Integer8<T>)         return V128<T> {simde_mm_setr_epi8 (Get<int8_t,        DEF, INDICES, 16>(values)...)};
-               else if constexpr (CT::Integer16<T>)   return V128<T> {simde_mm_setr_epi16(Get<int16_t,       DEF, INDICES, 8 >(values)...)};
-               else if constexpr (CT::Integer32<T>)   return V128<T> {simde_mm_setr_epi32(Get<int32_t,       DEF, INDICES, 4 >(values)...)};
-               else if constexpr (CT::Integer64<T>)   return V128<T> {simde_mm_set_epi64x(Get<int64_t,       DEF, INDICES, 2, true>(values)...)};
-               else if constexpr (CT::Float<T>)       return V128<T> {simde_mm_setr_ps   (Get<simde_float32, DEF, INDICES, 4 >(values)...)};
-               else if constexpr (CT::Double<T>)      return V128<T> {simde_mm_setr_pd   (Get<simde_float64, DEF, INDICES, 2 >(values)...)};
+               LANGULUS_SIMD_VERBOSE("Setting 128bit register from ", CountOf<FROM>, " elements");
+               if      constexpr (CT::Integer8<T>)    return V128<T> {simde_mm_setr_epi8 (Get<int8_t,        DEF, INDICES, 16>(values)...)};
+               else if constexpr (CT::Integer16<T>)   return V128<T> {simde_mm_setr_epi16(Get<int16_t,       DEF, INDICES,  8>(values)...)};
+               else if constexpr (CT::Integer32<T>)   return V128<T> {simde_mm_setr_epi32(Get<int32_t,       DEF, INDICES,  4>(values)...)};
+               else if constexpr (CT::Integer64<T>)   return V128<T> {simde_mm_set_epi64x(Get<int64_t,       DEF, INDICES,  2, true>(values)...)};
+               else if constexpr (CT::Float<T>)       return V128<T> {simde_mm_setr_ps   (Get<simde_float32, DEF, INDICES,  4>(values)...)};
+               else if constexpr (CT::Double<T>)      return V128<T> {simde_mm_setr_pd   (Get<simde_float64, DEF, INDICES,  2>(values)...)};
                else LANGULUS_ERROR("Can't set 16-byte package");
             }
             else
@@ -84,23 +82,18 @@ namespace Langulus::SIMD
          #if LANGULUS_SIMD(256BIT)
             if constexpr (CHUNK == 32) {
                LANGULUS_SIMD_VERBOSE("Setting 256bit register from ", CountOf<FROM>, " elements");
-
-               if constexpr (CT::Integer8<T>)         return V256<T> {simde_mm256_setr_epi8 (Get<int8_t,  DEF, INDICES, 32>(values)...)};
+               if      constexpr (CT::Integer8<T>)    return V256<T> {simde_mm256_setr_epi8 (Get<int8_t,  DEF, INDICES, 32>(values)...)};
                else if constexpr (CT::Integer16<T>)   return V256<T> {simde_mm256_setr_epi16(Get<int16_t, DEF, INDICES, 16>(values)...)};
-               else if constexpr (CT::Integer32<T>)   return V256<T> {simde_mm256_setr_epi32(Get<int32_t, DEF, INDICES, 8 >(values)...)};
+               else if constexpr (CT::Integer32<T>)   return V256<T> {simde_mm256_setr_epi32(Get<int32_t, DEF, INDICES,  8>(values)...)};
                else if constexpr (CT::Integer64<T>) {
                   // This hits a very nasty MSVC compiler bug           
                   // The workaround is temporary, hopefully             
                   // https://stackoverflow.com/questions/77191454       
                   #if LANGULUS_COMPILER(MSVC) and LANGULUS_BITNESS() == 32 and (LANGULUS_SIMD(AVX) or LANGULUS_SIMD(AVX2))
                      alignas(32) const int64_t temp[4] {Get<int64_t, DEF, INDICES, 4>(values)...};
-                     return V256<T> {
-                        simde_mm256_load_si256(reinterpret_cast<const simde__m256i*>(temp))
-                     };
+                     return V256<T> {simde_mm256_load_si256(reinterpret_cast<const simde__m256i*>(temp))};
                   #else
-                     return V256<T> {
-                        simde_mm256_setr_epi64x(Get<int64_t, DEF, INDICES, 4>(values)...)
-                     };
+                     return V256<T> {simde_mm256_setr_epi64x(Get<int64_t, DEF, INDICES, 4>(values)...)};
                   #endif
                }
                else if constexpr (CT::Float<T>)       return V256<T> {simde_mm256_setr_ps(Get<simde_float32, DEF, INDICES, 8>(values)...)};
@@ -113,13 +106,12 @@ namespace Langulus::SIMD
          #if LANGULUS_SIMD(512BIT)
             if constexpr (CHUNK == 64) {
                LANGULUS_SIMD_VERBOSE("Setting 512bit register from ", CountOf<FROM>, " elements");
-
-               if constexpr (CT::Integer8<T>)         return V512<T> {simde_mm512_setr_epi8 (Get<int8_t,        DEF, INDICES, 64>(values)...)};
+               if      constexpr (CT::Integer8<T>)    return V512<T> {simde_mm512_setr_epi8 (Get<int8_t,        DEF, INDICES, 64>(values)...)};
                else if constexpr (CT::Integer16<T>)   return V512<T> {simde_mm512_setr_epi16(Get<int16_t,       DEF, INDICES, 32>(values)...)};
                else if constexpr (CT::Integer32<T>)   return V512<T> {simde_mm512_setr_epi32(Get<int32_t,       DEF, INDICES, 16>(values)...)};
-               else if constexpr (CT::Integer64<T>)   return V512<T> {simde_mm512_setr_epi64(Get<int64_t,       DEF, INDICES, 8 >(values)...)};
+               else if constexpr (CT::Integer64<T>)   return V512<T> {simde_mm512_setr_epi64(Get<int64_t,       DEF, INDICES,  8>(values)...)};
                else if constexpr (CT::Float<T>)       return V512<T> {simde_mm512_setr_ps   (Get<simde_float32, DEF, INDICES, 16>(values)...)};
-               else if constexpr (CT::Double<T>)      return V512<T> {simde_mm512_setr_pd   (Get<simde_float64, DEF, INDICES, 8 >(values)...)};
+               else if constexpr (CT::Double<T>)      return V512<T> {simde_mm512_setr_pd   (Get<simde_float64, DEF, INDICES,  8>(values)...)};
                else LANGULUS_ERROR("Can't set 64-byte package");
             }
             else
@@ -141,11 +133,8 @@ namespace Langulus::SIMD
    auto Set(const FROM& values) noexcept {
       using T = TypeOf<FROM>;
       constexpr auto S = CountOf<FROM>;
-      constexpr auto MaxS = CHUNK / sizeof(Decay<T>);
-      static_assert((CT::Dense<T>  and MaxS >  S)
-                 or (CT::Sparse<T> and MaxS >= S),
-         "S should be smaller (or equal if sparse) than MaxS - use load otherwise");
-
+      constexpr auto MaxS = CHUNK / sizeof(T);
+      static_assert(MaxS > S, "S should be smaller than MaxS - use load otherwise");
       return Inner::Set<DEF, CHUNK>(Sequence<MaxS>::Expand, values);
    }
 

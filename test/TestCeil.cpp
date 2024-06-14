@@ -5,17 +5,12 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "Main.hpp"
-#include <catch2/catch.hpp>
+#include "Common.hpp"
 
-using timer = Catch::Benchmark::Chronometer;
-
-template<class T>
-using uninitialized = Catch::Benchmark::storage_for<T>;
 
 template<class VAL, class OUT> LANGULUS(INLINED)
 void ControlCeil(const VAL& val, OUT& out) noexcept {
-   DenseCast(out) = std::ceil(DenseCast(val));
+   out = std::ceil(val);
 }
 
 template<class VAL, size_t C, class OUT> LANGULUS(INLINED)
@@ -94,11 +89,7 @@ TEMPLATE_TEST_CASE("Ceil", "[ceil]"
 
       WHEN("Ceiled") {
          ControlCeil(x, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::Ceil(x.mArray, r.mArray);
-         else
-            SIMD::Ceil(x, r);
+         SIMD::Ceil(x, r);
 
          REQUIRE(r == rCheck);
 
@@ -125,10 +116,7 @@ TEMPLATE_TEST_CASE("Ceil", "[ceil]"
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Vector<T>)
-                     SIMD::Ceil(nx[i].mArray, nr[i].mArray);
-                  else
-                     SIMD::Ceil(nx[i], nr[i]);
+                  SIMD::Ceil(nx[i], nr[i]);
                });
             };
          #endif

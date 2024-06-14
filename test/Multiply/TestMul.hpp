@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include "../Main.hpp"
+#include "../Common.hpp"
 
 
 /// Scalar * Scalar  (either dense or sparse, wrapped or not)                 

@@ -5,9 +5,8 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "Main.hpp"
-#include <SIMD/SIMD.hpp>
-#include <catch2/catch.hpp>
+#include "Common.hpp"
+
 
 using Vec2u8  = Vector<::std::uint8_t,  2>;
 using Vec2u16 = Vector<::std::uint16_t, 2>;

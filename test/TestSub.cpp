@@ -5,21 +5,16 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "Main.hpp"
-#include <catch2/catch.hpp>
+#include "Common.hpp"
 
-using timer = Catch::Benchmark::Chronometer;
 
-template<class T>
-using uninitialized = Catch::Benchmark::storage_for<T>;
-
-template<class LHS, class RHS, class OUT>
-LANGULUS(INLINED) void ControlSub(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
+void ControlSub(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
    out = lhs - rhs;
 }
 
-template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(INLINED) void ControlSub(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+template<class LHS, class RHS, size_t C, class OUT> LANGULUS(INLINED)
+void ControlSub(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
    auto r = out.mArray;
    auto lhs = lhsArray.mArray;
    auto rhs = rhsArray.mArray;
@@ -55,11 +50,7 @@ TEMPLATE_TEST_CASE("Subtract", "[subtract]"
 
       WHEN("Subtracted") {
          ControlSub(x, y, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::Subtract(x.mArray, y.mArray, r.mArray);
-         else
-            SIMD::Subtract(x, y, r);
+         SIMD::Subtract(x, y, r);
 
          REQUIRE(r == rCheck);
 
@@ -98,10 +89,7 @@ TEMPLATE_TEST_CASE("Subtract", "[subtract]"
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Vector<T>)
-                     SIMD::Subtract(nx[i].mArray, ny[i].mArray, nr[i].mArray);
-                  else
-                     SIMD::Subtract(nx[i], ny[i], nr[i]);
+                  SIMD::Subtract(nx[i], ny[i], nr[i]);
                });
             };
          #endif
@@ -109,11 +97,7 @@ TEMPLATE_TEST_CASE("Subtract", "[subtract]"
 
       WHEN("Subtracted in reverse") {
          ControlSub(y, x, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::Subtract(y.mArray, x.mArray, r.mArray);
-         else
-            SIMD::Subtract(y, x, r);
+         SIMD::Subtract(y, x, r);
 
          REQUIRE(r == rCheck);
       }

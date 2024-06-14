@@ -6,7 +6,6 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #include "TestEqual.hpp"
-#include <catch2/catch.hpp>
 
 
 ///                                                                           

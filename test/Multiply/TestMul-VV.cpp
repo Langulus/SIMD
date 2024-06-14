@@ -6,7 +6,6 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #include "TestMul.hpp"
-#include <catch2/catch.hpp>
 
 
 TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"

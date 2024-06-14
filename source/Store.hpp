@@ -34,7 +34,11 @@ namespace Langulus::SIMD
          }
          else if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::Integer8<T>)    to = simde_mm256_movemask_epi8(from);
-            else if constexpr (CT::Integer16<T>)   to = simde_mm256_movemask_epi8(simde_mm256_packs_epi16(from, from.Zero()));
+            else if constexpr (CT::Integer16<T>) {
+               const auto lo_lane = simde_mm256_castsi256_si128(from);
+               const auto hi_lane = simde_mm256_extracti128_si256(from, 1);
+               to = simde_mm_movemask_epi8(simde_mm_packs_epi16(lo_lane, hi_lane));
+            }
             else if constexpr (CT::Integer32<T>)   to = simde_mm256_movemask_ps  (simde_mm256_castsi256_ps(from));
             else if constexpr (CT::Integer64<T>)   to = simde_mm256_movemask_pd  (simde_mm256_castsi256_pd(from));
             else if constexpr (CT::Float<T>)       to = simde_mm256_movemask_ps  (from);
@@ -43,7 +47,11 @@ namespace Langulus::SIMD
          }
          else if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::Integer8<T>)    to = simde_mm512_movemask_epi8(from);
-            else if constexpr (CT::Integer16<T>)   to = simde_mm512_movemask_epi8(simde_mm512_packs_epi16(from, from.Zero()));
+            else if constexpr (CT::Integer16<T>) {
+               const auto lo_lane = simde_mm512_castsi512_si256(from);
+               const auto hi_lane = simde_mm512_extracti256_si512(from, 1);
+               StoreSIMD(simde_mm256_packs_epi16(lo_lane, hi_lane), to);
+            }
             else if constexpr (CT::Integer32<T>)   to = simde_mm512_movemask_ps  (simde_mm512_castsi256_ps(from));
             else if constexpr (CT::Integer64<T>)   to = simde_mm512_movemask_pd  (simde_mm512_castsi256_pd(from));
             else if constexpr (CT::Float<T>)       to = simde_mm512_movemask_ps  (from);
