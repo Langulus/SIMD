@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include "../Main.hpp"
+#include "../Common.hpp"
 
 
 /// Compare two scalars and put result in a bit                               

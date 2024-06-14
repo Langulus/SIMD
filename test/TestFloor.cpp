@@ -5,13 +5,8 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "Main.hpp"
-#include <catch2/catch.hpp>
+#include "Common.hpp"
 
-using timer = Catch::Benchmark::Chronometer;
-
-template<class T>
-using uninitialized = Catch::Benchmark::storage_for<T>;
 
 template<class VAL, class OUT> LANGULUS(INLINED)
 void ControlFloor(const VAL& val, OUT& out) noexcept {
@@ -94,11 +89,7 @@ TEMPLATE_TEST_CASE("Floor", "[floor]"
 
       WHEN("Floored") {
          ControlFloor(x, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::Floor(x.mArray, r.mArray);
-         else
-            SIMD::Floor(x, r);
+         SIMD::Floor(x, r);
 
          REQUIRE(r == rCheck);
 
@@ -125,10 +116,7 @@ TEMPLATE_TEST_CASE("Floor", "[floor]"
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Vector<T>)
-                     SIMD::Floor(nx[i].mArray, nr[i].mArray);
-                  else
-                     SIMD::Floor(nx[i], nr[i]);
+                  SIMD::Floor(nx[i], nr[i]);
                });
             };
          #endif

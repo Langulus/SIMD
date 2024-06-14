@@ -5,56 +5,21 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "Main.hpp"
-#include <catch2/catch.hpp>
+#include "Common.hpp"
 
-namespace Catch {
-   template<>
-   struct StringMaker<char8_t> {
-      static std::string convert(char8_t const& value) {
-         return std::to_string(static_cast<int>(value));
-      }
-   };
 
-   template<>
-   struct StringMaker<char16_t> {
-      static std::string convert(char16_t const& value) {
-         return std::to_string(static_cast<int>(value));
-      }
-   };
-
-   template<>
-   struct StringMaker<wchar_t> {
-      static std::string convert(wchar_t const& value) {
-         return std::to_string(static_cast<int>(value));
-      }
-   };
-
-   template<>
-   struct StringMaker<::Langulus::Byte> {
-      static std::string convert(::Langulus::Byte const& value) {
-         return std::to_string(static_cast<int>(value.mValue));
-      }
-   };
-}
-
-using timer = Catch::Benchmark::Chronometer;
-
-template<class T>
-using uninitialized = Catch::Benchmark::storage_for<T>;
-
-template<class LHS, class RHS, class OUT>
-LANGULUS(INLINED) void ControlSR(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
-   static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
-   // Well defined condition in SIMD calls, that is otherwise				
-   // undefined behavior by C++ standard											
-   out = rhs < Decay<RHS> {sizeof(Decay<RHS>) * 8} and rhs >= 0
+template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
+void ControlSR(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+   static_assert(CT::IntegerX<LHS, RHS>, "Can only shift integers");
+   // Well defined condition in SIMD calls, that is otherwise           
+   // undefined behavior by C++ standard                                
+   out = rhs < RHS {sizeof(RHS) * 8} and rhs >= 0
       ? lhs >> rhs : 0;
 }
 
-template<class LHS, class RHS, size_t C, class OUT>
-LANGULUS(INLINED) void ControlSR(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
-   static_assert(CT::IntegerX<Decay<LHS>, Decay<RHS>>, "Can only shift integers");
+template<class LHS, class RHS, size_t C, class OUT> LANGULUS(INLINED)
+void ControlSR(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+   static_assert(CT::IntegerX<LHS, RHS>, "Can only shift integers");
    auto r = out.mArray;
    auto lhs = lhsArray.mArray;
    auto rhs = rhsArray.mArray;
@@ -90,11 +55,7 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
 
       WHEN("Shifted right") {
          ControlSR(x, y, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::ShiftRight(x.mArray, y.mArray, r.mArray);
-         else
-            SIMD::ShiftRight(x, y, r);
+         SIMD::ShiftRight(x, y, r);
 
          REQUIRE(r == rCheck);
 
@@ -133,10 +94,7 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Vector<T>)
-                     SIMD::ShiftRight(nx[i].mArray, ny[i].mArray, nr[i].mArray);
-                  else
-                     SIMD::ShiftRight(nx[i], ny[i], nr[i]);
+                  SIMD::ShiftRight(nx[i], ny[i], nr[i]);
                });
             };
          #endif
@@ -144,11 +102,7 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
 
       WHEN("Shifted right in reverse") {
          ControlSR(y, x, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::ShiftRight(y.mArray, x.mArray, r.mArray);
-         else
-            SIMD::ShiftRight(y, x, r);
+         SIMD::ShiftRight(y, x, r);
 
          REQUIRE(r == rCheck);
       }

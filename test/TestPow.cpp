@@ -5,8 +5,7 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "Main.hpp"
-#include <catch2/catch.hpp>
+#include "Common.hpp"
 
 
 template<CT::Dense B, CT::Dense E> NOD() LANGULUS(INLINED)
@@ -83,11 +82,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
 
       WHEN("Raised to a power") {
          ControlPow(x, y, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::Power(x.mArray, y.mArray, r.mArray);
-         else
-            SIMD::Power(x, y, r);
+         SIMD::Power(x, y, r);
 
          REQUIRE(r == rCheck);
 
@@ -126,10 +121,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  if constexpr (CT::Vector<T>)
-                     SIMD::Power(nx[i].mArray, ny[i].mArray, nr[i].mArray);
-                  else
-                     SIMD::Power(nx[i], ny[i], nr[i]);
+                  SIMD::Power(nx[i], ny[i], nr[i]);
                });
             };
          #endif
@@ -137,11 +129,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
 
       WHEN("Raise to a power in reverse") {
          ControlPow(y, x, rCheck);
-
-         if constexpr (CT::Vector<T>)
-            SIMD::Power(y.mArray, x.mArray, r.mArray);
-         else
-            SIMD::Power(y, x, r);
+         SIMD::Power(y, x, r);
 
          REQUIRE(r == rCheck);
       }

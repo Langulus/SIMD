@@ -6,17 +6,16 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #include "TestEqual.hpp"
-#include <catch2/catch.hpp>
 
 
 ///                                                                           
 TEMPLATE_TEST_CASE("Vector == Vector -> Bool", "[compare]"
+   , VECTORS_ALL(9)
    , VECTORS_ALL(2)
    , VECTORS_ALL(3)
    , VECTORS_ALL(4)
    , VECTORS_ALL(5)
    , VECTORS_ALL(8)
-   , VECTORS_ALL(9)
    , VECTORS_ALL(16)
    , VECTORS_ALL(17)
    , VECTORS_ALL(32)

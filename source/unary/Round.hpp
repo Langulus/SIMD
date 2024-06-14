@@ -31,24 +31,31 @@ namespace Langulus::SIMD
             "Suboptimal and pointless for whole numbers");
          (void)value;
 
-         constexpr auto STYLE = SIMDE_MM_FROUND_TO_NEAREST_INT | SIMDE_MM_FROUND_NO_EXC;
+         #if LANGULUS_COMPILER(CLANG) and LANGULUS(DEBUG)
+            // WORKAROUND for a Clang bug, see:                         
+            // https://github.com/simd-everywhere/simde/issues/1014     
+            //TODO hopefully it is fixed in the future                  
+            return Unsupported {};
+         #else
+            constexpr auto STYLE = SIMDE_MM_FROUND_TO_NEAREST_INT | SIMDE_MM_FROUND_NO_EXC;
 
-         if constexpr (CT::SIMD128<R>) {
-            if      constexpr (CT::Float<T>)    return R {simde_mm_round_ps(value, STYLE)};
-            else if constexpr (CT::Double<T>)   return R {simde_mm_round_pd(value, STYLE)};
-            else LANGULUS_ERROR("Unsupported type for 16-byte package");
-         }
-         else if constexpr (CT::SIMD256<R>) {
-            if      constexpr (CT::Float<T>)    return R {simde_mm256_round_ps(value, STYLE)};
-            else if constexpr (CT::Double<T>)   return R {simde_mm256_round_pd(value, STYLE)};
-            else LANGULUS_ERROR("Unsupported type for 32-byte package");
-         }
-         else if constexpr (CT::SIMD512<R>) {
-            if      constexpr (CT::Float<T>)    return R {simde_mm512_roundscale_ps(value, STYLE)};
-            else if constexpr (CT::Double<T>)   return R {simde_mm512_roundscale_pd(value, STYLE)};
-            else LANGULUS_ERROR("Unsupported type for 64-byte package");
-         }
-         else LANGULUS_ERROR("Unsupported type");
+            if constexpr (CT::SIMD128<R>) {
+               if      constexpr (CT::Float<T>)    return R {simde_mm_round_ps(value, STYLE)};
+               else if constexpr (CT::Double<T>)   return R {simde_mm_round_pd(value, STYLE)};
+               else LANGULUS_ERROR("Unsupported type for 16-byte package");
+            }
+            else if constexpr (CT::SIMD256<R>) {
+               if      constexpr (CT::Float<T>)    return R {simde_mm256_round_ps(value, STYLE)};
+               else if constexpr (CT::Double<T>)   return R {simde_mm256_round_pd(value, STYLE)};
+               else LANGULUS_ERROR("Unsupported type for 32-byte package");
+            }
+            else if constexpr (CT::SIMD512<R>) {
+               if      constexpr (CT::Float<T>)    return R {simde_mm512_roundscale_ps(value, STYLE)};
+               else if constexpr (CT::Double<T>)   return R {simde_mm512_roundscale_pd(value, STYLE)};
+               else LANGULUS_ERROR("Unsupported type for 64-byte package");
+            }
+            else LANGULUS_ERROR("Unsupported type");
+         #endif
       }
       
       /// Get rounded values as constexpr, if possible                        
