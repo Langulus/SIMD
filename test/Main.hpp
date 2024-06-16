@@ -208,12 +208,8 @@ struct Vector {
       return *this;
    }
 
-   constexpr explicit operator const T& () const noexcept requires (C==1) {
-      return mArray[0];
-   }
-
-   constexpr explicit operator T& () noexcept requires (C==1) {
-      return mArray[0];
+   constexpr explicit operator T& () const noexcept requires (C==1) {
+      return const_cast<T&>(mArray[0]);
    }
 
    constexpr const T& operator [](auto i) const noexcept {
