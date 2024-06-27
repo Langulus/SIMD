@@ -19,7 +19,7 @@ namespace Langulus::SIMD::Inner
    template<Element TO> NOD() LANGULUS(INLINED)
    auto ConvertFrom256f(CT::SIMD256f auto v) noexcept {
       if constexpr (CT::Double<TO>)
-         return V256<TO> {simde_mm256_cvtps_pd(v)};
+         return V256<TO> {simde_mm256_cvtps_pd(simde_mm256_castps256_ps128(v))};
       else if constexpr (CT::Float<TO>)
          return v;
       else if constexpr (CT::SignedInteger8<TO>) {

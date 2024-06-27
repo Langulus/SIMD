@@ -561,17 +561,21 @@ namespace Langulus::SIMD
          else if constexpr (CT::SignedInteger16<T>) {
             const auto lo_lane = simde_mm256_castsi256_si128(m);
             const auto hi_lane = simde_mm256_extracti128_si256(m, 1);
-            return V128<std::int8_t> {simde_mm_packs_epi16(lo_lane, hi_lane)};
+            return V256<std::int8_t> {simde_mm256_castsi128_si256(
+               simde_mm_packs_epi16(lo_lane, hi_lane)
+            )};
          }
          else if constexpr (CT::UnsignedInteger16<T>) {
             const auto lo_lane = simde_mm256_castsi256_si128(m);
             const auto hi_lane = simde_mm256_extracti128_si256(m, 1);
-            return V128<std::uint8_t> {simde_mm_packus_epi16(lo_lane, hi_lane)};
+            return V256<std::uint8_t> {simde_mm256_castsi128_si256(
+               simde_mm_packus_epi16(lo_lane, hi_lane)
+            )};
          }
          else if constexpr (CT::SignedInteger32<T>)
-            return V256<std::int16_t>     {simde_mm256_packs_epi32 (m, Zero())};
+            return V256<std::int16_t>     {simde_mm256_packs_epi32 (m, simde_mm256_permute2x128_si256(m, m, 1))};
          else if constexpr (CT::UnsignedInteger32<T>)
-            return V256<std::uint16_t>    {simde_mm256_packus_epi32(m, Zero())};
+            return V256<std::uint16_t>    {simde_mm256_packus_epi32(m, simde_mm256_permute2x128_si256(m, m, 1))};
          else if constexpr (CT::SignedInteger64<T>) {
             #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
                return V128<std::int32_t>  {simde_mm256_cvtepi64_epi32(m)};
@@ -779,7 +783,7 @@ namespace Langulus::SIMD
          else if constexpr (CT::UnsignedInteger64<T>)
             return V256<std::uint32_t> {simde_mm512_cvtepi64_epi32(m)};
          else
-            LANGULUS_ERROR("Can't unpack this type");
+            LANGULUS_ERROR("Can't pack this type");
       }
    };
 

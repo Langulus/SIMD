@@ -124,13 +124,13 @@ namespace Langulus::SIMD::Inner
          // Converting to 8bit integer                                  
          //                                                             
          if constexpr (CT::Integer8<T>)
-            return v;
+            return V128<TO> {v};
          else if constexpr (CT::Integer16<T>)
-            return v.UnpackLo();
+            return V128<TO> {v.Pack()};
          else if constexpr (CT::Integer32<T>)
-            return v.UnpackLo().UnpackLo();
+            return V128<TO> {v.Pack().Pack()};
          else if constexpr (CT::Integer64<T>)
-            return v.UnpackLo().UnpackLo().UnpackLo();
+            return V128<TO> {v.Pack().Pack().Pack()};
          else
             LANGULUS_ERROR("Unsupported conversion");
       }
@@ -139,13 +139,13 @@ namespace Langulus::SIMD::Inner
          // Converting to 16bit integer                                 
          //                                                             
          if constexpr (CT::Integer8<T>)
-            return v.Pack();
+            return V128<TO> {v.UnpackLo()};
          else if constexpr (CT::Integer16<T>)
-            return v;
+            return V128<TO> {v};
          else if constexpr (CT::Integer32<T>)
-            return v.UnpackLo();
+            return V128<TO> {v.Pack()};
          else if constexpr (CT::Integer64<T>)
-            return v.UnpackLo().UnpackLo();
+            return V128<TO> {v.Pack().Pack()};
          else
             LANGULUS_ERROR("Unsupported conversion");
       }
@@ -154,13 +154,13 @@ namespace Langulus::SIMD::Inner
          // Converting to 32bit integer                                 
          //                                                             
          if constexpr (CT::Integer8<T>)
-            return v.Pack().Pack();
+            return V128<TO> {v.UnpackLo().UnpackLo()};
          else if constexpr (CT::Integer16<T>)
-            return v.Pack();
+            return V128<TO> {v.UnpackLo()};
          else if constexpr (CT::Integer32<T>)
-            return v;
+            return V128<TO> {v};
          else if constexpr (CT::Integer64<T>)
-            return v.UnpackLo();
+            return V128<TO> {v.Pack()};
          else
             LANGULUS_ERROR("Unsupported conversion");
       }
@@ -169,13 +169,13 @@ namespace Langulus::SIMD::Inner
          // Converting to 64bit integer                                 
          //                                                             
          if constexpr (CT::Integer8<T>)
-            return v.Pack().Pack().Pack();
+            return V128<TO> {v.UnpackLo().UnpackLo().UnpackLo()};
          else if constexpr (CT::Integer16<T>)
-            return v.Pack().Pack();
+            return V128<TO> {v.UnpackLo().UnpackLo()};
          else if constexpr (CT::Integer32<T>)
-            return v.Pack();
+            return V128<TO> {v.UnpackLo()};
          else if constexpr (CT::Integer64<T>)
-            return v;
+            return V128<TO> {v};
          else
             LANGULUS_ERROR("Unsupported conversion");
       }

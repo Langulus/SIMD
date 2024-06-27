@@ -75,7 +75,7 @@ namespace Langulus::SIMD
             "Destination array must be smaller or equal of the register size");
          static_assert(CountOf<TO> > 1,
             "Storing a single element is suboptimial - don't use SIMD in the first place");
-         static_assert(CT::Similar<T, TO_T> or CT::Bool<TO_T>,
+         static_assert(CT::Similar<T, TypeOf<TO_T>> or CT::Bool<TO_T>,
             "Storing doesn't parform conversion, so destination must be "
             "of similar type as the register");
 
@@ -347,10 +347,13 @@ namespace Langulus::SIMD
    ///   @param to - where to store it                                        
    LANGULUS(INLINED)
    constexpr void Store(const CT::NotSemantic auto& from, CT::NotSIMD auto& to) noexcept {
-      if constexpr (CT::SIMD<decltype(from)>)
+      using FROM = Deref<decltype(from)>;
+      if constexpr (CT::SIMD<FROM>)
          Inner::StoreSIMD(from, to);
-      else
+      else if constexpr (CT::Supported<FROM>)
          Inner::StoreConstexpr(from, to);
+      //else
+      //   LANGULUS_ERROR("Source not supported");
    }
 
 } // namespace Langulus::SIMD
