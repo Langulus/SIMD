@@ -139,7 +139,7 @@ namespace Langulus::SIMD
       ///   @patam value - scalar/vector/register to operate on               
       ///   @return the product scalar/vector/register                        
       template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
-      auto Multiply(const auto& lhs, const auto& rhs) noexcept {
+      constexpr auto Multiply(const auto& lhs, const auto& rhs) noexcept {
          return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
             []<class R>(const R& l, const R& r) noexcept {
                LANGULUS_SIMD_VERBOSE("Multiplying (SIMD) as ", NameOf<REGISTER>());

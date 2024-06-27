@@ -18,7 +18,7 @@ namespace Langulus::SIMD
    ///   @return the filled register                                          
    template<int R> NOD() LANGULUS(INLINED)
    auto Fill(const CT::Scalar auto& s) noexcept {
-      using T = Deref<decltype(s)>;
+      using T = Decvq<TypeOf<decltype(s)>>;
 
       #if LANGULUS_SIMD(128BIT)
          if constexpr (R <= 16) {

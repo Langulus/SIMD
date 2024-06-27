@@ -26,9 +26,9 @@ void ControlDiv(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, 
 }
 
 TEMPLATE_TEST_CASE("Divide", "[divide]"
+   , VECTORS_ALL(2)
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
-   , VECTORS_ALL(2)
    , VECTORS_ALL(3)
    , VECTORS_ALL(4)
    , VECTORS_ALL(5)
@@ -48,6 +48,12 @@ TEMPLATE_TEST_CASE("Divide", "[divide]"
       if constexpr (not CT::Vector<T>) {
          InitOne(x, 1);
          InitOne(y, -5);
+      }
+      else for (int i = 0; i < CountOf<T>; ++i) {
+         if (x[i] == 0)
+            x[i] = 1;
+         if (y[i] == 0)
+            y[i] = 1;
       }
 
       WHEN("Divided") {
@@ -108,7 +114,7 @@ TEMPLATE_TEST_CASE("Divide", "[divide]"
          if constexpr (not CT::Vector<T>)
             InitOne(x, 0);
          else
-            DenseCast(x.mArray[0]) = {};
+            x[0] = 0;
 
          REQUIRE_THROWS(ControlDiv(y, x, rCheck));
          REQUIRE_THROWS(SIMD::Divide(y, x, r));
