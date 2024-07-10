@@ -53,7 +53,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 #else
    #undef LANGULUS_SIMD_VERBOSE
    #define LANGULUS_SIMD_VERBOSE(...)     Logger::Info(__VA_ARGS__)
-   #define LANGULUS_SIMD_VERBOSE_TAB(...) const auto scoped = Logger::Info(__VA_ARGS__, Logger::Tabs {})
+   #define LANGULUS_SIMD_VERBOSE_TAB(...) const auto scoped = Logger::InfoTab(__VA_ARGS__)
 #endif
 
 
