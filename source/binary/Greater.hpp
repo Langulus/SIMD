@@ -63,7 +63,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector to operate on                        
       ///   @return bool/bitmask                                              
-      template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
       constexpr auto GreaterConstexpr(const auto& lhs, const auto& rhs) noexcept {
          // Will always return a std::array<bool>                       
          constexpr auto S = OverlapCounts<decltype(lhs), decltype(rhs)>();
@@ -80,7 +80,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector/register to operate on               
       ///   @return bool/bitmask/register                                     
-      template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
       auto Greater(const auto& lhs, const auto& rhs) noexcept {
          // Will return either a std::array<bool>, or a masked register,
          // depending whether SIMD operation is supported or not        
@@ -108,13 +108,13 @@ namespace Langulus::SIMD
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in 'out'. Use Inner::Greater if you    
    ///      don't want this.                                                  
-   template<class LHS, class RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
+   template<class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED)
    constexpr void Greater(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
       IF_CONSTEXPR() {
-         Store(Inner::GreaterConstexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
+         Store(Inner::GreaterConstexpr<OUT>(DeintCast(lhs), DeintCast(rhs)), out);
       }
       else {
-         Store(Inner::Greater<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
+         Store(Inner::Greater<OUT>(DeintCast(lhs), DeintCast(rhs)), out);
       }
    }
 
@@ -125,11 +125,11 @@ namespace Langulus::SIMD
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in an instance of 'OUT'. Use           
    ///      Inner::Greater if you don't want this.                            
-   template<class LHS, class RHS, CT::NotSemantic OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
+   template<class LHS, class RHS, CT::NoIntent OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
    LANGULUS(INLINED)
    constexpr OUT Greater(const LHS& lhs, const RHS& rhs) noexcept {
       OUT out;
-      Greater(DesemCast(lhs), DesemCast(rhs), out);
+      Greater(DeintCast(lhs), DeintCast(rhs), out);
       return out;
    }
 

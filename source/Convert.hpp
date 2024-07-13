@@ -143,20 +143,20 @@ namespace Langulus::SIMD
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in 'out'. Use Inner::Convert if you    
    ///      don't want this.                                                  
-   template<auto DEF, CT::NotSemantic OUT> LANGULUS(INLINED)
+   template<auto DEF, CT::NoIntent OUT> LANGULUS(INLINED)
    constexpr void Convert(const auto& val, OUT& out) noexcept {
       using TO = TypeOf<OUT>;
 
       IF_CONSTEXPR() {
          // Converting in a contexpr context                            
-         Store(Inner::ConvertConstexpr<TO>(DesemCast(val)), out);
+         Store(Inner::ConvertConstexpr<TO>(DeintCast(val)), out);
       }
       else {
          // Converting using SIMD, hopefully                            
          if constexpr (CT::SIMD<OUT>)
-            out = Inner::Convert<DEF, TO>(DesemCast(val));
+            out = Inner::Convert<DEF, TO>(DeintCast(val));
          else
-            Store(Inner::Convert<DEF, TO>(DesemCast(val)), out);
+            Store(Inner::Convert<DEF, TO>(DeintCast(val)), out);
       }
    }
 
@@ -166,11 +166,11 @@ namespace Langulus::SIMD
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in an instance of 'OUT'. Use           
    ///      Inner::Convert if you don't want this.                            
-   template<class VAL, CT::NotSemantic OUT = LosslessArray<VAL, VAL>>
+   template<class VAL, CT::NoIntent OUT = LosslessArray<VAL, VAL>>
    NOD() LANGULUS(INLINED)
    constexpr OUT Convert(const VAL& val) noexcept {
       OUT out;
-      Convert(DesemCast(val), out);
+      Convert(DeintCast(val), out);
       return out;
    }
 

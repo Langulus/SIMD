@@ -933,8 +933,8 @@ namespace Langulus::SIMD
 
       template<class LHS, class RHS>
       consteval auto LosslessArray() {
-         using LT = TypeOf<Desem<LHS>>;
-         using RT = TypeOf<Desem<RHS>>;
+         using LT = TypeOf<Deint<LHS>>;
+         using RT = TypeOf<Deint<RHS>>;
          constexpr auto C = OverlapCounts<LHS, RHS>();
 
          if constexpr (CT::Void<LHS, RHS>) {
