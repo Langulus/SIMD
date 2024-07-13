@@ -60,7 +60,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector to operate on                        
       ///   @return the floored scalar/vector                                 
-      template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
       constexpr auto FloorConstexpr(const auto& value) noexcept {
          return AttemptUnary<0, FORCE_OUT>(value, nullptr,
             []<class E>(const E& f) noexcept -> E {
@@ -77,7 +77,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector/register to operate on               
       ///   @return the floored scalar/vector/register                        
-      template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
       auto Floor(const auto& value) noexcept {
          return AttemptUnary<0, FORCE_OUT>(value,
             []<class R>(const R& v) noexcept {

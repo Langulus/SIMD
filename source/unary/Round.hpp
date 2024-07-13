@@ -62,7 +62,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector to operate on                        
       ///   @return the rounded scalar/vector                                 
-      template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
       constexpr auto RoundConstexpr(const auto& value) noexcept {
          return AttemptUnary<0, FORCE_OUT>(value, nullptr,
             []<class E>(const E& f) noexcept -> E {
@@ -76,7 +76,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector/register to operate on               
       ///   @return the rounded scalar/vector/register                        
-      template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
       auto Round(const auto& value) noexcept {
          return AttemptUnary<0, FORCE_OUT>(value,
             []<class R>(const R& v) noexcept {

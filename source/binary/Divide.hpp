@@ -128,7 +128,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector to operate on                        
       ///   @return the divided scalar/vector                                 
-      template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
       constexpr auto DivideConstexpr(const auto& lhs, const auto& rhs) {
          return AttemptBinary<1, FORCE_OUT>(lhs, rhs, nullptr,
             []<class E>(const E& l, const E& r) -> E {
@@ -144,7 +144,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector/register to operate on               
       ///   @return the divided scalar/vector/register                        
-      template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
       auto Divide(const auto& lhs, const auto& rhs) {
          return AttemptBinary<1, FORCE_OUT>(lhs, rhs,
             []<class R>(const R& l, const R& r) {
@@ -170,7 +170,7 @@ namespace Langulus::SIMD
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in 'out'. Use Inner::Divide if you     
    ///      don't want this.                                                  
-   template<class LHS, class RHS, CT::NotSemantic OUT> LANGULUS(INLINED)
+   template<class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED)
    constexpr void Divide(const LHS& lhs, const RHS& rhs, OUT& out) {
       if constexpr (CT::SIMD<OUT>)
          out = Inner::Divide<OUT>(lhs, rhs);
@@ -178,10 +178,10 @@ namespace Langulus::SIMD
          Store(Inner::Divide<OUT>(lhs, rhs), out);
       else {
          IF_CONSTEXPR() {
-            Store(Inner::DivideConstexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
+            Store(Inner::DivideConstexpr<OUT>(DeintCast(lhs), DeintCast(rhs)), out);
          }
          else {
-            Store(Inner::Divide<OUT>(DesemCast(lhs), DesemCast(rhs)), out);
+            Store(Inner::Divide<OUT>(DeintCast(lhs), DeintCast(rhs)), out);
          }
       }
    }
@@ -193,11 +193,11 @@ namespace Langulus::SIMD
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in an instance of 'OUT'. Use           
    ///      Inner::Divide if you don't want this.                             
-   template<class LHS, class RHS, CT::NotSemantic OUT = LosslessArray<LHS, RHS>>
+   template<class LHS, class RHS, CT::NoIntent OUT = LosslessArray<LHS, RHS>>
    LANGULUS(INLINED)
    constexpr auto Divide(const LHS& lhs, const RHS& rhs) {
       OUT out;
-      Divide(DesemCast(lhs), DesemCast(rhs), out);
+      Divide(DeintCast(lhs), DeintCast(rhs), out);
 
       if constexpr (CT::Similar<LHS, RHS> or CT::DerivedFrom<LHS, RHS>)
          return LHS {out};

@@ -346,7 +346,7 @@ namespace Langulus::SIMD
    ///   @param from - what to store                                          
    ///   @param to - where to store it                                        
    LANGULUS(INLINED)
-   constexpr void Store(const CT::NotSemantic auto& from, CT::NotSIMD auto& to) noexcept {
+   constexpr void Store(const CT::NoIntent auto& from, CT::NotSIMD auto& to) noexcept {
       using FROM = Deref<decltype(from)>;
       if constexpr (CT::SIMD<FROM>)
          Inner::StoreSIMD(from, to);
@@ -361,21 +361,21 @@ namespace Langulus::SIMD
 
 ///                                                                           
 #define LANGULUS_SIMD_ARITHMETHIC_API(OP) \
-   template<class LHS, class RHS, CT::NotSemantic OUT> LANGULUS(INLINED) \
+   template<class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED) \
    constexpr void OP(const LHS& lhs, const RHS& rhs, OUT& out) noexcept { \
       IF_CONSTEXPR() { \
-         Store(Inner::OP##Constexpr<OUT>(DesemCast(lhs), DesemCast(rhs)), out); \
+         Store(Inner::OP##Constexpr<OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
       } \
       else if constexpr (CT::SIMD<OUT>) \
          out = Inner::OP<OUT>(lhs, rhs); \
       else \
-         Store(Inner::OP<OUT>(DesemCast(lhs), DesemCast(rhs)), out); \
+         Store(Inner::OP<OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
    } \
-   template<class LHS, class RHS, CT::NotSemantic OUT = LosslessArray<LHS, RHS>> \
+   template<class LHS, class RHS, CT::NoIntent OUT = LosslessArray<LHS, RHS>> \
    NOD() LANGULUS(INLINED) \
    constexpr auto OP(const LHS& lhs, const RHS& rhs) noexcept { \
       OUT out; \
-      OP(DesemCast(lhs), DesemCast(rhs), out); \
+      OP(DeintCast(lhs), DeintCast(rhs), out); \
       if constexpr (CT::Similar<LHS, RHS> or CT::DerivedFrom<LHS, RHS>) \
          return LHS {out}; \
       else if constexpr (CT::DerivedFrom<RHS, LHS>) \
@@ -386,20 +386,20 @@ namespace Langulus::SIMD
 
 ///                                                                           
 #define LANGULUS_SIMD_ARITHMETHIC_UNARY_API(OP) \
-   template<class VAL, CT::NotSemantic OUT> LANGULUS(INLINED) \
+   template<class VAL, CT::NoIntent OUT> LANGULUS(INLINED) \
    constexpr void OP(const VAL& val, OUT& out) noexcept { \
       IF_CONSTEXPR() { \
-         Store(Inner::OP##Constexpr<OUT>(DesemCast(val)), out); \
+         Store(Inner::OP##Constexpr<OUT>(DeintCast(val)), out); \
       } \
       else if constexpr (CT::SIMD<OUT>) \
          out = Inner::OP<OUT>(val); \
       else \
-         Store(Inner::OP<OUT>(DesemCast(val)), out); \
+         Store(Inner::OP<OUT>(DeintCast(val)), out); \
    } \
-   template<class VAL, CT::NotSemantic OUT = LosslessArray<VAL>> \
+   template<class VAL, CT::NoIntent OUT = LosslessArray<VAL>> \
    NOD() LANGULUS(INLINED) \
    constexpr auto OP(const VAL& val) noexcept { \
       OUT out; \
-      OP(DesemCast(val), out); \
+      OP(DeintCast(val), out); \
       return out; \
    }

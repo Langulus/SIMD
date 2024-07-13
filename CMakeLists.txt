@@ -13,16 +13,16 @@ if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
     include(LangulusUtilities.cmake)
 
     # Add Langulus::Core/Logger/RTTI libraries                              
-    fetch_langulus_module(Core   GIT_TAG 828bd2400b3f58069cdde28d8b189ed915069ad6)
-    fetch_langulus_module(Logger GIT_TAG a4fb95beb9ba95ca7d4b4b69cb0de9448bce7862)
-    fetch_langulus_module(RTTI   GIT_TAG a6cc1d97a067c5a2014d258805165465ee311050)
+    fetch_langulus_module(Core   GIT_TAG 393d95b6ab13fc5846bda8a3044e4ca62f02fd5a)
+    fetch_langulus_module(Logger GIT_TAG 9c0156a1310b6734fea73a26f93aa532adfa1515)
+    fetch_langulus_module(RTTI   GIT_TAG 699bbb5833690cffea20e791fee7a31669b929bc)
 endif()
 
 # Configure SIMDe library                                                   
 fetch_external_module(
     SIMDe
     GIT_REPOSITORY  https://github.com/simd-everywhere/simde.git
-    GIT_TAG         5e7c4d4ec10855ebe8f19af8a80fdfa26caad5e9 # master branch
+    GIT_TAG         32c959c1039a15cec465bfa1103b4bcf34b3ac3a # master branch
 )
 
 # Build and install SIMD library                                            

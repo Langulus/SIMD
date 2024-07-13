@@ -69,7 +69,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector to operate on                        
       ///   @return the summed scalar/vector                                  
-      template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
       constexpr auto AddConstexpr(const auto& lhs, const auto& rhs) noexcept {
          return AttemptBinary<0, FORCE_OUT>(lhs, rhs, nullptr,
             []<class E>(const E& l, const E& r) noexcept -> E {
@@ -82,7 +82,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector/register to operate on               
       ///   @return the summed scalar/vector/register                         
-      template<CT::NotSemantic FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
       auto Add(const auto& lhs, const auto& rhs) noexcept {
          return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
             []<class R>(const R& l, const R& r) noexcept {

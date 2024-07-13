@@ -82,8 +82,8 @@ namespace Langulus::SIMD::Inner
    ///   @return the result - either scalar, vector or register               
    template<auto DEF, class FORCE_OUT = void> NOD() LANGULUS(INLINED)
    constexpr auto AttemptBinary(
-      const CT::NotSemantic auto& lhs,
-      const CT::NotSemantic auto& rhs,
+      const CT::NoIntent auto& lhs,
+      const CT::NoIntent auto& rhs,
       const auto& opSIMD,
       const auto& opFALL
    ) {
