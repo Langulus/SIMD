@@ -31,6 +31,12 @@ add_library(LangulusSIMD ${LANGULUS_LIBRARY_TYPE}
     $<TARGET_OBJECTS:LangulusRTTI>
 )
 
+if(MSVC)
+	# Some SVML functions seem to be broken on x86 MSVC builds				
+	# See https://github.com/simd-everywhere/simde/issues/1111				
+    target_compile_options(LangulusSIMD INTERFACE -DSIMDE_X86_SVML_NO_NATIVE)
+endif()
+
 target_include_directories(LangulusSIMD
 	PUBLIC      include
                 $<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>
