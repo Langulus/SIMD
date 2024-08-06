@@ -49,7 +49,7 @@ TEMPLATE_TEST_CASE("Divide", "[divide]"
          InitOne(x, 1);
          InitOne(y, -5);
       }
-      else for (int i = 0; i < CountOf<T>; ++i) {
+      else for (Count i = 0; i < CountOf<T>; ++i) {
          if (x[i] == 0)
             x[i] = 1;
          if (y[i] == 0)
