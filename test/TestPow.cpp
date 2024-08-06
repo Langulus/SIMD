@@ -85,7 +85,7 @@ TEMPLATE_TEST_CASE("Power", "[power]"
          SIMD::Power(x, y, r);
 
          if constexpr (CT::Vector<T> and CT::Real<TypeOf<T>>) {
-            for (int i = 0; i < T::MemberCount; ++i) {
+            for (Count i = 0; i < T::MemberCount; ++i) {
                if (r[i] != rCheck[i])
                   Logger::Fatal(x[i], " ^ ", y[i], " = ", rCheck[i], " but got ", r[i]);
             }
