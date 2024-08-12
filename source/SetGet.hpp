@@ -62,11 +62,11 @@ namespace Langulus::SIMD
       template<auto DEF, Offset CHUNK, CT::Vector FROM, Offset...INDICES>
       LANGULUS(INLINED)
       auto Set(ExpandedSequence<INDICES...>, const FROM& values) {
-         using T = Decay<TypeOf<FROM>>;
          (void)values;
 
          #if LANGULUS_SIMD(128BIT)
             if constexpr (CHUNK == 16) {
+               using T = Decay<TypeOf<FROM>>;
                LANGULUS_SIMD_VERBOSE("Setting 128bit register from ", CountOf<FROM>, " elements");
                if      constexpr (CT::Integer8<T>)    return V128<T> {simde_mm_setr_epi8 (Get<int8_t,        DEF, INDICES, 16>(values)...)};
                else if constexpr (CT::Integer16<T>)   return V128<T> {simde_mm_setr_epi16(Get<int16_t,       DEF, INDICES,  8>(values)...)};
@@ -81,6 +81,7 @@ namespace Langulus::SIMD
 
          #if LANGULUS_SIMD(256BIT)
             if constexpr (CHUNK == 32) {
+               using T = Decay<TypeOf<FROM>>;
                LANGULUS_SIMD_VERBOSE("Setting 256bit register from ", CountOf<FROM>, " elements");
                if      constexpr (CT::Integer8<T>)    return V256<T> {simde_mm256_setr_epi8 (Get<int8_t,  DEF, INDICES, 32>(values)...)};
                else if constexpr (CT::Integer16<T>)   return V256<T> {simde_mm256_setr_epi16(Get<int16_t, DEF, INDICES, 16>(values)...)};
@@ -105,6 +106,7 @@ namespace Langulus::SIMD
 
          #if LANGULUS_SIMD(512BIT)
             if constexpr (CHUNK == 64) {
+               using T = Decay<TypeOf<FROM>>;
                LANGULUS_SIMD_VERBOSE("Setting 512bit register from ", CountOf<FROM>, " elements");
                if      constexpr (CT::Integer8<T>)    return V512<T> {simde_mm512_setr_epi8 (Get<int8_t,        DEF, INDICES, 64>(values)...)};
                else if constexpr (CT::Integer16<T>)   return V512<T> {simde_mm512_setr_epi16(Get<int16_t,       DEF, INDICES, 32>(values)...)};

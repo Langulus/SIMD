@@ -75,7 +75,7 @@ namespace Langulus::SIMD
          // DEF value, or directly if vector is of the proper size      
          // Should perform faster if 'v' is aligned properly            
          constexpr auto S  = Inner::DecideCount<R, FORCE_OUT>();
-         constexpr auto RS = sizeof(T) * S;
+         UNUSED() constexpr auto RS = sizeof(T) * S;
 
          #if LANGULUS_SIMD(128BIT)
             if constexpr (RS <= 16) {

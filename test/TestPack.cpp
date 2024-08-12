@@ -9,10 +9,10 @@
 
 
 TEMPLATE_TEST_CASE("Pack 64 bits", "[pack]", ::std::int64_t, ::std::uint64_t) {
-   using T = TestType;
 
 #if LANGULUS_SIMD(128BIT)
    GIVEN("A 128bit sequence of numbers") {
+      using T = TestType;
       const T n[2] {4, 8};
       const auto r = SIMD::Load<0>(n);
 
@@ -77,6 +77,7 @@ TEMPLATE_TEST_CASE("Pack 64 bits", "[pack]", ::std::int64_t, ::std::uint64_t) {
 
 #if LANGULUS_SIMD(256BIT)
    GIVEN("A 256bit sequence of numbers") {
+      using T = TestType;
       const T n[4] {4, 8, 12, 16};
       const auto r = SIMD::Load<0>(n);
 

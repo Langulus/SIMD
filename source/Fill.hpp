@@ -18,10 +18,10 @@ namespace Langulus::SIMD
    ///   @return the filled register                                          
    template<int R> NOD() LANGULUS(INLINED)
    auto Fill(const CT::Scalar auto& s) noexcept {
-      using T = Decvq<TypeOf<decltype(s)>>;
 
       #if LANGULUS_SIMD(128BIT)
          if constexpr (R <= 16) {
+            using T = Decvq<TypeOf<decltype(s)>>;
             if      constexpr (CT::SignedInteger8<T>)    return V128<T> {simde_mm_set1_epi8        ( GetFirst(s))};
             else if constexpr (CT::UnsignedInteger8<T>)  return V128<T> {simde_x_mm_set1_epu8      ( GetFirst(s))};
             else if constexpr (CT::SignedInteger16<T>)   return V128<T> {simde_mm_set1_epi16       ( GetFirst(s))};
@@ -39,6 +39,7 @@ namespace Langulus::SIMD
 
       #if LANGULUS_SIMD(256BIT)
          if constexpr (R <= 32) {
+            using T = Decvq<TypeOf<decltype(s)>>;
             if      constexpr (CT::Integer8<T>)          return V256<T> {simde_mm256_set1_epi8     ( GetFirst(s))};
             else if constexpr (CT::Integer16<T>)         return V256<T> {simde_mm256_set1_epi16    ( GetFirst(s))};
             else if constexpr (CT::Integer32<T>)         return V256<T> {simde_mm256_set1_epi32    ( GetFirst(s))};
@@ -52,6 +53,7 @@ namespace Langulus::SIMD
 
       #if LANGULUS_SIMD(512BIT)
          if constexpr (R <= 64) {
+            using T = Decvq<TypeOf<decltype(s)>>;
             if      constexpr (CT::Integer8<T>)          return V512<T> {simde_mm512_set1_epi8     (GetFirst(s))};
             else if constexpr (CT::Integer16<T>)         return V512<T> {simde_mm512_set1_epi16    (GetFirst(s))};
             else if constexpr (CT::Integer32<T>)         return V512<T> {simde_mm512_set1_epi32    (GetFirst(s))};
