@@ -9,10 +9,10 @@
 
 
 TEMPLATE_TEST_CASE("Unpack 8 bits", "[unpack]", ::std::int8_t, ::std::uint8_t) {
-   using T = TestType;
 
 #if LANGULUS_SIMD(128BIT)
    GIVEN("A 128bit sequence of numbers") {
+      using T = TestType;
       const T n[16] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
       const auto r = SIMD::Load<0>(n);
 
@@ -134,6 +134,7 @@ TEMPLATE_TEST_CASE("Unpack 8 bits", "[unpack]", ::std::int8_t, ::std::uint8_t) {
 
 #if LANGULUS_SIMD(256BIT)
    GIVEN("A 256bit sequence of numbers") {
+      using T = TestType;
       const T n[32] {
           1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
          17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
