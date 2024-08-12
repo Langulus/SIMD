@@ -21,8 +21,8 @@ endif()
 # Configure SIMDe library                                                   
 fetch_external_module(
     SIMDe
-    GIT_REPOSITORY  https://github.com/Epixu/simde.git
-    GIT_TAG         no_windows_h
+    GIT_REPOSITORY  https://github.com/simd-everywhere/simde.git
+    GIT_TAG         f47e3c5c9ecbea85b4f802e07feebab113c837cd #master
 )
 
 # Build and install SIMD library                                            
