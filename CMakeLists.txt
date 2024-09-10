@@ -15,7 +15,7 @@ if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
     # Add Langulus::Core/Logger/RTTI libraries                              
     fetch_langulus_module(Core   GIT_TAG 393d95b6ab13fc5846bda8a3044e4ca62f02fd5a)
     fetch_langulus_module(Logger GIT_TAG 69626cd4c738195df0929a1cd867317422506e61)
-    fetch_langulus_module(RTTI   GIT_TAG 4184bde5e28d0bb00d12a9f4a3b1d2a49d0ca312)
+    fetch_langulus_module(RTTI   GIT_TAG 720e675b1ea114156c309fe44871e03557e0a64f)
 endif()
 
 # Configure SIMDe library                                                   
