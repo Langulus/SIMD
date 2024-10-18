@@ -56,7 +56,7 @@ namespace Langulus::SIMD
                return result;
             }
             else if constexpr (CT::IntegerX<T>)    return Unsupported {};
-            else LANGULUS_ERROR("Unsupported type for 16-byte package");
+            else static_assert(false, "Unsupported type for 16-byte package");
          }
          else if constexpr (CT::SIMD256<R>) {
             if constexpr (CT::Float<T>)            return R {simde_mm256_pow_ps(lhs, rhs)};
@@ -84,7 +84,7 @@ namespace Langulus::SIMD
                return result;
             }
             else if constexpr (CT::IntegerX<T>)    return Unsupported {};
-            else LANGULUS_ERROR("Unsupported type for 32-byte package");
+            else static_assert(false, "Unsupported type for 32-byte package");
          }
          else if constexpr (CT::SIMD512<R>) {
             if constexpr (CT::Float<T>)                  return R {simde_mm512_pow_ps(lhs, rhs)};
@@ -94,9 +94,9 @@ namespace Langulus::SIMD
                //https://stackoverflow.com/questions/42964882/test-if-a-big-integer-is-a-power-of-two
             }
             else if constexpr (CT::IntegerX<T>)          return Unsupported {};
-            else LANGULUS_ERROR("Unsupported type for 64-byte package");
+            else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else static_assert(false, "Unsupported type");
       }
       
       /// Raise values to a power as constexpr, if possible                   
@@ -134,7 +134,7 @@ namespace Langulus::SIMD
                else if constexpr (CT::Real<E>)
                   return ::std::pow(l, r);
                else
-                  LANGULUS_ERROR("T must be a number");
+                  static_assert(false, "T must be a number");
             }
          );
       }
@@ -179,7 +179,7 @@ namespace Langulus::SIMD
                else if constexpr (CT::Real<E>)
                   return ::std::pow(l, r);
                else
-                  LANGULUS_ERROR("T must be a number");
+                  static_assert(false, "T must be a number");
             }
          );
       }

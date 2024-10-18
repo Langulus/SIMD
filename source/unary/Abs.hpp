@@ -38,7 +38,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::SignedInteger64<T>) return R {simde_mm_abs_epi64(v)};
             else if constexpr (CT::Float<T>)           return R {simde_mm_andnot_ps(simde_mm_set1_ps(-0.0F), v)};
             else if constexpr (CT::Double<T>)          return R {simde_mm_andnot_pd(simde_mm_set1_pd(-0.0F), v)};
-            else LANGULUS_ERROR("Unsupported type for 16-byte package");
+            else static_assert(false, "Unsupported type for 16-byte package");
          }
          else if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::SignedInteger8<T>)  return R {simde_mm256_abs_epi8(v)};
@@ -47,7 +47,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::SignedInteger64<T>) return R {simde_mm256_abs_epi64(v)};
             else if constexpr (CT::Float<T>)           return R {simde_mm256_andnot_ps(simde_mm256_set1_ps(-0.0F), v)};
             else if constexpr (CT::Double<T>)          return R {simde_mm256_andnot_pd(simde_mm256_set1_pd(-0.0F), v)};
-            else LANGULUS_ERROR("Unsupported type for 32-byte package");
+            else static_assert(false, "Unsupported type for 32-byte package");
          }
          else if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::SignedInteger8<T>)  return R {simde_mm512_abs_epi8(v)};
@@ -56,9 +56,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::SignedInteger64<T>) return R {simde_mm512_abs_epi64(v)};
             else if constexpr (CT::Float<T>)           return R {simde_mm512_andnot_ps(simde_mm512_set1_ps(-0.0F), v)};
             else if constexpr (CT::Double<T>)          return R {simde_mm512_andnot_pd(simde_mm512_set1_pd(-0.0F), v)};
-            else LANGULUS_ERROR("Unsupported type for 64-byte package");
+            else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else static_assert(false, "Unsupported type");
       }
       
       /// Get absolute values as constexpr, if possible                       

@@ -46,7 +46,7 @@ namespace Langulus::SIMD
                if (simde_mm_movemask_pd(EqualsSIMD(rhs, rhs.Zero())))
                   LANGULUS_THROW(DivisionByZero, "Division by zero");
             }
-            else LANGULUS_ERROR("Unsupported T");
+            else static_assert(false, "Unsupported T");
 
             // Divide                                                   
             if      constexpr (CT::UnsignedInteger8<T>)  return simde_mm_div_epu8   (lhs, rhs);
@@ -59,7 +59,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::SignedInteger64<T>)   return simde_mm_div_epi64  (lhs, rhs);
             else if constexpr (CT::Float<T>)             return simde_mm_div_ps     (lhs, rhs);
             else if constexpr (CT::Double<T>)            return simde_mm_div_pd     (lhs, rhs);
-            else LANGULUS_ERROR("Unsupported type for 16-byte package");
+            else static_assert(false, "Unsupported type for 16-byte package");
          }
          else if constexpr (CT::SIMD256<R>) {
             // Check if anything in 'rhs' is zero                       
@@ -75,7 +75,7 @@ namespace Langulus::SIMD
                if (simde_mm256_movemask_pd(EqualsSIMD(rhs, rhs.Zero())))
                   LANGULUS_THROW(DivisionByZero, "Division by zero");
             }
-            else LANGULUS_ERROR("Unsupported T");
+            else static_assert(false, "Unsupported T");
 
             // Divide                                                   
             if      constexpr (CT::UnsignedInteger8<T>)  return simde_mm256_div_epu8   (lhs, rhs);
@@ -88,7 +88,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::SignedInteger64<T>)   return simde_mm256_div_epi64  (lhs, rhs);
             else if constexpr (CT::Float<T>)             return simde_mm256_div_ps     (lhs, rhs);
             else if constexpr (CT::Double<T>)            return simde_mm256_div_pd     (lhs, rhs);
-            else LANGULUS_ERROR("Unsupported type for 32-byte package");
+            else static_assert(false, "Unsupported type for 32-byte package");
          }
          else if constexpr (CT::SIMD512<R>) {
             // Check if anything in 'rhs' is zero                       
@@ -104,7 +104,7 @@ namespace Langulus::SIMD
                if (EqualsSIMD(rhs, rhs.Zero()))
                   LANGULUS_THROW(DivisionByZero, "Division by zero");
             }
-            else LANGULUS_ERROR("Unsupported T");
+            else static_assert(false, "Unsupported T");
 
             // Divide                                                   
             if      constexpr (CT::UnsignedInteger8<T>)  return simde_mm512_div_epu8   (lhs, rhs);
@@ -117,9 +117,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::SignedInteger64<T>)   return simde_mm512_div_epi64  (lhs, rhs);
             else if constexpr (CT::Float<T>)             return simde_mm512_div_ps     (lhs, rhs);
             else if constexpr (CT::Double<T>)            return simde_mm512_div_pd     (lhs, rhs);
-            else LANGULUS_ERROR("Unsupported type for 64-byte package");
+            else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else static_assert(false, "Unsupported type");
       }
 
       

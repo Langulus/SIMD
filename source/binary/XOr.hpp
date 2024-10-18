@@ -33,21 +33,21 @@ namespace Langulus::SIMD
             if      constexpr (CT::Integer<T>)  return simde_mm_xor_si128   (lhs, rhs);
             else if constexpr (CT::Float<T>)    return simde_mm_xor_ps      (lhs, rhs);
             else if constexpr (CT::Double<T>)   return simde_mm_xor_pd      (lhs, rhs);
-            else LANGULUS_ERROR("Unsupported type for 16-byte package");
+            else static_assert(false, "Unsupported type for 16-byte package");
          }
          else if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::Integer<T>)  return simde_mm256_xor_si256(lhs, rhs);
             else if constexpr (CT::Float<T>)    return simde_mm256_xor_ps   (lhs, rhs);
             else if constexpr (CT::Double<T>)   return simde_mm256_xor_pd   (lhs, rhs);
-            else LANGULUS_ERROR("Unsupported type for 32-byte package");
+            else static_assert(false, "Unsupported type for 32-byte package");
          }
          else if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::Integer<T>)  return simde_mm512_xor_si512(lhs, rhs);
             else if constexpr (CT::Float<T>)    return simde_mm512_xor_ps   (lhs, rhs);
             else if constexpr (CT::Double<T>)   return simde_mm512_xor_pd   (lhs, rhs);
-            else LANGULUS_ERROR("Unsupported type for 64-byte package");
+            else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else static_assert(false, "Unsupported type");
       }
       
       /// Xor values as constexpr, if possible                                

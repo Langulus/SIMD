@@ -74,7 +74,7 @@ namespace Langulus::SIMD
                else if constexpr (CT::Integer64<T>)   return V128<T> {simde_mm_set_epi64x(Get<int64_t,       DEF, INDICES,  2, true>(values)...)};
                else if constexpr (CT::Float<T>)       return V128<T> {simde_mm_setr_ps   (Get<simde_float32, DEF, INDICES,  4>(values)...)};
                else if constexpr (CT::Double<T>)      return V128<T> {simde_mm_setr_pd   (Get<simde_float64, DEF, INDICES,  2>(values)...)};
-               else LANGULUS_ERROR("Can't set 16-byte package");
+               else static_assert(false, "Can't set 16-byte package");
             }
             else
          #endif
@@ -99,7 +99,7 @@ namespace Langulus::SIMD
                }
                else if constexpr (CT::Float<T>)       return V256<T> {simde_mm256_setr_ps(Get<simde_float32, DEF, INDICES, 8>(values)...)};
                else if constexpr (CT::Double<T>)      return V256<T> {simde_mm256_setr_pd(Get<simde_float64, DEF, INDICES, 4>(values)...)};
-               else LANGULUS_ERROR("Can't set 32-byte package");
+               else static_assert(false, "Can't set 32-byte package");
             }
             else
          #endif
@@ -114,11 +114,11 @@ namespace Langulus::SIMD
                else if constexpr (CT::Integer64<T>)   return V512<T> {simde_mm512_setr_epi64(Get<int64_t,       DEF, INDICES,  8>(values)...)};
                else if constexpr (CT::Float<T>)       return V512<T> {simde_mm512_setr_ps   (Get<simde_float32, DEF, INDICES, 16>(values)...)};
                else if constexpr (CT::Double<T>)      return V512<T> {simde_mm512_setr_pd   (Get<simde_float64, DEF, INDICES,  8>(values)...)};
-               else LANGULUS_ERROR("Can't set 64-byte package");
+               else static_assert(false, "Can't set 64-byte package");
             }
             else
          #endif
-            LANGULUS_ERROR("Unsupported package");
+            static_assert(false, "Unsupported package");
       }
 
    } // namespace Langulus::SIMD::Inner

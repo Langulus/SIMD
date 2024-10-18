@@ -72,7 +72,7 @@ namespace Langulus::SIMD
                   return Unsupported {}; //TODO
                #endif
             }
-            else LANGULUS_ERROR("Unsupported type for SIMD::ShiftRightInner of 16-byte package");
+            else static_assert(false, "Unsupported type for SIMD::ShiftRightInner of 16-byte package");
          }
          else if constexpr (CT::SIMD256<R>) {
             if constexpr (CT::Integer8<T>) {
@@ -91,7 +91,7 @@ namespace Langulus::SIMD
             }
             else if constexpr (CT::Integer32<T>)         return R {simde_mm256_srlv_epi32(lhs, rhs)};
             else if constexpr (CT::Integer64<T>)         return R {simde_mm256_srlv_epi64(lhs, rhs)};
-            else LANGULUS_ERROR("Unsupported type for SIMD::ShiftRightInner of 32-byte package");
+            else static_assert(false, "Unsupported type for SIMD::ShiftRightInner of 32-byte package");
          }
          else if constexpr (CT::SIMD512<R>) {
             if constexpr (CT::Integer8<T>) {
@@ -102,9 +102,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer16<T>)         return R {simde_mm512_srlv_epi16(lhs, rhs)};
             else if constexpr (CT::Integer32<T>)         return R {simde_mm512_srlv_epi32(lhs, rhs)};
             else if constexpr (CT::Integer64<T>)         return R {simde_mm512_srlv_epi64(lhs, rhs)};
-            else LANGULUS_ERROR("Unsupported type for SIMD::ShiftRightInner of 64-byte package");
+            else static_assert(false, "Unsupported type for SIMD::ShiftRightInner of 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type for SIMD::ShiftRightInner");
+         else static_assert(false, "Unsupported type for SIMD::ShiftRightInner");
       }
       
       /// Bitwise right shift values as constexpr, if possible                

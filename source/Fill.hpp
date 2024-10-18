@@ -32,7 +32,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::UnsignedInteger64<T>) return V128<T> {simde_x_mm_set1_epu64     ( GetFirst(s))};
             else if constexpr (CT::Float<T>)             return V128<T> {simde_mm_broadcast_ss     (&GetFirst(s))};
             else if constexpr (CT::Double<T>)            return V128<T> {simde_mm_set1_pd          ( GetFirst(s))};
-            else LANGULUS_ERROR("Unsupported type for filling V128");
+            else static_assert(false, "Unsupported type for filling V128");
          }
          else
       #endif
@@ -46,7 +46,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer64<T>)         return V256<T> {simde_mm256_set1_epi64x   ( GetFirst(s))};
             else if constexpr (CT::Float<T>)             return V256<T> {simde_mm256_broadcast_ss  (&GetFirst(s))};
             else if constexpr (CT::Double<T>)            return V256<T> {simde_mm256_broadcast_sd  (&GetFirst(s))};
-            else LANGULUS_ERROR("Unsupported type for filling of V256");
+            else static_assert(false, "Unsupported type for filling of V256");
          }
          else
       #endif
@@ -60,7 +60,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer64<T>)         return V512<T> {simde_mm512_set1_epi64    (GetFirst(s))};
             else if constexpr (CT::Float<T>)             return V512<T> {simde_mm512_set1_ps       (GetFirst(s))};
             else if constexpr (CT::Double<T>)            return V512<T> {simde_mm512_set1_pd       (GetFirst(s))};
-            else LANGULUS_ERROR("Unsupported type for filling of V512");
+            else static_assert(false, "Unsupported type for filling of V512");
          }
          else
       #endif

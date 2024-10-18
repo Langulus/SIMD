@@ -41,7 +41,7 @@ namespace Langulus::SIMD
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm_log1p_ps(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm_log2_ps(value);
                else if constexpr (STYLE == LogStyle::FlooredBase2)   return simde_mm_logb_ps(value);
-               else LANGULUS_ERROR("Unsupported style for float[4] package");
+               else static_assert(false, "Unsupported style for float[4] package");
             }
             else if constexpr (CT::Double<T>) {
                if      constexpr (STYLE == LogStyle::Natural)        return simde_mm_log_pd(value);
@@ -49,9 +49,9 @@ namespace Langulus::SIMD
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm_log1p_pd(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm_log2_pd(value);
                else if constexpr (STYLE == LogStyle::FlooredBase2)   return simde_mm_logb_pd(value);
-               else LANGULUS_ERROR("Unsupported style for double[2] package");
+               else static_assert(false, "Unsupported style for double[2] package");
             }
-            else LANGULUS_ERROR("Unsupported type for 16-byte package");
+            else static_assert(false, "Unsupported type for 16-byte package");
          }
          else if constexpr (CT::SIMD256<REGISTER>) {
             if constexpr (CT::Float<T>) {
@@ -60,7 +60,7 @@ namespace Langulus::SIMD
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm256_log1p_ps(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm256_log2_ps(value);
                else if constexpr (STYLE == LogStyle::FlooredBase2)   return simde_mm256_logb_ps(value);
-               else LANGULUS_ERROR("Unsupported style for float[8] package");
+               else static_assert(false, "Unsupported style for float[8] package");
             }
             else if constexpr (CT::Double<T>) {
                if      constexpr (STYLE == LogStyle::Natural)        return simde_mm256_log_pd(value);
@@ -68,9 +68,9 @@ namespace Langulus::SIMD
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm256_log1p_pd(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm256_log2_pd(value);
                else if constexpr (STYLE == LogStyle::FlooredBase2)   return simde_mm256_logb_pd(value);
-               else LANGULUS_ERROR("Unsupported style for double[4] package");
+               else static_assert(false, "Unsupported style for double[4] package");
             }
-            else LANGULUS_ERROR("Unsupported type for 32-byte package");
+            else static_assert(false, "Unsupported type for 32-byte package");
          }
          else if constexpr (CT::SIMD512<REGISTER>) {
             if constexpr (CT::Float<T>) {
@@ -79,7 +79,7 @@ namespace Langulus::SIMD
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm512_log1p_ps(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm512_log2_ps(value);
                else if constexpr (STYLE == LogStyle::FlooredBase2)   return simde_mm512_logb_ps(value);
-               else LANGULUS_ERROR("Unsupported style for float[16] package");
+               else static_assert(false, "Unsupported style for float[16] package");
             }
             else if constexpr (CT::Double<T>) {
                if      constexpr (STYLE == LogStyle::Natural)        return simde_mm512_log_pd(value);
@@ -87,11 +87,11 @@ namespace Langulus::SIMD
                else if constexpr (STYLE == LogStyle::Base1P)         return simde_mm512_log1p_pd(value);
                else if constexpr (STYLE == LogStyle::Base2)          return simde_mm512_log2_pd(value);
                else if constexpr (STYLE == LogStyle::FlooredBase2)   return simde_mm512_logb_pd(value);
-               else LANGULUS_ERROR("Unsupported style for double[8] package");
+               else static_assert(false, "Unsupported style for double[8] package");
             }
-            else LANGULUS_ERROR("Unsupported type for 64-byte package");
+            else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else static_assert(false, "Unsupported type");
       }
 
    } // namespace Langulus::SIMD::Inner

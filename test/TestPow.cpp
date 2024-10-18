@@ -37,7 +37,7 @@ constexpr auto Pow(B base, E exponent) noexcept {
    else if constexpr (CT::Real<B, E>)
       return ::std::pow(base, exponent);
    else
-      LANGULUS_ERROR("T must be a number");
+      static_assert(false, "T must be a number");
 }
 
 template<class LHS, class RHS, class OUT> LANGULUS(INLINED)

@@ -72,7 +72,7 @@ namespace Langulus::SIMD
                   return Unsupported {}; //TODO
                #endif
             }
-            else LANGULUS_ERROR("Unsupported type for 16-byte package");
+            else static_assert(false, "Unsupported type for 16-byte package");
          }
          else if constexpr (CT::SIMD256<R>) {
             if constexpr (CT::Integer8<T>) {
@@ -91,7 +91,7 @@ namespace Langulus::SIMD
             }
             else if constexpr (CT::Integer32<T>)         return R {simde_mm256_sllv_epi32(lhs, rhs)};
             else if constexpr (CT::Integer64<T>)         return R {simde_mm256_sllv_epi64(lhs, rhs)};
-            else LANGULUS_ERROR("Unsupported type for 32-byte package");
+            else static_assert(false, "Unsupported type for 32-byte package");
          }
          else if constexpr (CT::SIMD512<R>) {
             if constexpr (CT::Integer8<T>) {
@@ -102,9 +102,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer16<T>)         return R {simde_mm512_sllv_epi16(lhs, rhs)};
             else if constexpr (CT::Integer32<T>)         return R {simde_mm512_sllv_epi32(lhs, rhs)};
             else if constexpr (CT::Integer64<T>)         return R {simde_mm512_sllv_epi64(lhs, rhs)};
-            else LANGULUS_ERROR("Unsupported type for 64-byte package");
+            else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else static_assert(false, "Unsupported type");
       }
       
       /// Bitwise left shift values as constexpr, if possible                 

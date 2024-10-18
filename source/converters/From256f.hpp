@@ -71,7 +71,7 @@ namespace Langulus::SIMD::Inner
             return t32.UnpackLo();
          #endif
       }
-      else LANGULUS_ERROR("Unsupported register");
+      else static_assert(false, "Unsupported register");
    }
 
 } // namespace Langulus::SIMD
