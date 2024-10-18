@@ -52,7 +52,7 @@ namespace Langulus::SIMD
             }
             else if constexpr (CT::Float<T>)             return R {simde_mm_max_ps      (lhs, rhs)};
             else if constexpr (CT::Double<T>)            return R {simde_mm_max_pd      (lhs, rhs)};
-            else LANGULUS_ERROR("Unsupported type for 16-byte package");
+            else static_assert(false, "Unsupported type for 16-byte package");
          }
          else if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm256_max_epi8 (lhs, rhs)};
@@ -77,7 +77,7 @@ namespace Langulus::SIMD
             }
             else if constexpr (CT::Float<T>)             return R {simde_mm256_max_ps   (lhs, rhs)};
             else if constexpr (CT::Double<T>)            return R {simde_mm256_max_pd   (lhs, rhs)};
-            else LANGULUS_ERROR("Unsupported type for 32-byte package");
+            else static_assert(false, "Unsupported type for 32-byte package");
          }
          else if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm512_max_epi8 (lhs, rhs)};
@@ -90,9 +90,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::UnsignedInteger64<T>) return R {simde_mm512_max_epu64(lhs, rhs)};
             else if constexpr (CT::Float<T>)             return R {simde_mm512_max_ps   (lhs, rhs)};
             else if constexpr (CT::Double<T>)            return R {simde_mm512_max_pd   (lhs, rhs)};
-            else LANGULUS_ERROR("Unsupported type for 64-byte package");
+            else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else LANGULUS_ERROR("Unsupported type");
+         else static_assert(false, "Unsupported type");
       }
       
       /// Get biggest values as constexpr, if possible                        

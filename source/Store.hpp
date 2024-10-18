@@ -30,7 +30,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer64<T>)   to = simde_mm_movemask_pd     (simde_mm_castsi128_pd(from));
             else if constexpr (CT::Float<T>)       to = simde_mm_movemask_ps     (from);
             else if constexpr (CT::Double<T>)      to = simde_mm_movemask_pd     (from);
-            else LANGULUS_ERROR("Unsupported type");
+            else static_assert(false, "Unsupported type");
          }
          else if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::Integer8<T>)    to = simde_mm256_movemask_epi8(from);
@@ -43,7 +43,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer64<T>)   to = simde_mm256_movemask_pd  (simde_mm256_castsi256_pd(from));
             else if constexpr (CT::Float<T>)       to = simde_mm256_movemask_ps  (from);
             else if constexpr (CT::Double<T>)      to = simde_mm256_movemask_pd  (from);
-            else LANGULUS_ERROR("Unsupported type");
+            else static_assert(false, "Unsupported type");
          }
          else if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::Integer8<T>)    to = simde_mm512_movemask_epi8(from);
@@ -56,9 +56,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer64<T>)   to = simde_mm512_movemask_pd  (simde_mm512_castsi256_pd(from));
             else if constexpr (CT::Float<T>)       to = simde_mm512_movemask_ps  (from);
             else if constexpr (CT::Double<T>)      to = simde_mm512_movemask_pd  (from);
-            else LANGULUS_ERROR("Unsupported type");
+            else static_assert(false, "Unsupported type");
          }
-         else LANGULUS_ERROR("Unsupported register");
+         else static_assert(false, "Unsupported register");
       }
 
       /// Save a register to a vector in memory                               
@@ -117,7 +117,7 @@ namespace Langulus::SIMD
                      simde_mm_storeu_pd(&GetFirst(to), from);
                   }
                }
-               else LANGULUS_ERROR("Shouldn't be reached (storing one double)");
+               else static_assert(false, "Shouldn't be reached (storing one double)");
             }
             else if constexpr (CT::Integer<T>) {
                // To integer array                                      
@@ -138,7 +138,7 @@ namespace Langulus::SIMD
                   memcpy(&GetFirst(to), temp, sizeof(to));
                }
             }
-            else LANGULUS_ERROR("Unsupported output");
+            else static_assert(false, "Unsupported output");
          }
          else if constexpr (CT::SIMD256<R>) {
             if constexpr (CT::Float<T>) {
@@ -198,7 +198,7 @@ namespace Langulus::SIMD
                   memcpy(&GetFirst(to), temp, sizeof(to));
                }
             }
-            else LANGULUS_ERROR("Unsupported output");
+            else static_assert(false, "Unsupported output");
          }
          else if constexpr (CT::SIMD512<R>) {
             if constexpr (CT::Float<T>) {
@@ -258,9 +258,9 @@ namespace Langulus::SIMD
                   memcpy(&GetFirst(to), temp, sizeof(to));
                }
             }
-            else LANGULUS_ERROR("Unsupported output");
+            else static_assert(false, "Unsupported output");
          }
-         else LANGULUS_ERROR("Unsupported register");
+         else static_assert(false, "Unsupported register");
       }
 
       /// Fallback store routine, doesn't use SIMD, hopefully constexpr       
@@ -287,16 +287,16 @@ namespace Langulus::SIMD
                   for (Offset i = 0; i < S; ++i)
                      to[i] = from[i];
                }
-               else LANGULUS_ERROR("Bad output to store a bitmask");
+               else static_assert(false, "Bad output to store a bitmask");
             }
             else if constexpr (CT::Scalar<TO>) {
                if constexpr (CT::Bool<E>) {
                   // Collapse the entire bitmask to a single boolean    
                   GetFirst(to) = from;
                }
-               else LANGULUS_ERROR("Bad output to store a bitmask");
+               else static_assert(false, "Bad output to store a bitmask");
             }
-            else LANGULUS_ERROR("Unsupported destination");
+            else static_assert(false, "Unsupported destination");
          }
          else if constexpr (CT::Vector<FROM>) {
             // Extract from any range                                   
@@ -325,7 +325,7 @@ namespace Langulus::SIMD
                }
                else GetFirst(to) = from;
             }
-            else LANGULUS_ERROR("Unsupported destination");
+            else static_assert(false, "Unsupported destination");
          }
          else if constexpr (CT::Scalar<FROM>) {
             // Extract from a scalar                                    
@@ -336,7 +336,7 @@ namespace Langulus::SIMD
             }
             else GetFirst(to) = from;
          }
-         else LANGULUS_ERROR("Unsupported source");
+         else static_assert(false, "Unsupported source");
       }
 
    } // namespace Langulus::SIMD::Inner
@@ -353,7 +353,7 @@ namespace Langulus::SIMD
       else if constexpr (CT::Supported<FROM>)
          Inner::StoreConstexpr(from, to);
       //else
-      //   LANGULUS_ERROR("Source not supported");
+      //   static_assert(false, "Source not supported");
    }
 
 } // namespace Langulus::SIMD

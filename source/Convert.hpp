@@ -65,7 +65,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)   return ConvertFrom512d<TO>(in);
             else if constexpr (CT::Integer<T>)  return ConvertFrom512i<TO>(in);
          }
-         else LANGULUS_ERROR("Can't convert from unsupported");
+         else static_assert(false, "Can't convert from unsupported");
       }
 
       /// Convert scalars/arrays at compile-time, if possible                 

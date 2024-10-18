@@ -42,7 +42,7 @@ namespace Langulus::SIMD
       else {
          // Cast into another type of regiter, filling the blanks with  
          // DEF value                                                   
-         LANGULUS_ERROR("TODO use _mm_cast...");
+         static_assert(false, "TODO use _mm_cast...");
       }
    }
 
@@ -87,7 +87,7 @@ namespace Langulus::SIMD
                   if      constexpr (CT::Float<T>)    return V128<T> {simde_mm_loadu_ps   (&GetFirst(v))};
                   else if constexpr (CT::Double<T>)   return V128<T> {simde_mm_loadu_pd   (&GetFirst(v))};
                   else if constexpr (CT::Integer<T>)  return V128<T> {simde_mm_loadu_si128(&GetFirst(v))};
-                  else LANGULUS_ERROR("Unsupported element");
+                  else static_assert(false, "Unsupported element");
                }
                else return Set<DEF, 16>(v);
             }
@@ -104,7 +104,7 @@ namespace Langulus::SIMD
                   if      constexpr (CT::Float<T>)    return V256<T> {simde_mm256_loadu_ps   (&GetFirst(v))};
                   else if constexpr (CT::Double<T>)   return V256<T> {simde_mm256_loadu_pd   (&GetFirst(v))};
                   else if constexpr (CT::Integer<T>)  return V256<T> {simde_mm256_loadu_si256(&GetFirst(v))};
-                  else LANGULUS_ERROR("Unsupported element");
+                  else static_assert(false, "Unsupported element");
                }
                else return Set<DEF, 32>(v);
             }
@@ -121,7 +121,7 @@ namespace Langulus::SIMD
                   if      constexpr (CT::Float<T>)    return V512<T> {simde_mm512_loadu_ps   (&GetFirst(v))};
                   else if constexpr (CT::Double<T>)   return V512<T> {simde_mm512_loadu_pd   (&GetFirst(v))};
                   else if constexpr (CT::Integer<T>)  return V512<T> {simde_mm512_loadu_si512(&GetFirst(v))};
-                  else LANGULUS_ERROR("Unsupported element");
+                  else static_assert(false, "Unsupported element");
                }
                else return Set<DEF, 64>(v);
             }

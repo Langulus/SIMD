@@ -343,7 +343,7 @@ namespace Langulus::SIMD
          else if constexpr (CT::UnsignedInteger32<T>)
             return V128<std::uint64_t> {simde_mm_unpacklo_epi32(m, Zero())};
          else
-            LANGULUS_ERROR("Can't unpack this type");
+            static_assert(false, "Can't unpack this type");
       }
 
       NOD() LANGULUS(INLINED)
@@ -361,7 +361,7 @@ namespace Langulus::SIMD
          else if constexpr (CT::UnsignedInteger32<T>)
             return V128<std::uint64_t> {simde_mm_unpackhi_epi32(m, Zero())};
          else
-            LANGULUS_ERROR("Can't unpack this type");
+            static_assert(false, "Can't unpack this type");
       }
 
       NOD() LANGULUS(INLINED)
@@ -418,7 +418,7 @@ namespace Langulus::SIMD
                return V128<std::uint32_t> {simde_mm_castpd_si128(ordered)};
             #endif
          }
-         else LANGULUS_ERROR("Can't unpack this type");
+         else static_assert(false, "Can't unpack this type");
       }
    };
 
@@ -533,7 +533,7 @@ namespace Langulus::SIMD
          else if constexpr (CT::UnsignedInteger32<T>)
             return V256<std::uint64_t> {simde_mm256_cvtepu32_epi64(simde_mm256_extractf128_si256(m, 0))};
          else
-            LANGULUS_ERROR("Can't unpack this type");
+            static_assert(false, "Can't unpack this type");
       }
 
       NOD() LANGULUS(INLINED)
@@ -551,7 +551,7 @@ namespace Langulus::SIMD
          else if constexpr (CT::UnsignedInteger32<T>)
             return V256<std::uint64_t> {simde_mm256_cvtepu32_epi64(simde_mm256_extractf128_si256(m, 1))};
          else
-            LANGULUS_ERROR("Can't unpack this type");
+            static_assert(false, "Can't unpack this type");
       }
 
       NOD() LANGULUS(INLINED)
@@ -620,7 +620,7 @@ namespace Langulus::SIMD
                return V256<std::uint32_t>  {simde_mm256_castpd_si256(ordered)};
             #endif
          }
-         else LANGULUS_ERROR("Can't unpack this type");
+         else static_assert(false, "Can't unpack this type");
       }
    };
 
@@ -735,7 +735,7 @@ namespace Langulus::SIMD
          else if constexpr (CT::UnsignedInteger32<T>)
             return V512<std::uint64_t> {simde_mm512_unpacklo_epi32(m, Zero())};
          else
-            LANGULUS_ERROR("Can't unpack this type");
+            static_assert(false, "Can't unpack this type");
       }
 
       NOD() LANGULUS(INLINED)
@@ -753,7 +753,7 @@ namespace Langulus::SIMD
          else if constexpr (CT::UnsignedInteger32<T>)
             return V512<std::uint64_t> {simde_mm512_unpackhi_epi32(m, Zero())};
          else
-            LANGULUS_ERROR("Can't unpack this type");
+            static_assert(false, "Can't unpack this type");
       }
 
       NOD() LANGULUS(INLINED)
@@ -783,7 +783,7 @@ namespace Langulus::SIMD
          else if constexpr (CT::UnsignedInteger64<T>)
             return V256<std::uint32_t> {simde_mm512_cvtepi64_epi32(m)};
          else
-            LANGULUS_ERROR("Can't pack this type");
+            static_assert(false, "Can't pack this type");
       }
    };
 
@@ -1120,7 +1120,7 @@ namespace Langulus::SIMD
          constexpr int8_t imm8 = static_cast<int8_t>(Shuffle(0, 1, 2, 3));
          return simde_mm_shuffle_epi32(what.m, imm8);
       }
-      else LANGULUS_ERROR("TODO");
+      else static_assert(false, "TODO");
    }
 #endif
 
