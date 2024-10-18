@@ -36,7 +36,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer64<T>)   return simde_mm_cmpeq_epi64   (lhs, rhs);
             else if constexpr (CT::Float<T>)       return simde_mm_cmpeq_ps      (lhs, rhs);
             else if constexpr (CT::Double<T>)      return simde_mm_cmpeq_pd      (lhs, rhs);
-            else LANGULUS_ERROR("Unsupported type");
+            else static_assert(false, "Unsupported type");
          }
          else if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::Integer8<T>)    return simde_mm256_cmpeq_epi8 (lhs, rhs);
@@ -45,7 +45,7 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer64<T>)   return simde_mm256_cmpeq_epi64(lhs, rhs);
             else if constexpr (CT::Float<T>)       return simde_mm256_cmp_ps     (lhs, rhs, SIMDE_CMP_EQ_OQ);
             else if constexpr (CT::Double<T>)      return simde_mm256_cmp_pd     (lhs, rhs, SIMDE_CMP_EQ_OQ);
-            else LANGULUS_ERROR("Unsupported type");
+            else static_assert(false, "Unsupported type");
          }
          else if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::Integer8<T>)    return simde_mm512_cmpeq_epi8 (lhs, rhs);
@@ -54,9 +54,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer64<T>)   return simde_mm512_cmpeq_epi64(lhs, rhs);
             else if constexpr (CT::Float<T>)       return simde_mm512_cmp_ps_mask(lhs, rhs, SIMDE_CMP_EQ_OQ);
             else if constexpr (CT::Double<T>)      return simde_mm512_cmp_pd_mask(lhs, rhs, SIMDE_CMP_EQ_OQ);
-            else LANGULUS_ERROR("Unsupported type");
+            else static_assert(false, "Unsupported type");
          }
-         else LANGULUS_ERROR("Unsupported register");
+         else static_assert(false, "Unsupported register");
       }
       
       /// Compare values as constexpr, if possible                            

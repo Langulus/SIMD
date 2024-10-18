@@ -67,7 +67,7 @@ namespace Langulus::SIMD::Inner
                return V128<TO> {uint64_to_double_full(v)};
             #endif
          }
-         else LANGULUS_ERROR("Unsupported conversion");
+         else static_assert(false, "Unsupported conversion");
       }
       else if constexpr (CT::Float<TO>) {
          //                                                             
@@ -117,7 +117,7 @@ namespace Langulus::SIMD::Inner
                return V128<TO> {simde_mm_cvtpd_ps(m1)};
             #endif
          }
-         else LANGULUS_ERROR("Unsupported conversion");
+         else static_assert(false, "Unsupported conversion");
       }
       else if constexpr (CT::Integer8<TO>) {
          //                                                             
@@ -132,7 +132,7 @@ namespace Langulus::SIMD::Inner
          else if constexpr (CT::Integer64<T>)
             return V128<TO> {v.Pack().Pack().Pack()};
          else
-            LANGULUS_ERROR("Unsupported conversion");
+            static_assert(false, "Unsupported conversion");
       }
       else if constexpr (CT::Integer16<TO>) {
          //                                                             
@@ -147,7 +147,7 @@ namespace Langulus::SIMD::Inner
          else if constexpr (CT::Integer64<T>)
             return V128<TO> {v.Pack().Pack()};
          else
-            LANGULUS_ERROR("Unsupported conversion");
+            static_assert(false, "Unsupported conversion");
       }
       else if constexpr (CT::Integer32<TO>) {
          //                                                             
@@ -162,7 +162,7 @@ namespace Langulus::SIMD::Inner
          else if constexpr (CT::Integer64<T>)
             return V128<TO> {v.Pack()};
          else
-            LANGULUS_ERROR("Unsupported conversion");
+            static_assert(false, "Unsupported conversion");
       }
       else if constexpr (CT::Integer64<TO>) {
          //                                                             
@@ -177,9 +177,9 @@ namespace Langulus::SIMD::Inner
          else if constexpr (CT::Integer64<T>)
             return V128<TO> {v};
          else
-            LANGULUS_ERROR("Unsupported conversion");
+            static_assert(false, "Unsupported conversion");
       }
-      else LANGULUS_ERROR("Unsupported register");
+      else static_assert(false, "Unsupported register");
    }
 
 } // namespace Langulus::SIMD
