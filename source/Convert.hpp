@@ -47,7 +47,7 @@ namespace Langulus::SIMD
          using T = TypeOf<R>;
 
          if constexpr (CT::Similar<T, TO>) {
-            // No conversion required, just forward the register        
+            LANGULUS_SIMD_VERBOSE("No conversion required");
             return in;
          }
          else if constexpr (CT::SIMD128<R>) {
