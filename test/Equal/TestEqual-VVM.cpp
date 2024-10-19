@@ -49,7 +49,6 @@ TEMPLATE_TEST_CASE("Vector == Vector -> Bitmask", "[compare]"
          SIMD::Add(x, 1, y);
 
          ControlEqualM(x, y, rCheck);
-         const auto k = Logger::InfoTab("Test start");
          SIMD::Equals(x, y, r);
 
          REQUIRE(r == rCheck);
