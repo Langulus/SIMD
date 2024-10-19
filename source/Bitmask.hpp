@@ -95,11 +95,13 @@ namespace Langulus::SIMD
       Bitmask& operator = (const Bitmask&) noexcept = default;
 
       Bitmask& operator = (const Type& a) noexcept {
+         Logger::Info("Bitmask& operator = (const Type& a)");
          mValue = a & Mask;
          return *this;
       }
 
       Bitmask& operator = (const ::std::array<bool, C>& a) noexcept {
+         Logger::Info("Bitmask& operator = (const ::std::array<bool, C>& a)");
          mValue = {};
          for (Type i = 0; i < Type {C}; ++i)
             mValue |= (static_cast<Type>(a[i]) << i);
@@ -107,6 +109,7 @@ namespace Langulus::SIMD
       }
 
       Bitmask& operator = (bool a) noexcept requires (C == 1) {
+         Logger::Info("Bitmask& operator = (bool a)");
          mValue = a;
          return *this;
       }
