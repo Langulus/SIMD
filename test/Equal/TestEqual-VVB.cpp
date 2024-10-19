@@ -53,7 +53,6 @@ TEMPLATE_TEST_CASE("Vector == Vector -> Bool", "[compare]"
          SIMD::Add(x, 1, y);
 
          ControlEqualV(x, y, rCheck);
-         const auto k = Logger::InfoTab("Test start");
          SIMD::Equals(x, y, r);
 
          REQUIRE(r == rCheck);

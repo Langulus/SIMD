@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, windows-latest]
-        build: [Release]
+        build: [Release, Debug]
         arch: [x86, x64]
         cxx: [g++-14, clang++-19, ClangCl, v143]
         feature: [
