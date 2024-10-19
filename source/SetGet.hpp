@@ -69,6 +69,7 @@ namespace Langulus::SIMD
                using T = Decay<TypeOf<FROM>>;
                LANGULUS_SIMD_VERBOSE("Setting 128bit register from ", CountOf<FROM>, " elements");
                if      constexpr (CT::Integer8<T>)    return V128<T> {simde_mm_setr_epi8 (Get<int8_t,        DEF, INDICES, 16>(values)...)};
+               else if constexpr (CT::Same<T, char16_t>)   return V128<T> {simde_mm_setr_epi16(Get<char16_t,       DEF, INDICES,  8>(values)...)};
                else if constexpr (CT::Integer16<T>)   return V128<T> {simde_mm_setr_epi16(Get<int16_t,       DEF, INDICES,  8>(values)...)};
                else if constexpr (CT::Integer32<T>)   return V128<T> {simde_mm_setr_epi32(Get<int32_t,       DEF, INDICES,  4>(values)...)};
                else if constexpr (CT::Integer64<T>)   return V128<T> {simde_mm_set_epi64x(Get<int64_t,       DEF, INDICES,  2, true>(values)...)};
