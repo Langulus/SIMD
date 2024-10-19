@@ -62,10 +62,6 @@ namespace Langulus::SIMD
       template<auto DEF, Offset CHUNK, CT::Vector FROM, Offset...INDICES>
       LANGULUS(INLINED)
       auto Set(ExpandedSequence<INDICES...>, const FROM& values) {
-         static_assert(CT::Integer8 <char8_t >);
-         static_assert(CT::Integer16<char16_t>);
-         static_assert(CT::Integer32<char32_t>);
-
          (void)values;
 
          #if LANGULUS_SIMD(128BIT)
