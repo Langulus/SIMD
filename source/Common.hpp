@@ -47,7 +47,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 /// Make the rest of the code aware, that Langulus::SIMD has been included    
 #define LANGULUS_LIBRARY_SIMD() 1
 
-#if 1
+#if 0
    #define LANGULUS_SIMD_VERBOSE(...)     Logger::Info(__VA_ARGS__)
    #define LANGULUS_SIMD_VERBOSE_TAB(...) const auto scoped = Logger::InfoTab(__VA_ARGS__)
 #else
