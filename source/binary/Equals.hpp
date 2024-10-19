@@ -31,7 +31,10 @@ namespace Langulus::SIMD
 
          if constexpr (CT::SIMD128<R>) {
             if      constexpr (CT::Integer8<T>)    return simde_mm_cmpeq_epi8    (lhs, rhs);
-            else if constexpr (CT::Integer16<T>)   return simde_mm_cmpeq_epi16   (lhs, rhs);
+            else if constexpr (CT::Integer16<T>) {
+               Logger::Info("simde_mm_cmpeq_epi16!!");
+               return simde_mm_cmpeq_epi16(lhs, rhs);
+            }
             else if constexpr (CT::Integer32<T>)   return simde_mm_cmpeq_epi32   (lhs, rhs);
             else if constexpr (CT::Integer64<T>)   return simde_mm_cmpeq_epi64   (lhs, rhs);
             else if constexpr (CT::Float<T>)       return simde_mm_cmpeq_ps      (lhs, rhs);
