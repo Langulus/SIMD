@@ -11,6 +11,8 @@
 ///                                                                           
 TEMPLATE_TEST_CASE("Vector == Vector -> Bool", "[compare]"
    , VECTORS_ALL(5)
+   , VECTORS_ALL(6)
+   , VECTORS_ALL(7)
    , VECTORS_ALL(9)
    , VECTORS_ALL(2)
    , VECTORS_ALL(3)

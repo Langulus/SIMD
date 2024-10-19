@@ -16,6 +16,8 @@ TEMPLATE_TEST_CASE("Vector == Vector -> Bitmask", "[compare]"
    , VECTORS_ALL(3)
    , VECTORS_ALL(4)
    , VECTORS_ALL(5)
+   , VECTORS_ALL(6)
+   , VECTORS_ALL(7)
    , VECTORS_ALL(8)
    , VECTORS_ALL(9)
    , VECTORS_ALL(16)
