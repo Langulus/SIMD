@@ -96,7 +96,6 @@ namespace Langulus::SIMD
 
       Bitmask& operator = (const Type& a) noexcept {
          mValue = a & Mask;
-         Logger::Special("MASK WAS ", mValue);
          return *this;
       }
 
