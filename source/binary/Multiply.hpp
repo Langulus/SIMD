@@ -142,7 +142,7 @@ namespace Langulus::SIMD
       constexpr auto Multiply(const auto& lhs, const auto& rhs) noexcept {
          return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
             []<class R>(const R& l, const R& r) noexcept {
-               LANGULUS_SIMD_VERBOSE("Multiplying (SIMD) as ", NameOf<REGISTER>());
+               LANGULUS_SIMD_VERBOSE("Multiplying (SIMD) as ", NameOf<R>());
                return MultiplySIMD(l, r);
             },
             []<class E>(const E& l, const E& r) noexcept -> E {
