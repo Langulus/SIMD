@@ -63,8 +63,8 @@ using namespace Langulus;
    (Vector<double, S>)
 
 #define VECTORS_SIGNED(S)       \
-   (Vector<::std::int8_t, S>),  \
    (Vector<::std::int16_t, S>), \
+   (Vector<::std::int8_t, S>),  \
    (Vector<::std::int32_t, S>), \
    (Vector<::std::int64_t, S>), \
    VECTORS_REAL(S)
