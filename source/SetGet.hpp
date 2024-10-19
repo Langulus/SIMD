@@ -85,7 +85,7 @@ namespace Langulus::SIMD
                using T = Decay<TypeOf<FROM>>;
                LANGULUS_SIMD_VERBOSE("Setting 256bit register from ", CountOf<FROM>, " elements");
                if      constexpr (CT::Integer8<T>)    return V256<T> {simde_mm256_setr_epi8 (Get<int8_t,  DEF, INDICES, 32>(values)...)};
-               else if constexpr (CT::Same<T, char16_t>)   return V256<T> {simde_mm256_setr_epi16(Get<char16_t, DEF, INDICES, 8>(values)...)};
+               else if constexpr (CT::Same<T, char16_t>)   return V256<T> {simde_mm256_setr_epi16(Get<char16_t, DEF, INDICES, 16>(values)...)};
                else if constexpr (CT::Integer16<T>)   return V256<T> {simde_mm256_setr_epi16(Get<int16_t, DEF, INDICES, 16>(values)...)};
                else if constexpr (CT::Integer32<T>)   return V256<T> {simde_mm256_setr_epi32(Get<int32_t, DEF, INDICES,  8>(values)...)};
                else if constexpr (CT::Integer64<T>) {
@@ -111,7 +111,7 @@ namespace Langulus::SIMD
                using T = Decay<TypeOf<FROM>>;
                LANGULUS_SIMD_VERBOSE("Setting 512bit register from ", CountOf<FROM>, " elements");
                if      constexpr (CT::Integer8<T>)    return V512<T> {simde_mm512_setr_epi8 (Get<int8_t,        DEF, INDICES, 64>(values)...)};
-               else if constexpr (CT::Same<T, char16_t>)   return V512<T> {simde_mm512_setr_epi16(Get<char16_t, DEF, INDICES, 8>(values)...)};
+               else if constexpr (CT::Same<T, char16_t>)   return V512<T> {simde_mm512_setr_epi16(Get<char16_t, DEF, INDICES, 32>(values)...)};
                else if constexpr (CT::Integer16<T>)   return V512<T> {simde_mm512_setr_epi16(Get<int16_t,       DEF, INDICES, 32>(values)...)};
                else if constexpr (CT::Integer32<T>)   return V512<T> {simde_mm512_setr_epi32(Get<int32_t,       DEF, INDICES, 16>(values)...)};
                else if constexpr (CT::Integer64<T>)   return V512<T> {simde_mm512_setr_epi64(Get<int64_t,       DEF, INDICES,  8>(values)...)};
