@@ -26,7 +26,7 @@ fetch_external_module(
 )
 
 # Build and install SIMD library                                            
-add_library(LangulusSIMD ${LANGULUS_LIBRARY_TYPE}
+add_langulus_library(LangulusSIMD
     $<TARGET_OBJECTS:LangulusLogger>
     $<TARGET_OBJECTS:LangulusRTTI>
 )

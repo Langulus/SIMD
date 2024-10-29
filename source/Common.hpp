@@ -236,6 +236,7 @@ namespace Langulus::SIMD
    /// Single integer element inside a register                               
    template<class...T>
    concept IntElement = ((CT::ExactAsOneOf<T,
+      signed int, signed long, unsigned int, unsigned long,
       ::std::int8_t,  ::std::int16_t,  ::std::int32_t,  ::std::int64_t,
       ::std::uint8_t, ::std::uint16_t, ::std::uint32_t, ::std::uint64_t,
       char8_t, char16_t, char32_t, wchar_t, Langulus::Byte
