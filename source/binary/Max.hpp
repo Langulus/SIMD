@@ -15,7 +15,7 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       constexpr Unsupported MaxSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept {
          return {};
       }
@@ -24,7 +24,7 @@ namespace Langulus::SIMD
       ///   @param lhs - left register                                        
       ///   @param rhs - right register                                       
       ///   @return the resulting register                                    
-      template<CT::SIMD R> NOD() LANGULUS(INLINED)
+      template<CT::SIMD R> LANGULUS(INLINED)
       auto MaxSIMD(R lhs, R rhs) noexcept {
          using T = TypeOf<R>;
          (void)lhs; (void)rhs;
@@ -99,7 +99,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector to operate on                        
       ///   @return the biggest scalar/vector                                 
-      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
       constexpr auto MaxConstexpr(const auto& lhs, const auto& rhs) noexcept {
          return AttemptBinary<0, FORCE_OUT>(lhs, rhs, nullptr,
             []<class E>(const E& l, const E& r) noexcept -> E {
@@ -112,7 +112,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector/register to operate on               
       ///   @return the biggest scalar/vector/register                        
-      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
       auto Max(const auto& lhs, const auto& rhs) noexcept {
          return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
             []<class R>(const R& l, const R& r) noexcept {

@@ -8,7 +8,7 @@
 #include "Common.hpp"
 
 
-template<CT::Dense B, CT::Dense E> NOD() LANGULUS(INLINED)
+template<CT::Dense B, CT::Dense E> LANGULUS(INLINED)
 constexpr auto Pow(B base, E exponent) noexcept {
    if (base == B {1})
       return B {1};

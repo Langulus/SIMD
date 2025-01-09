@@ -372,13 +372,13 @@ namespace Langulus::SIMD
          Store(Inner::OP<OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
    } \
    template<class LHS, class RHS, CT::NoIntent OUT = LosslessArray<LHS, RHS>> \
-   NOD() LANGULUS(INLINED) \
+   LANGULUS(INLINED) \
    constexpr auto OP(const LHS& lhs, const RHS& rhs) noexcept { \
       OUT out; \
       OP(DeintCast(lhs), DeintCast(rhs), out); \
-      if constexpr (CT::Similar<LHS, RHS> or CT::DerivedFrom<LHS, RHS>) \
+      if constexpr (::std::derived_from<Decay<LHS>, Decay<RHS>>) \
          return LHS {out}; \
-      else if constexpr (CT::DerivedFrom<RHS, LHS>) \
+      else if constexpr (::std::derived_from<Decay<RHS>, Decay<LHS>>) \
          return RHS {out}; \
       else \
          return out; \
@@ -397,7 +397,7 @@ namespace Langulus::SIMD
          Store(Inner::OP<OUT>(DeintCast(val)), out); \
    } \
    template<class VAL, CT::NoIntent OUT = LosslessArray<VAL>> \
-   NOD() LANGULUS(INLINED) \
+   LANGULUS(INLINED) \
    constexpr auto OP(const VAL& val) noexcept { \
       OUT out; \
       OP(DeintCast(val), out); \

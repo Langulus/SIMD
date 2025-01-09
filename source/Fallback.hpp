@@ -17,8 +17,7 @@ namespace Langulus::SIMD::Inner
    ///   @param val - argument                                                
    ///   @param op - the fallback function to invoke                          
    ///   @return the resulting number/bool/std::array of numbers/bools        
-   template<class OUT, class VAL, class FFALL>
-   NOD() LANGULUS(INLINED)
+   template<class OUT, class VAL, class FFALL> LANGULUS(INLINED)
    constexpr auto FallbackUnary(VAL& val, FFALL&& op) {
       if constexpr (CT::SIMD<VAL>) {
          // Fallback routine can't handle registers, but the function   
@@ -58,8 +57,7 @@ namespace Langulus::SIMD::Inner
    ///   @param rhs - right argument                                          
    ///   @param op - the fallback function to invoke                          
    ///   @return the resulting number/bool/std::array of numbers/bools        
-   template<class OUT, class LHS, class RHS, class FFALL>
-   NOD() LANGULUS(INLINED)
+   template<class OUT, class LHS, class RHS, class FFALL> LANGULUS(INLINED)
    constexpr auto FallbackBinary(LHS& lhs, RHS& rhs, FFALL&& op) {
       if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>) {
          // Fallback routine can't handle registers, but the function   

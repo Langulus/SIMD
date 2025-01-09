@@ -16,11 +16,15 @@ namespace Langulus::SIMD::Inner
    ///   @tparam TO - the desired element type                                
    ///   @param v - the input register                                        
    ///   @return the converted register                                       
-   template<Element TO> NOD() LANGULUS(INLINED)
+   template<Element TO> LANGULUS(INLINED)
    auto ConvertFrom128f(CT::SIMD128f auto v) noexcept {
       if constexpr (CT::Double<TO>) {
          LANGULUS_SIMD_VERBOSE("Converting 32bit floats -> 64bit floats");
-         return V128<TO> {simde_mm_cvtps_pd(v)};
+         #if LANGULUS_SIMD(AVX)
+            return V256<TO> {simde_mm256_cvtps_pd(v)};
+         #else
+            return V128<TO> {simde_mm_cvtps_pd(v)};
+         #endif
       }
       else if constexpr (CT::Float<TO>) {
          LANGULUS_SIMD_VERBOSE("No conversion required");
@@ -70,6 +74,9 @@ namespace Langulus::SIMD::Inner
          LANGULUS_SIMD_VERBOSE("Converting 32bit floats -> signed 64bit integers");
          #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
             return V128<TO> {simde_mm_cvtps_epi64(v)};
+         #elif LANGULUS_SIMD(AVX)
+            const V256i32 t32 {simde_mm256_cvtps_epi32(simde_mm256_castps128_ps256(v))};
+            return t32.UnpackLo();
          #else
             const V128i32 t32 {simde_mm_cvtps_epi32(v)};
             return t32.UnpackLo();
@@ -79,6 +86,9 @@ namespace Langulus::SIMD::Inner
          LANGULUS_SIMD_VERBOSE("Converting 32bit floats -> unsigned 64bit integers");
          #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
             return V128<TO> {simde_mm_cvtps_epu64(v)};
+         #elif LANGULUS_SIMD(AVX)
+            const V256u32 t32 {simde_mm256_cvtps_epi32(simde_mm256_castps128_ps256(v))};
+            return t32.UnpackLo();
          #else
             const V128u32 t32 {simde_mm_cvtps_epi32(v)};
             return t32.UnpackLo();

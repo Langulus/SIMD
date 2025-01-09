@@ -15,7 +15,7 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       constexpr Unsupported AbsSIMD(CT::NotSIMD auto) noexcept {
          return {};
       }
@@ -23,7 +23,7 @@ namespace Langulus::SIMD
       /// Get absolute values via SIMD                                        
       ///   @param v - the register                                           
       ///   @return the absolute values                                       
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       auto AbsSIMD(CT::SIMD auto v) noexcept {
          using R = decltype(v);
          using T = TypeOf<R>;
@@ -65,7 +65,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector to operate on                        
       ///   @return the absolute scalar/vector                                
-      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
       constexpr auto AbsConstexpr(const auto& value) noexcept {
          return AttemptUnary<0, FORCE_OUT>(value, nullptr,
             []<class E>(const E& f) noexcept -> E {
@@ -79,7 +79,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector/register to operate on               
       ///   @return the absolute scalar/vector/register                       
-      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
       auto Abs(const auto& value) noexcept {
          return AttemptUnary<0, FORCE_OUT>(value,
             []<class R>(const R& v) noexcept {

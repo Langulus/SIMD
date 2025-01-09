@@ -16,7 +16,7 @@ namespace Langulus::SIMD::Inner
    ///   @tparam TO - the desired element type                                
    ///   @param v - the input register                                        
    ///   @return the converted register                                       
-   template<Element TO> NOD() LANGULUS(INLINED)
+   template<Element TO> LANGULUS(INLINED)
    auto ConvertFrom256i(CT::SIMD256i auto v) noexcept {
       using R = decltype(v);
       using T = TypeOf<R>;

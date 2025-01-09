@@ -17,7 +17,7 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       constexpr Unsupported DivideSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept {
          return {};
       }
@@ -27,7 +27,7 @@ namespace Langulus::SIMD
       ///   @param lhs - left register                                        
       ///   @param rhs - right register                                       
       ///   @return the resulting register                                    
-      template<CT::SIMD R> NOD() LANGULUS(INLINED)
+      template<CT::SIMD R> LANGULUS(INLINED)
       R DivideSIMD(R lhs, R rhs) {
          using T = TypeOf<R>;
          (void)lhs; (void)rhs;
@@ -128,7 +128,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector to operate on                        
       ///   @return the divided scalar/vector                                 
-      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
       constexpr auto DivideConstexpr(const auto& lhs, const auto& rhs) {
          return AttemptBinary<1, FORCE_OUT>(lhs, rhs, nullptr,
             []<class E>(const E& l, const E& r) -> E {
@@ -144,7 +144,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector/register to operate on               
       ///   @return the divided scalar/vector/register                        
-      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
       auto Divide(const auto& lhs, const auto& rhs) {
          return AttemptBinary<1, FORCE_OUT>(lhs, rhs,
             []<class R>(const R& l, const R& r) {
