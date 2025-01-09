@@ -12,63 +12,63 @@
 namespace Langulus::SIMD::Inner
 {
 
-   /// Convert V256f to any other register                                    
+   /// Convert V256d to any other register                                    
    ///   @tparam TO - the desired element type                                
    ///   @param v - the input register                                        
    ///   @return the converted register                                       
-   template<Element TO> NOD() LANGULUS(INLINED)
+   template<Element TO> LANGULUS(INLINED)
    auto ConvertFrom256d(CT::SIMD256d auto v) noexcept {
       if constexpr (CT::Double<TO>)
          return v;
       else if constexpr (CT::Float<TO>)
-         return V256<TO> {simde_mm256_cvtpd_ps(v)};
+         return V128<TO> {simde_mm256_cvtpd_ps(v)};
       else if constexpr (CT::SignedInteger8<TO>) {
-         const V256i32 t32 {simde_mm256_cvtpd_epi32(v)};
+         const V128i32 t32 {simde_mm256_cvtpd_epi32(v)};
          return t32.Pack().Pack();
       }
       else if constexpr (CT::UnsignedInteger8<TO>) {
          #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
-            const V256u32 t32 {simde_mm256_cvtpd_epu32(v)};
+            const V128u32 t32 {simde_mm256_cvtpd_epu32(v)};
          #else
-            const V256u32 t32 {simde_mm256_cvtpd_epi32(v)};
+            const V128u32 t32 {simde_mm256_cvtpd_epi32(v)};
          #endif
          return t32.Pack().Pack();
       }
       else if constexpr (CT::SignedInteger16<TO>) {
-         const V256i32 t32 {simde_mm256_cvtpd_epi32(v)};
+         const V128i32 t32 {simde_mm256_cvtpd_epi32(v)};
          return t32.Pack();
       }
       else if constexpr (CT::UnsignedInteger16<TO>) {
          #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
-            const V256u32 t32 {simde_mm256_cvtpd_epu32(v)};
+            const V128u32 t32 {simde_mm256_cvtpd_epu32(v)};
          #else
-            const V256u32 t32 {simde_mm256_cvtpd_epi32(v)};
+            const V128u32 t32 {simde_mm256_cvtpd_epi32(v)};
          #endif
          return t32.Pack();
       }
       else if constexpr (CT::SignedInteger32<TO>)
-         return V256<TO> {simde_mm256_cvtpd_epi32(v)};
+         return V128<TO> {simde_mm256_cvtpd_epi32(v)};
       else if constexpr (CT::UnsignedInteger32<TO>) {
          #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
-            return V256<TO> {simde_mm256_cvtpd_epu32(v)};
+            return V128<TO> {simde_mm256_cvtpd_epu32(v)};
          #else
-            return V256<TO> {simde_mm256_cvtpd_epi32(v)};
+            return V128<TO> {simde_mm256_cvtpd_epi32(v)};
          #endif
       }
       else if constexpr (CT::SignedInteger64<TO>) {
          #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
             return V256<TO> {simde_mm256_cvtpd_epi64(v)};
          #else
-            const V256i32 t32 {simde_mm256_cvtpd_epi32(v)};
-            return t32.UnpackLo();
+            const V128i32 t32 {simde_mm256_cvtpd_epi32(v)};
+            return V256<TO> {t32.UnpackLo(), t32.UnpackHi()};
          #endif
       }
       else if constexpr (CT::UnsignedInteger64<TO>) {
          #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
             return V256<TO> {simde_mm256_cvtpd_epu64(v)};
          #else
-            const V256u32 t32 {simde_mm256_cvtpd_epi32(v)};
-            return t32.UnpackLo();
+            const V128u32 t32 {simde_mm256_cvtpd_epi32(v)};
+            return V256<TO> {t32.UnpackLo(), t32.UnpackHi()};
          #endif
       }
       else static_assert(false, "Unsupported register");

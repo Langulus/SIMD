@@ -29,10 +29,10 @@ namespace Langulus::SIMD
       ///   @tparam REGISTER - the register type (deducible)                  
       ///   @param value - the array                                          
       ///   @return the logarithm values                                      
-      template<LogStyle STYLE = LogStyle::Base10, CT::Decayed T, CT::SIMD REGISTER>
-      LANGULUS(INLINED)
-      REGISTER Log(UNUSED() const REGISTER& value) noexcept {
+      template<LogStyle STYLE = LogStyle::Base10, CT::Decayed T, CT::SIMD REGISTER> LANGULUS(INLINED)
+      REGISTER Log(const REGISTER& value) noexcept {
          static_assert(CT::Real<T>, "Doesn't work for whole numbers");
+         (void) value;
 
          if constexpr (CT::SIMD128<REGISTER>) {
             if constexpr (CT::Float<T>) {

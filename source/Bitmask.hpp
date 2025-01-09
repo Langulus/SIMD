@@ -56,7 +56,7 @@ namespace Langulus::SIMD
             : marker {a}
             , bitset {set} {}
 
-         NOD() constexpr bool operator == (const iterator& it) const noexcept {
+         constexpr bool operator == (const iterator& it) const noexcept {
             return marker == it.marker;
          }
 
@@ -67,22 +67,22 @@ namespace Langulus::SIMD
          }
 
          // Suffix operator                                             
-         NOD() constexpr iterator operator ++ (int) noexcept {
+         constexpr iterator operator ++ (int) noexcept {
             const auto backup = *this;
             operator ++ ();
             return backup;
          }
 
-         NOD() constexpr bool operator * () const noexcept {
+         constexpr bool operator * () const noexcept {
             return 0 != (bitset & (Type {1} << marker));
          }
       };
 
-      NOD() auto begin() const noexcept {
+      auto begin() const noexcept {
          return iterator {0, mValue};
       }
 
-      NOD() auto end() const noexcept {
+      auto end() const noexcept {
          return iterator {C, mValue};
       }
 
@@ -111,7 +111,7 @@ namespace Langulus::SIMD
          return *this;
       }
 
-      NOD() constexpr bool operator == (const Bitmask& a) const noexcept {
+      constexpr bool operator == (const Bitmask& a) const noexcept {
          return mValue == a.mValue;
       }
 
@@ -130,7 +130,7 @@ namespace Langulus::SIMD
          return *this;
       }
 
-      NOD() constexpr bool operator [] (const Offset& idx) const noexcept {
+      constexpr bool operator [] (const Offset& idx) const noexcept {
          LANGULUS_ASSUME(UserAssumes, idx < C, "Index out of limits");
          return 0 != (mValue & (Type {1} << idx));
       }
@@ -148,7 +148,7 @@ namespace Langulus::SIMD
          }
       };
 
-      NOD() constexpr BitSwitcher operator [] (const Offset& idx) noexcept {
+      constexpr BitSwitcher operator [] (const Offset& idx) noexcept {
          LANGULUS_ASSUME(UserAssumes, idx < C, "Index out of limits");
          return BitSwitcher {*this, Type {1} << idx};
       }

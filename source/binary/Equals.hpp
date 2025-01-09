@@ -15,7 +15,7 @@ namespace Langulus::SIMD
    {
 
       /// Used to detect missing SIMD routine                                 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       constexpr Unsupported EqualsSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept {
          return {};
       }
@@ -24,7 +24,7 @@ namespace Langulus::SIMD
       ///   @param lhs - left register                                        
       ///   @param rhs - right register                                       
       ///   @return the resulting register                                    
-      template<CT::SIMD R> NOD() LANGULUS(INLINED)
+      template<CT::SIMD R> LANGULUS(INLINED)
       R EqualsSIMD(R lhs, R rhs) noexcept {
          using T = TypeOf<R>;
          (void)lhs; (void)rhs;
@@ -63,7 +63,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector to operate on                        
       ///   @return bool/bitmask                                              
-      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
       constexpr auto EqualsConstexpr(const auto& lhs, const auto& rhs) noexcept {
          // Will always return a std::array<bool>                       
          constexpr auto S = OverlapCounts<decltype(lhs), decltype(rhs)>();
@@ -80,7 +80,7 @@ namespace Langulus::SIMD
       ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
       ///   @patam value - scalar/vector/register to operate on               
       ///   @return bool/bitmask/register                                     
-      template<CT::NoIntent FORCE_OUT = void> NOD() LANGULUS(INLINED)
+      template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
       auto Equals(const auto& lhs, const auto& rhs) noexcept {
          // Will return either a std::array<bool>, or a masked register,
          // depending whether SIMD operation is supported or not        

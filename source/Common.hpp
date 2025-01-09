@@ -246,10 +246,63 @@ namespace Langulus::SIMD
    template<class...T>
    concept Element = RealElement<T...> or IntElement<T...>;
 
+
+#if LANGULUS_SIMD(512BIT)
+   /// 512bit register                                                        
+   template<class>
+   struct V512;
+
+   using V512f   = V512<simde_float32>;
+   using V512d   = V512<simde_float64>;
+
+   using V512i8  = V512<std::int8_t>;
+   using V512i16 = V512<std::int16_t>;
+   using V512i32 = V512<std::int32_t>;
+   using V512i64 = V512<std::int64_t>;
+
+   using V512u8  = V512<std::uint8_t>;
+   using V512u16 = V512<std::uint16_t>;
+   using V512u32 = V512<std::uint32_t>;
+   using V512u64 = V512<std::uint64_t>; 
+#endif
+
+#if LANGULUS_SIMD(256BIT)
+   /// 256bit register                                                        
+   template<class>
+   struct V256;
+
+   using V256f   = V256<simde_float32>;
+   using V256d   = V256<simde_float64>;
+
+   using V256i8  = V256<std::int8_t>;
+   using V256i16 = V256<std::int16_t>;
+   using V256i32 = V256<std::int32_t>;
+   using V256i64 = V256<std::int64_t>;
+
+   using V256u8  = V256<std::uint8_t>;
+   using V256u16 = V256<std::uint16_t>;
+   using V256u32 = V256<std::uint32_t>;
+   using V256u64 = V256<std::uint64_t>;
+#endif
+
 #if LANGULUS_SIMD(128BIT)
    /// 128bit register                                                        
    template<class>
    struct V128;
+
+   using V128f   = V128<simde_float32>;
+   using V128d   = V128<simde_float64>;
+
+   using V128i8  = V128<std::int8_t>;
+   using V128i16 = V128<std::int16_t>;
+   using V128i32 = V128<std::int32_t>;
+   using V128i64 = V128<std::int64_t>;
+
+   using V128u8  = V128<std::uint8_t>;
+   using V128u16 = V128<std::uint16_t>;
+   using V128u32 = V128<std::uint32_t>;
+   using V128u64 = V128<std::uint64_t>;
+
 
    template<>
    struct V128<simde_float32> {
@@ -263,7 +316,7 @@ namespace Langulus::SIMD
       V128(const simde__m128& v) noexcept
          : m {v} {}
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       static V128 Zero() noexcept {
          return simde_mm_setzero_ps();
       }
@@ -275,6 +328,10 @@ namespace Langulus::SIMD
       operator simde__m128 const& () const noexcept {
          return m;
       }
+
+   #if LANGULUS_SIMD(256BIT)
+      explicit operator V256<simde_float32>() const noexcept;
+   #endif
    };
 
    template<>
@@ -289,7 +346,7 @@ namespace Langulus::SIMD
       V128(const simde__m128d& v) noexcept
          : m {v} {}
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       static V128 Zero() noexcept {
          return simde_mm_setzero_pd();
       }
@@ -301,6 +358,10 @@ namespace Langulus::SIMD
       operator simde__m128d const& () const noexcept {
          return m;
       }
+
+   #if LANGULUS_SIMD(256BIT)
+      explicit operator V256<simde_float64>() const noexcept;
+   #endif
    };
 
    template<IntElement T>
@@ -315,7 +376,7 @@ namespace Langulus::SIMD
       V128(const simde__m128i& v) noexcept
          : m {v} {}
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       static V128 Zero() noexcept {
          return simde_mm_setzero_si128();
       }
@@ -328,7 +389,7 @@ namespace Langulus::SIMD
          return m;
       }
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       auto UnpackLo() const noexcept {
          if constexpr (CT::SignedInteger8<T>)
             return V128<std::int16_t>  {simde_mm_unpacklo_epi8 (m, Zero())};
@@ -346,7 +407,7 @@ namespace Langulus::SIMD
             static_assert(false, "Can't unpack this type");
       }
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       auto UnpackHi() const noexcept {
          if constexpr (CT::SignedInteger8<T>)
             return V128<std::int16_t>  {simde_mm_unpackhi_epi8 (m, Zero())};
@@ -364,7 +425,7 @@ namespace Langulus::SIMD
             static_assert(false, "Can't unpack this type");
       }
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       auto Pack() const noexcept {
          if constexpr (CT::Integer8<T>)
             return *this;
@@ -420,27 +481,14 @@ namespace Langulus::SIMD
          }
          else static_assert(false, "Can't unpack this type");
       }
+
+   #if LANGULUS_SIMD(256BIT)
+      explicit operator V256<T>() const noexcept;
+   #endif
    };
-
-   using V128f   = V128<simde_float32>;
-   using V128d   = V128<simde_float64>;
-
-   using V128i8  = V128<std::int8_t>;
-   using V128i16 = V128<std::int16_t>;
-   using V128i32 = V128<std::int32_t>;
-   using V128i64 = V128<std::int64_t>;
-
-   using V128u8  = V128<std::uint8_t>;
-   using V128u16 = V128<std::uint16_t>;
-   using V128u32 = V128<std::uint32_t>;
-   using V128u64 = V128<std::uint64_t>;
 #endif
    
 #if LANGULUS_SIMD(256BIT)
-   /// 256bit register                                                        
-   template<class>
-   struct V256;
-
    template<>
    struct V256<simde_float32> {
       LANGULUS(TYPED) simde_float32;
@@ -453,7 +501,7 @@ namespace Langulus::SIMD
       V256(const simde__m256& v) noexcept
          : m {v} {}
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       static V256 Zero() noexcept {
          return simde_mm256_setzero_ps();
       }
@@ -467,6 +515,14 @@ namespace Langulus::SIMD
       }
    };
 
+   #if LANGULUS_SIMD(256BIT)
+      LANGULUS(INLINED)
+      V128<simde_float32>::operator V256<simde_float32>() const noexcept {
+         return {simde_mm256_castps128_ps256(m)};
+      }
+   #endif
+
+
    template<>
    struct V256<simde_float64> {
       LANGULUS(TYPED) simde_float64;
@@ -479,7 +535,7 @@ namespace Langulus::SIMD
       V256(const simde__m256d& v) noexcept
          : m {v} {}
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       static V256 Zero() noexcept {
          return simde_mm256_setzero_pd();
       }
@@ -493,6 +549,14 @@ namespace Langulus::SIMD
       }
    };
 
+   #if LANGULUS_SIMD(256BIT)
+      LANGULUS(INLINED)
+      V128<simde_float64>::operator V256<simde_float64>() const noexcept {
+         return {simde_mm256_castpd128_pd256(m)};
+      }
+   #endif
+
+
    template<IntElement T>
    struct V256<T> {
       LANGULUS(TYPED) T;
@@ -505,7 +569,7 @@ namespace Langulus::SIMD
       V256(const simde__m256i& v) noexcept
          : m {v} {}
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       static V256 Zero() noexcept {
          return simde_mm256_setzero_si256();
       }
@@ -518,7 +582,7 @@ namespace Langulus::SIMD
          return m;
       }
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       auto UnpackLo() const noexcept {
          if constexpr (CT::SignedInteger8<T>)
             return V256<std::int16_t>  {simde_mm256_cvtepi8_epi16 (simde_mm256_extractf128_si256(m, 0))};
@@ -536,7 +600,7 @@ namespace Langulus::SIMD
             static_assert(false, "Can't unpack this type");
       }
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       auto UnpackHi() const noexcept {
          if constexpr (CT::SignedInteger8<T>)
             return V256<std::int16_t>  {simde_mm256_cvtepi8_epi16 (simde_mm256_extractf128_si256(m, 1))};
@@ -554,7 +618,7 @@ namespace Langulus::SIMD
             static_assert(false, "Can't unpack this type");
       }
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       auto Pack() const noexcept {
          if constexpr (CT::Integer8<T>)
             return *this;
@@ -624,25 +688,16 @@ namespace Langulus::SIMD
       }
    };
 
-   using V256f   = V256<simde_float32>;
-   using V256d   = V256<simde_float64>;
+   #if LANGULUS_SIMD(256BIT)
+      template<IntElement T> LANGULUS(INLINED)
+      V128<T>::operator V256<T>() const noexcept {
+         return {simde_mm256_castsi128_si256(m)};
+      }
+   #endif
 
-   using V256i8  = V256<std::int8_t>;
-   using V256i16 = V256<std::int16_t>;
-   using V256i32 = V256<std::int32_t>;
-   using V256i64 = V256<std::int64_t>;
-
-   using V256u8  = V256<std::uint8_t>;
-   using V256u16 = V256<std::uint16_t>;
-   using V256u32 = V256<std::uint32_t>;
-   using V256u64 = V256<std::uint64_t>;
 #endif
 
 #if LANGULUS_SIMD(512BIT)
-   /// 512bit register                                                        
-   template<class>
-   struct V512;
-
    template<>
    struct V512<simde_float32> {
       LANGULUS(TYPED) simde_float32;
@@ -655,7 +710,7 @@ namespace Langulus::SIMD
       V512(const simde__m512& v) noexcept
          : m {v} {}
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       static V512 Zero() noexcept {
          return simde_mm512_setzero_ps();
       }
@@ -681,7 +736,7 @@ namespace Langulus::SIMD
       V512(const simde__m512d& v) noexcept
          : m {v} {}
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       static V512 Zero() noexcept {
          return simde_mm512_setzero_pd();
       }
@@ -707,7 +762,7 @@ namespace Langulus::SIMD
       V512(const simde__m512i& v) noexcept
          : m {v} {}
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       static V512 Zero() noexcept {
          return simde_mm512_setzero_si512();
       }
@@ -720,7 +775,7 @@ namespace Langulus::SIMD
          return m;
       }
       
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       auto UnpackLo() const noexcept {
          if constexpr (CT::SignedInteger8<T>)
             return V512<std::int16_t>  {simde_mm512_unpacklo_epi8 (m, Zero())};
@@ -738,7 +793,7 @@ namespace Langulus::SIMD
             static_assert(false, "Can't unpack this type");
       }
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       auto UnpackHi() const noexcept {
          if constexpr (CT::SignedInteger8<T>)
             return V512<std::int16_t>  {simde_mm512_unpackhi_epi8 (m, Zero())};
@@ -756,7 +811,7 @@ namespace Langulus::SIMD
             static_assert(false, "Can't unpack this type");
       }
 
-      NOD() LANGULUS(INLINED)
+      LANGULUS(INLINED)
       auto Pack() const noexcept {
          if constexpr (CT::Integer8<T>)
             return *this;
@@ -786,19 +841,6 @@ namespace Langulus::SIMD
             static_assert(false, "Can't pack this type");
       }
    };
-
-   using V512f   = V512<simde_float32>;
-   using V512d   = V512<simde_float64>;
-
-   using V512i8  = V512<std::int8_t>;
-   using V512i16 = V512<std::int16_t>;
-   using V512i32 = V512<std::int32_t>;
-   using V512i64 = V512<std::int64_t>;
-
-   using V512u8  = V512<std::uint8_t>;
-   using V512u16 = V512<std::uint16_t>;
-   using V512u32 = V512<std::uint32_t>;
-   using V512u64 = V512<std::uint64_t>;
 #endif
 
 } // namespace Langulus::SIMD
@@ -911,8 +953,8 @@ namespace Langulus::SIMD
 {
 
    /// Get the first element of an array or vector, or just the scalar        
-   template<CT::NotSIMD T> NOD() LANGULUS(INLINED)
-   constexpr decltype(auto) GetFirst(const T& a) noexcept {
+   LANGULUS(INLINED)
+   constexpr decltype(auto) GetFirst(const CT::NotSIMD auto& a) noexcept {
       if constexpr (requires { a[0]; })
          return (a[0]);
       else
@@ -920,8 +962,8 @@ namespace Langulus::SIMD
    }
 
    /// Get the first element of an array or vector, or just the scalar        
-   template<CT::NotSIMD T> NOD() LANGULUS(INLINED)
-   constexpr decltype(auto) GetFirst(T& a) noexcept {
+   LANGULUS(INLINED)
+   constexpr decltype(auto) GetFirst(CT::NotSIMD auto& a) noexcept {
       if constexpr (requires { a[0]; })
          return (a[0]);
       else
@@ -1081,7 +1123,7 @@ namespace Langulus::SIMD
 #endif
 
    /// Shuffle eight indices                                                  
-   NOD() constexpr int Shuffle(
+   constexpr int Shuffle(
       int&& z1, int&& y1, int&& x1, int&& w1,
       int&& z0, int&& y0, int&& x0, int&& w0
    ) noexcept {
@@ -1091,13 +1133,13 @@ namespace Langulus::SIMD
    }
 
    /// Shuffle four indices                                                   
-   NOD() constexpr int Shuffle(int&& z, int&& y, int&& x, int&& w) noexcept {
+   constexpr int Shuffle(int&& z, int&& y, int&& x, int&& w) noexcept {
       // 4 indices, 2 bits each                                         
       return (z << 6) | (y << 4) | (x << 2) | w;
    }
 
    /// Shuffle two indices                                                    
-   NOD() constexpr int Shuffle(int&& x, int&& w) noexcept {
+   constexpr int Shuffle(int&& x, int&& w) noexcept {
       // 2 indices, 1 bit each                                          
       return (x << 1) | w;
    }

@@ -16,7 +16,7 @@ namespace Langulus::SIMD
    ///   @tparam R - register size                                            
    ///   @param s -  the scalar value to use for filling                      
    ///   @return the filled register                                          
-   template<int R> NOD() LANGULUS(INLINED)
+   template<int R> LANGULUS(INLINED)
    auto Fill(const CT::Scalar auto& s) noexcept {
       (void)s;
 

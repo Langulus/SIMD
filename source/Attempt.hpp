@@ -24,7 +24,7 @@ namespace Langulus::SIMD::Inner
    ///   @param opSIMD - the SIMD function to invoke if supported             
    ///   @param opFALL - the fallback (non-SIMD/constexpr) function           
    ///   @return the result - either scalar, vector or register               
-   template<auto DEF, class FORCE_OUT = void> NOD() LANGULUS(INLINED)
+   template<auto DEF, class FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto AttemptUnary(
       const auto& val,
       const auto& opSIMD,
@@ -80,7 +80,7 @@ namespace Langulus::SIMD::Inner
    ///   @param opSIMD - the SIMD function to invoke if supported             
    ///   @param opFALL - the fallback (non-SIMD/constexpr) function           
    ///   @return the result - either scalar, vector or register               
-   template<auto DEF, class FORCE_OUT = void> NOD() LANGULUS(INLINED)
+   template<auto DEF, class FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto AttemptBinary(
       const CT::NoIntent auto& lhs,
       const CT::NoIntent auto& rhs,
@@ -131,12 +131,26 @@ namespace Langulus::SIMD::Inner
 
          if constexpr (not CT::SIMD<decltype(ConvertSIMD<E>(loadL))>
                     or not CT::SIMD<decltype(ConvertSIMD<E>(loadR))>) {
-            // Arguments can't be converted to the desired type         
+            // Arguments can't be converted by SIMD                     
             return FallbackBinary<OUT>(lhs, rhs, opFALL);
          }
          else {
             // Perform the SIMD operation                               
-            return opSIMD(ConvertSIMD<E>(loadL), ConvertSIMD<E>(loadR));
+            // LHS and RHS might end up in differently sized registers, 
+            // so we might cast them into compatible ones               
+            const CT::SIMD auto cvtL = ConvertSIMD<E>(loadL);
+            const CT::SIMD auto cvtR = ConvertSIMD<E>(loadR);
+            using LT = decltype(cvtL);
+            using RT = decltype(cvtR);
+
+            if constexpr (requires { opSIMD(cvtL, cvtR); })
+               return opSIMD(cvtL, cvtR);
+            else {
+               if constexpr (sizeof(LT) > sizeof(RT))
+                  return opSIMD(cvtL, static_cast<LT>(cvtR));
+               else
+                  return opSIMD(static_cast<RT>(cvtL), cvtR);
+            }
          }
       }
    }
