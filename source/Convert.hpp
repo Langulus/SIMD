@@ -158,10 +158,16 @@ namespace Langulus::SIMD
          }
          else {
             // Converting using SIMD, hopefully                         
-            constexpr auto CI = CountOf<decltype(Inner::Convert<DEF, TO>(DeintCast(val)))>;
+            using CONVERTED_TYPE = decltype(Inner::Convert<DEF, TO>(DeintCast(val)));
+            constexpr bool supported = CT::SIMD<CONVERTED_TYPE>;
+            constexpr auto CI = CountOf<CONVERTED_TYPE>;
             constexpr auto CO = CountOf<OUT>;
 
-            if constexpr (CI >= CO or CI == 1) {
+            if constexpr (not supported) {
+               // Will always utilize the fallback converter            
+               Store(Inner::ConvertConstexpr<TO>(DeintCast(val)), out);
+            }
+            else if constexpr (CI >= CO or CI == 1) {
                // We're able to do the conversion with a single register
                // (or SIMD is not required at all)                      
                if constexpr (CT::SIMD<OUT>)
