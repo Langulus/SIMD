@@ -332,6 +332,13 @@ namespace Langulus::SIMD
    #if LANGULUS_SIMD(256BIT)
       explicit operator V256<simde_float32>() const noexcept;
    #endif
+
+      LANGULUS(INLINED)
+      V128 operator ! () const noexcept {
+         return simde_mm_castsi128_ps(
+            simde_mm_xor_si128(simde_mm_castps_si128(m), simde_mm_set1_epi32(0xffffffff))
+         );
+      }
    };
 
    template<>
@@ -362,6 +369,13 @@ namespace Langulus::SIMD
    #if LANGULUS_SIMD(256BIT)
       explicit operator V256<simde_float64>() const noexcept;
    #endif
+
+      LANGULUS(INLINED)
+      V128 operator ! () const noexcept {
+         return simde_mm_castsi128_pd(
+            simde_mm_xor_si128(simde_mm_castpd_si128(m), simde_mm_set1_epi32(0xffffffff))
+         );
+      }
    };
 
    template<IntElement T>
@@ -485,6 +499,11 @@ namespace Langulus::SIMD
    #if LANGULUS_SIMD(256BIT)
       explicit operator V256<T>() const noexcept;
    #endif
+
+      LANGULUS(INLINED)
+      V128 operator ! () const noexcept {
+         return simde_mm_xor_si128(m, simde_mm_set1_epi32(0xffffffff));
+      }
    };
 #endif
    
@@ -512,6 +531,13 @@ namespace Langulus::SIMD
       LANGULUS(INLINED)
       operator simde__m256 const& () const noexcept {
          return m;
+      }
+
+      LANGULUS(INLINED)
+      V256 operator ! () const noexcept {
+         return simde_mm256_castsi256_ps(
+            simde_mm256_xor_si256(simde_mm256_castps_si256(m), simde_mm256_set1_epi32(0xffffffff))
+         );
       }
    };
 
@@ -546,6 +572,13 @@ namespace Langulus::SIMD
       LANGULUS(INLINED)
       operator simde__m256d const& () const noexcept {
          return m;
+      }
+
+      LANGULUS(INLINED)
+      V256 operator ! () const noexcept {
+         return simde_mm256_castsi256_pd(
+            simde_mm256_xor_si256(simde_mm256_castpd_si256(m), simde_mm256_set1_epi32(0xffffffff))
+         );
       }
    };
 
@@ -685,6 +718,11 @@ namespace Langulus::SIMD
             #endif
          }
          else static_assert(false, "Can't unpack this type");
+      }
+
+      LANGULUS(INLINED)
+      V256 operator ! () const noexcept {
+         return simde_mm256_xor_si256(m, simde_mm256_set1_epi32(0xffffffff));
       }
    };
 
