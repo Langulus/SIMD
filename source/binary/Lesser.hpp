@@ -43,8 +43,8 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer16<T>)   return simde_mm256_cmplt_epi16(lhs, rhs);
             else if constexpr (CT::Integer32<T>)   return simde_mm256_cmplt_epi32(lhs, rhs);
             else if constexpr (CT::Integer64<T>)   return simde_mm256_cmplt_epi64(lhs, rhs);
-            else if constexpr (CT::Float<T>)       return simde_mm256_cmplt_ps   (lhs, rhs);
-            else if constexpr (CT::Double<T>)      return simde_mm256_cmplt_pd   (lhs, rhs);
+            else if constexpr (CT::Float<T>)       return simde_mm256_cmp_ps(lhs, rhs, SIMDE_CMP_LT_OQ);
+            else if constexpr (CT::Double<T>)      return simde_mm256_cmp_pd(lhs, rhs, SIMDE_CMP_LT_OQ);
             else static_assert(false, "Unsupported type for 32-byte package");
          }
          else if constexpr (CT::SIMD512<R>) {
@@ -52,8 +52,8 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer16<T>)   return simde_mm512_cmplt_epi16(lhs, rhs);
             else if constexpr (CT::Integer32<T>)   return simde_mm512_cmplt_epi32(lhs, rhs);
             else if constexpr (CT::Integer64<T>)   return simde_mm512_cmplt_epi64(lhs, rhs);
-            else if constexpr (CT::Float<T>)       return simde_mm512_cmplt_ps   (lhs, rhs);
-            else if constexpr (CT::Double<T>)      return simde_mm512_cmplt_pd   (lhs, rhs);
+            else if constexpr (CT::Float<T>)       return simde_mm512_cmp_ps(lhs, rhs, SIMDE_CMP_LT_OQ);
+            else if constexpr (CT::Double<T>)      return simde_mm512_cmp_pd(lhs, rhs, SIMDE_CMP_LT_OQ);
             else static_assert(false, "Unsupported type for 64-byte package");
          }
          else static_assert(false, "Unsupported type");
