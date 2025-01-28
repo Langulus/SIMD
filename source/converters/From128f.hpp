@@ -7,10 +7,27 @@
 ///                                                                           
 #pragma once
 #include "../Common.hpp"
+#include "From128d.hpp"
 
 
 namespace Langulus::SIMD::Inner
 {
+
+   /// https://stackoverflow.com/questions/41144668                           
+   /// Converts the lower two floats into uint64                              
+   ///   @attention only works for inputs in the range: [0, 2^52)             
+   LANGULUS(INLINED)
+   simde__m128i float_to_uint64(simde__m128 x) noexcept {
+      return double_to_uint64(simde_mm_cvtps_pd(x));
+   }
+
+   /// Converts the lower two floats into int64                               
+   ///   @attention only works for inputs in the range: [-2^51, 2^51]         
+   LANGULUS(INLINED)
+   simde__m128i float_to_int64(simde__m128d x) noexcept {
+      return double_to_int64(simde_mm_cvtps_pd(x));
+   }
+
 
    /// Convert V128f to any other register                                    
    ///   @tparam TO - the desired element type                                
@@ -78,8 +95,7 @@ namespace Langulus::SIMD::Inner
             const V256i32 t32 {simde_mm256_cvtps_epi32(simde_mm256_castps128_ps256(v))};
             return t32.UnpackLo();
          #else
-            const V128i32 t32 {simde_mm_cvtps_epi32(v)};
-            return t32.UnpackLo();
+            return V128<TO> {float_to_int64(v)};
          #endif
       }
       else if constexpr (CT::UnsignedInteger64<TO>) {
@@ -90,8 +106,7 @@ namespace Langulus::SIMD::Inner
             const V256u32 t32 {simde_mm256_cvtps_epi32(simde_mm256_castps128_ps256(v))};
             return t32.UnpackLo();
          #else
-            const V128u32 t32 {simde_mm_cvtps_epi32(v)};
-            return t32.UnpackLo();
+            return V128<TO> {float_to_uint64(v)};
          #endif
       }
       else static_assert(false, "Unsupported register");
