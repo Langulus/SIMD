@@ -24,7 +24,7 @@ namespace Langulus::SIMD::Inner
    /// Converts the lower two floats into int64                               
    ///   @attention only works for inputs in the range: [-2^51, 2^51]         
    LANGULUS(INLINED)
-   simde__m128i float_to_int64(simde__m128d x) noexcept {
+   simde__m128i float_to_int64(simde__m128 x) noexcept {
       return double_to_int64(simde_mm_cvtps_pd(x));
    }
 
