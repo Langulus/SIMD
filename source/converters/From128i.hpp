@@ -11,6 +11,41 @@
 
 namespace Langulus::SIMD::Inner
 {
+   
+   /// https://stackoverflow.com/questions/41144668                           
+   //  Only works for inputs in the range: [0, 2^52)
+   LANGULUS(INLINED)
+   simde__m128d uint64_to_double(simde__m128i x) noexcept {
+      x = simde_mm_or_si128(x, simde_mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000)));
+      return simde_mm_sub_pd(simde_mm_castsi128_pd(x), simde_mm_set1_pd(0x0010000000000000));
+   }
+
+   //  Only works for inputs in the range: [-2^51, 2^51]
+   LANGULUS(INLINED)
+   simde__m128d int64_to_double(simde__m128i x) noexcept {
+      x = simde_mm_add_epi64(x, simde_mm_castpd_si128(simde_mm_set1_pd(0x0018000000000000)));
+      return simde_mm_sub_pd(simde_mm_castsi128_pd(x), simde_mm_set1_pd(0x0018000000000000));
+   }
+
+   LANGULUS(INLINED)
+   simde__m128d uint64_to_double_full(simde__m128i x) noexcept {
+      simde__m128i xH = simde_mm_srli_epi64(x, 32);
+      xH = simde_mm_or_si128(xH, simde_mm_castpd_si128(simde_mm_set1_pd(19342813113834066795298816.)));          //  2^84
+      simde__m128i xL = simde_mm_blend_epi16(x, simde_mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000)), 0xcc);   //  2^52
+      simde__m128d f = simde_mm_sub_pd(simde_mm_castsi128_pd(xH), simde_mm_set1_pd(19342813118337666422669312.));     //  2^84 + 2^52
+      return simde_mm_add_pd(f, simde_mm_castsi128_pd(xL));
+   }
+
+   LANGULUS(INLINED)
+   simde__m128d int64_to_double_full(simde__m128i x) noexcept {
+      simde__m128i xH = simde_mm_srai_epi32(x, 16);
+      xH = simde_mm_blend_epi16(xH, simde_mm_setzero_si128(), 0x33);
+      xH = simde_mm_add_epi64(xH, simde_mm_castpd_si128(simde_mm_set1_pd(442721857769029238784.)));              //  3*2^67
+      simde__m128i xL = simde_mm_blend_epi16(x, simde_mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000)), 0x88);   //  2^52
+      simde__m128d f = simde_mm_sub_pd(simde_mm_castsi128_pd(xH), simde_mm_set1_pd(442726361368656609280.));          //  3*2^67 + 2^52
+      return simde_mm_add_pd(f, simde_mm_castsi128_pd(xL));
+   }
+
 
    /// Convert V128i to any other register                                    
    ///   @tparam TO - the desired element type                                

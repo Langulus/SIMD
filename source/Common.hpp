@@ -312,6 +312,8 @@ namespace Langulus::SIMD
 
       simde__m128 m;
 
+      V128() noexcept = default;
+
       LANGULUS(INLINED)
       V128(const simde__m128& v) noexcept
          : m {v} {}
@@ -349,6 +351,8 @@ namespace Langulus::SIMD
 
       simde__m128d m;
 
+      V128() noexcept = default;
+
       LANGULUS(INLINED)
       V128(const simde__m128d& v) noexcept
          : m {v} {}
@@ -385,6 +389,8 @@ namespace Langulus::SIMD
       static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
 
       simde__m128i m;
+
+      V128() noexcept = default;
 
       LANGULUS(INLINED)
       V128(const simde__m128i& v) noexcept
@@ -516,6 +522,8 @@ namespace Langulus::SIMD
 
       simde__m256 m;
 
+      V256() noexcept = default;
+
       LANGULUS(INLINED)
       V256(const simde__m256& v) noexcept
          : m {v} {}
@@ -557,6 +565,8 @@ namespace Langulus::SIMD
 
       simde__m256d m;
 
+      V256() noexcept = default;
+
       LANGULUS(INLINED)
       V256(const simde__m256d& v) noexcept
          : m {v} {}
@@ -597,6 +607,8 @@ namespace Langulus::SIMD
       static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
 
       simde__m256i m;
+
+      V256() noexcept = default;
 
       LANGULUS(INLINED)
       V256(const simde__m256i& v) noexcept
@@ -744,6 +756,8 @@ namespace Langulus::SIMD
 
       simde__m512 m;
 
+      V512() noexcept = default;
+
       LANGULUS(INLINED)
       V512(const simde__m512& v) noexcept
          : m {v} {}
@@ -770,6 +784,8 @@ namespace Langulus::SIMD
 
       simde__m512d m;
 
+      V512() noexcept = default;
+
       LANGULUS(INLINED)
       V512(const simde__m512d& v) noexcept
          : m {v} {}
@@ -795,6 +811,8 @@ namespace Langulus::SIMD
       static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
 
       simde__m512i m;
+
+      V512() noexcept = default;
 
       LANGULUS(INLINED)
       V512(const simde__m512i& v) noexcept
@@ -1011,6 +1029,27 @@ namespace Langulus::SIMD
    namespace Inner
    {
 
+      template<class T>
+      consteval auto LosslessRegister() {
+         using DT = Deint<T>;
+         #if LANGULUS_SIMD(128BIT)
+            if constexpr (sizeof(DT) <= 16)
+               return (V128<TypeOf<DT>>*) nullptr;
+            else
+         #endif
+         #if LANGULUS_SIMD(256BIT)
+            if constexpr (sizeof(DT) <= 32)
+               return (V256<TypeOf<DT>>*) nullptr;
+            else
+         #endif
+         #if LANGULUS_SIMD(512BIT)
+            if constexpr (sizeof(DT) <= 64)
+               return (V512<TypeOf<DT>>*) nullptr;
+            else
+         #endif
+            static_assert(false, "Unsupported register");
+      }
+
       template<class LHS, class RHS>
       consteval auto LosslessArray() {
          using LT = TypeOf<Deint<LHS>>;
@@ -1085,6 +1124,9 @@ namespace Langulus::SIMD
 
    } // namespace Langulus::SIMD::Inner
 
+   template<class T>
+   using LosslessRegister = Deptr<decltype(Inner::LosslessRegister<T>())>;
+
    /// Useful tool for auto-deducing operation return type based on arguments 
    ///   @tparam LHS - left operand                                           
    ///   @tparam RHS - right operand                                          
@@ -1101,83 +1143,24 @@ namespace Langulus::SIMD
    using InvocableResult2 = Deptr<
       decltype(Inner::InvocableResultInner2<F, T>())>;
 
-
-
-#if LANGULUS_SIMD(128BIT)
-   /// Got these from:                                                        
-   /// https://stackoverflow.com/questions/41144668                           
-   LANGULUS(INLINED)
-   V128d uint64_to_double_full(V128u64 x) {
-      auto xH = simde_mm_srli_epi64(x.m, 32);
-      xH = simde_mm_or_si128(xH, simde_mm_castpd_si128(simde_mm_set1_pd(19342813113834066795298816.)));          //  2^84
-      auto xL = simde_mm_blend_epi16(x.m, simde_mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000)), 0xcc);   //  2^52
-      auto f = simde_mm_sub_pd(simde_mm_castsi128_pd(xH), simde_mm_set1_pd(19342813118337666422669312.));     //  2^84 + 2^52
-      return {simde_mm_add_pd(f, simde_mm_castsi128_pd(xL))};
-   }
-
-   LANGULUS(INLINED)
-   V128d int64_to_double_full(V128i64 x) {
-      auto xH = simde_mm_srai_epi32(x.m, 16);
-      xH = simde_mm_blend_epi16(xH, simde_mm_setzero_si128(), 0x33);
-      xH = simde_mm_add_epi64(xH, simde_mm_castpd_si128(simde_mm_set1_pd(442721857769029238784.)));              //  3*2^67
-      auto xL = simde_mm_blend_epi16(x.m, simde_mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000)), 0x88);   //  2^52
-      auto f = simde_mm_sub_pd(simde_mm_castsi128_pd(xH), simde_mm_set1_pd(442726361368656609280.));          //  3*2^67 + 2^52
-      return {simde_mm_add_pd(f, simde_mm_castsi128_pd(xL))};
-   }
-
-   /// Only works for inputs in the range: [-2^51, 2^51]                      
-   LANGULUS(INLINED)
-   V128d int64_to_double(V128i64 x) {
-      x.m = simde_mm_add_epi64(x.m, simde_mm_castpd_si128(simde_mm_set1_pd(0x0018000000000000)));
-      return {simde_mm_sub_pd(simde_mm_castsi128_pd(x.m), simde_mm_set1_pd(0x0018000000000000))};
-   }
-
-   /// Only works for inputs in the range: [0, 2^52)                          
-   LANGULUS(INLINED)
-   V128d uint64_to_double(V128u64 x) {
-      x.m = simde_mm_or_si128(x.m, simde_mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000)));
-      return {simde_mm_sub_pd(simde_mm_castsi128_pd(x.m), simde_mm_set1_pd(0x0010000000000000))};
-   }
-
-   /// Only works for inputs in the range: [-2^51, 2^51]                      
-   LANGULUS(INLINED)
-   V128i64 double_to_int64(V128d x) {
-      x.m = simde_mm_add_pd(x.m, simde_mm_set1_pd(0x0018000000000000));
-      return {simde_mm_sub_epi64(
-         simde_mm_castpd_si128(x.m),
-         simde_mm_castpd_si128(simde_mm_set1_pd(0x0018000000000000))
-      )};
-   }
-
-   /// Only works for inputs in the range: [0, 2^52)                          
-   LANGULUS(INLINED)
-   V128u64 double_to_uint64(V128d x) {
-      x.m = simde_mm_add_pd(x.m, simde_mm_set1_pd(0x0010000000000000));
-      return {simde_mm_xor_si128(
-         simde_mm_castpd_si128(x.m),
-         simde_mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000))
-      )};
-   }
-#endif
-
    /// Shuffle eight indices                                                  
-   constexpr int Shuffle(
-      int&& z1, int&& y1, int&& x1, int&& w1,
-      int&& z0, int&& y0, int&& x0, int&& w0
-   ) noexcept {
+   consteval int Shuffle(
+      int z1, int y1, int x1, int w1,
+      int z0, int y0, int x0, int w0
+   ) {
       // 8 indices, 4 bits each                                         
       return (z1 << 28) | (y1 << 24) | (x1 << 20) | (w1 << 16)
            | (z0 << 12) | (y0 <<  8) | (x0 <<  4) |  w0;
    }
 
    /// Shuffle four indices                                                   
-   constexpr int Shuffle(int&& z, int&& y, int&& x, int&& w) noexcept {
+   consteval int Shuffle(int z, int y, int x, int w) {
       // 4 indices, 2 bits each                                         
       return (z << 6) | (y << 4) | (x << 2) | w;
    }
 
    /// Shuffle two indices                                                    
-   constexpr int Shuffle(int&& x, int&& w) noexcept {
+   consteval int Shuffle(int x, int w) {
       // 2 indices, 1 bit each                                          
       return (x << 1) | w;
    }

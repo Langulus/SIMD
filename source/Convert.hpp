@@ -147,12 +147,13 @@ namespace Langulus::SIMD
    ///      used only if input extent is smaller than output extent           
    ///   @param val - what scalar/array/register are we converting?           
    ///   @param out - what scalar/array/register are we converting into?      
-   template<auto DEF, CT::NoIntent OUT> LANGULUS(INLINED)
-   constexpr void Convert(const auto& val, OUT& out) noexcept {
-      using TO = TypeOf<OUT>;
+   template<auto DEF, class INPUT, CT::NoIntent OUTPUT> LANGULUS(INLINED)
+   constexpr void Convert(const INPUT& val, OUTPUT& out) noexcept {
+      using FROM = TypeOf<Deint<INPUT>>;
+      using TO   = TypeOf<OUTPUT>;
 
-      if constexpr (CT::Vector<OUT>) {
-         IF_CONSTEXPR() {
+      if constexpr (CT::Vector<OUTPUT>) {
+         if (::std::is_constant_evaluated()) {
             // Converting in a contexpr context                         
             Store(Inner::ConvertConstexpr<TO>(DeintCast(val)), out);
          }
@@ -161,7 +162,7 @@ namespace Langulus::SIMD
             using CONVERTED_TYPE = decltype(Inner::Convert<DEF, TO>(DeintCast(val)));
             constexpr bool supported = CT::SIMD<CONVERTED_TYPE>;
             constexpr auto CI = CountOf<CONVERTED_TYPE>;
-            constexpr auto CO = CountOf<OUT>;
+            constexpr auto CO = CountOf<OUTPUT>;
 
             if constexpr (not supported) {
                // Will always utilize the fallback converter            
@@ -170,7 +171,7 @@ namespace Langulus::SIMD
             else if constexpr (CI >= CO or CI == 1) {
                // We're able to do the conversion with a single register
                // (or SIMD is not required at all)                      
-               if constexpr (CT::SIMD<OUT>)
+               if constexpr (CT::SIMD<OUTPUT>)
                   out = Inner::Convert<DEF, TO>(DeintCast(val));
                else
                   Store(Inner::Convert<DEF, TO>(DeintCast(val)), out);
@@ -179,7 +180,39 @@ namespace Langulus::SIMD
                // We have to divide the conversion into multiple regs   
                // This happens when we convert float[4] to double[4]    
                // without AVX support for example                       
-               static_assert(false, "TODO");
+               constexpr Count left = Roof2(CountOf<INPUT>/2);
+               static_assert(left < CountOf<INPUT>,
+                  "Can't properly split the input vector");
+               static_assert(left < CountOf<OUTPUT>,
+                  "Can't properly split the output vector");
+
+               using LEFTI  = const FROM(&)[left];
+               using RIGHTI = const FROM(&)[CountOf<INPUT>  - left];
+               using LEFTO  = TO(&)[left];
+               using RIGHTO = TO(&)[CountOf<OUTPUT> - left];
+
+               // Nest the two parts so that splitting can occur        
+               // statically multiple times if it has to                
+               auto input = reinterpret_cast<FROM const*>(SparseCast(DeintCast(val)));
+
+               if constexpr (CT::SIMD<OUTPUT>) {
+                  LosslessRegister<LEFTO> out1;
+                  LosslessRegister<RIGHTO> out2;
+                  Convert<DEF>(reinterpret_cast<LEFTI> (input[0]), out1);
+                  Convert<DEF>(reinterpret_cast<RIGHTI>(input[left]), out2);
+                  ConcatSIMD(out1, out2, out);
+               }
+               else {
+                  auto output = reinterpret_cast<TO*>(SparseCast(out));
+                  Convert<DEF>(
+                     reinterpret_cast<LEFTI>(input[0]),
+                     reinterpret_cast<LEFTO>(output[0])
+                  );
+                  Convert<DEF>(
+                     reinterpret_cast<RIGHTI>(input[left]),
+                     reinterpret_cast<RIGHTO>(output[left])
+                  );
+               }
             }
          }
       }

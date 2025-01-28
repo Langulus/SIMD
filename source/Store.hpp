@@ -356,6 +356,12 @@ namespace Langulus::SIMD
       //   static_assert(false, "Source not supported");
    }
 
+   /// This exists only so that we're able to compile                         
+   /*LANGULUS(INLINED)
+   constexpr void Store(const CT::NoIntent auto& from, CT::SIMD auto& to) noexcept {
+      Logger::Fatal("Shouldn't be reached: ", LANGULUS_LOCATION());
+   }*/
+
 } // namespace Langulus::SIMD
 
 
