@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include <SIMD/SIMD.hpp>
+#include <Langulus/SIMD/SIMD.hpp>
 #include <cstdint>
 #include <cstddef>
 #include <random>
