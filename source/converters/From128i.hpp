@@ -95,7 +95,7 @@ namespace Langulus::SIMD::Inner
             LANGULUS_SIMD_VERBOSE("Converting signed 64bit ints -> 64bit floats");
             #if LANGULUS_SIMD(AVX512DQ) and LANGULUS_SIMD(AVX512VL)
                return V128<TO> {simde_mm_cvtepi64_pd(v)};
-            #elif LANGULUS_SIMD(256BIT)
+            #else
                return V128<TO> {int64_to_double_full(v)};
             #endif
          }
