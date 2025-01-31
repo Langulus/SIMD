@@ -433,20 +433,19 @@ namespace Langulus::SIMD
 
       template<class T>
       consteval auto LosslessRegister() {
-         using DT = Deint<T>;
          #if LANGULUS_SIMD(128BIT)
-            if constexpr (sizeof(DT) <= 16)
-               return (V128<TypeOf<DT>>*) nullptr;
+            if constexpr (sizeof(Deint<T>) <= 16)
+               return (V128<TypeOf<Deint<T>>>*) nullptr;
             else
          #endif
          #if LANGULUS_SIMD(256BIT)
-            if constexpr (sizeof(DT) <= 32)
-               return (V256<TypeOf<DT>>*) nullptr;
+            if constexpr (sizeof(Deint<T>) <= 32)
+               return (V256<TypeOf<Deint<T>>>*) nullptr;
             else
          #endif
          #if LANGULUS_SIMD(512BIT)
-            if constexpr (sizeof(DT) <= 64)
-               return (V512<TypeOf<DT>>*) nullptr;
+            if constexpr (sizeof(Deint<T>) <= 64)
+               return (V512<TypeOf<Deint<T>>>*) nullptr;
             else
          #endif
             static_assert(false, "Unsupported register");
