@@ -42,7 +42,7 @@ namespace Langulus::SIMD
                #if LANGULUS_SIMD(256BIT) or LANGULUS_SIMD(512BIT)
                   auto lo = ShiftLeftSIMD(lhs.UnpackLo(), rhs.UnpackLo());
                   auto hi = ShiftLeftSIMD(lhs.UnpackHi(), rhs.UnpackHi());
-                  return R {lgls_pack_epi16(lo, hi)};
+                  return R {lgls_pack_epi16<false>(lo, hi)};
                #else
                   return Unsupported {}; //TODO
                #endif
@@ -53,7 +53,7 @@ namespace Langulus::SIMD
                #elif LANGULUS_SIMD(256BIT)
                   auto lo = ShiftLeftSIMD(lhs.UnpackLo(), rhs.UnpackLo());
                   auto hi = ShiftLeftSIMD(lhs.UnpackHi(), rhs.UnpackHi());
-                  return R {lgls_pack_epi32(lo, hi)};
+                  return R {lgls_pack_epi32<false>(lo, hi)};
                #else
                   return Unsupported {}; //TODO
                #endif
@@ -78,7 +78,7 @@ namespace Langulus::SIMD
             if constexpr (CT::Integer8<T>) {
                auto lo = ShiftLeftSIMD(lhs.UnpackLo(), rhs.UnpackLo());
                auto hi = ShiftLeftSIMD(lhs.UnpackHi(), rhs.UnpackHi());
-               return R {lgls_pack_epi16(lo, hi)};
+               return R {lgls_pack_epi16<false>(lo, hi)};
             }
             else if constexpr (CT::Integer16<T>) {
                #if LANGULUS_SIMD(512BIT)
@@ -86,7 +86,7 @@ namespace Langulus::SIMD
                #else
                   auto lo = ShiftLeftSIMD(lhs.UnpackLo(), rhs.UnpackLo());
                   auto hi = ShiftLeftSIMD(lhs.UnpackHi(), rhs.UnpackHi());
-                  return R {lgls_pack_epi32(lo, hi)};
+                  return R {lgls_pack_epi32<false>(lo, hi)};
                #endif
             }
             else if constexpr (CT::Integer32<T>)         return R {simde_mm256_sllv_epi32(lhs, rhs)};
@@ -97,7 +97,7 @@ namespace Langulus::SIMD
             if constexpr (CT::Integer8<T>) {
                auto lo = ShiftLeftSIMD(lhs.UnpackLo(), rhs.UnpackLo());
                auto hi = ShiftLeftSIMD(lhs.UnpackHi(), rhs.UnpackHi());
-               return R {lgls_pack_epi16(lo, hi)};
+               return R {lgls_pack_epi16<false>(lo, hi)};
             }
             else if constexpr (CT::Integer16<T>)         return R {simde_mm512_sllv_epi16(lhs, rhs)};
             else if constexpr (CT::Integer32<T>)         return R {simde_mm512_sllv_epi32(lhs, rhs)};

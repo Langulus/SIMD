@@ -196,6 +196,13 @@ struct Vector {
       return true;
    }
 
+   constexpr bool operator == (const T& e) const noexcept {
+      for (Count i = 0; i < C; ++i)
+         if (DenseCast(mArray[i]) != e)
+            return false;
+      return true;
+   }
+
    constexpr Vector& operator = (const Vector& b) noexcept {
       for (Count i = 0; i < C; ++i)
          DenseCast(mArray[i]) = DenseCast(b.mArray[i]);

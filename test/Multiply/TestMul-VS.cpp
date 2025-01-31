@@ -9,9 +9,9 @@
 
 
 TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
-   , VECTORS_ALL(2)
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
+   , VECTORS_ALL(2)
    , VECTORS_ALL(3)
    , VECTORS_ALL(4)
    , VECTORS_ALL(5)
@@ -37,16 +37,23 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
       }
       else InitOne(y, -5);
 
-      WHEN("Multiplied as constexpr") {
+      WHEN("Multiplied as constexpr (with saturation)") {
          constexpr T lhs = E {0};
-         constexpr T rhs = E {5};
+         constexpr E rhs = E {5};
          constexpr T res = E {0};
-         static_assert(SIMD::Multiply(lhs, rhs) == res);
+         static_assert(SIMD::Multiply<true>(lhs, rhs) == res);
       }
 
-      WHEN("Multiplied") {
-         ControlMul(x, y, rCheck);
-         SIMD::Multiply(x, y, r);
+      WHEN("Multiplied as constexpr (without saturation)") {
+         constexpr T lhs = E {0};
+         constexpr E rhs = E {5};
+         constexpr T res = E {0};
+         static_assert(SIMD::Multiply<false>(lhs, rhs) == res);
+      }
+
+      WHEN("Multiplied (with saturation)") {
+         ControlMul<true>(x, y, rCheck);
+         SIMD::Multiply<true>(x, y, r);
             
          REQUIRE(r == rCheck);
 
@@ -94,9 +101,66 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
          #endif
       }
 
-      WHEN("Multiplied in reverse") {
-         ControlMul(y, x, rCheck);
-         SIMD::Multiply(y, x, r);
+      WHEN("Multiplied (without saturation)") {
+         ControlMul<false>(x, y, rCheck);
+         SIMD::Multiply<false>(x, y, r);
+            
+         REQUIRE(r == rCheck);
+
+         #ifdef LANGULUS_STD_BENCHMARK
+            BENCHMARK_ADVANCED("Multiply (control)") (timer meter) {
+               some<T> nx(meter.runs());
+               if constexpr (not CT::Vector<T>) {
+                  for (auto& i : nx)
+                     InitOne(i, 1);
+               }
+
+               some<T> ny(meter.runs());
+               if constexpr (not CT::Vector<T>) {
+                  for (auto& i : ny)
+                     InitOne(i, 1);
+               }
+
+               some<T> nr(meter.runs());
+               meter.measure([&](int i) {
+                  ControlMul(nx[i], ny[i], nr[i]);
+               });
+            };
+
+            BENCHMARK_ADVANCED("Multiply (SIMD)") (timer meter) {
+               some<T> nx(meter.runs());
+               if constexpr (not CT::Vector<T>) {
+                  for (auto& i : nx)
+                     InitOne(i, 1);
+               }
+
+               some<T> ny(meter.runs());
+               if constexpr (not CT::Vector<T>) {
+                  for (auto& i : ny)
+                     InitOne(i, 1);
+               }
+
+               some<T> nr(meter.runs());
+               meter.measure([&](int i) {
+                  if constexpr (CT::Vector<T>)
+                     SIMD::Multiply(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+                  else
+                     SIMD::Multiply(nx[i], ny[i], nr[i]);
+               });
+            };
+         #endif
+      }
+
+      WHEN("Multiplied in reverse (with saturation)") {
+         ControlMul<true>(y, x, rCheck);
+         SIMD::Multiply<true>(y, x, r);
+
+         REQUIRE(r == rCheck);
+      }
+
+      WHEN("Multiplied in reverse (without saturation)") {
+         ControlMul<false>(y, x, rCheck);
+         SIMD::Multiply<false>(y, x, r);
 
          REQUIRE(r == rCheck);
       }

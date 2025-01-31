@@ -5,10 +5,10 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "TestMul.hpp"
+#include "TestSub.hpp"
 
 
-TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
+TEMPLATE_TEST_CASE("Vector - Vector", "[subtract]"
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -33,28 +33,26 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          InitOne(y, -5);
       }
 
-      WHEN("Multiplied as constexpr (with saturation)") {
+      WHEN("Subtracted as constexpr (with saturation)") {
          constexpr T lhs {0};
          constexpr T rhs {5};
-         constexpr T res {0};
-         static_assert(SIMD::Multiply<true>(lhs, rhs) == res);
+         static_assert(SIMD::Subtract<true>(lhs, rhs) == T {CT::Signed<TypeOf<T>> and not CT::Real<TypeOf<T>> ? -5 : 0});
       }
 
-      WHEN("Multiplied as constexpr (without saturation)") {
+      WHEN("Subtracted as constexpr (without saturation)") {
          constexpr T lhs {0};
          constexpr T rhs {5};
-         constexpr T res {0};
-         static_assert(SIMD::Multiply<false>(lhs, rhs) == res);
+         static_assert(SIMD::Subtract<false>(lhs, rhs) == static_cast<T>(-5));
       }
 
-      WHEN("Multiplied (with saturation)") {
-         ControlMul<true>(x, y, rCheck);
-         SIMD::Multiply<true>(x, y, r);
+      WHEN("Subtracted (with saturation)") {
+         ControlSub<true>(x, y, rCheck);
+         SIMD::Subtract<true>(x, y, r);
 
          REQUIRE(r == rCheck);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Multiply (control)") (timer meter) {
+            BENCHMARK_ADVANCED("Subtract (control)") (timer meter) {
                some<T> nx(meter.runs());
                if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
@@ -69,11 +67,11 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  ControlMul(nx[i], ny[i], nr[i]);
+                  ControlSub(nx[i], ny[i], nr[i]);
                });
             };
 
-            BENCHMARK_ADVANCED("Multiply (SIMD)") (timer meter) {
+            BENCHMARK_ADVANCED("Subtract (SIMD)") (timer meter) {
                some<T> nx(meter.runs());
                if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
@@ -89,22 +87,22 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
                   if constexpr (CT::Vector<T>)
-                     SIMD::Multiply(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+                     SIMD::Subtract(nx[i].mArray, ny[i].mArray, nr[i].mArray);
                   else
-                     SIMD::Multiply(nx[i], ny[i], nr[i]);
+                     SIMD::Subtract(nx[i], ny[i], nr[i]);
                });
             };
          #endif
       }
 
-      WHEN("Multiplied (without saturation)") {
-         ControlMul<false>(x, y, rCheck);
-         SIMD::Multiply<false>(x, y, r);
+      WHEN("Subtracted (without saturation)") {
+         ControlSub<false>(x, y, rCheck);
+         SIMD::Subtract<false>(x, y, r);
 
          REQUIRE(r == rCheck);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Multiply (control)") (timer meter) {
+            BENCHMARK_ADVANCED("Subtract (control)") (timer meter) {
                some<T> nx(meter.runs());
                if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
@@ -119,11 +117,11 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
 
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
-                  ControlMul(nx[i], ny[i], nr[i]);
+                  ControlSub(nx[i], ny[i], nr[i]);
                });
             };
 
-            BENCHMARK_ADVANCED("Multiply (SIMD)") (timer meter) {
+            BENCHMARK_ADVANCED("Subtract (SIMD)") (timer meter) {
                some<T> nx(meter.runs());
                if constexpr (not CT::Vector<T>) {
                   for (auto& i : nx)
@@ -139,24 +137,24 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
                some<T> nr(meter.runs());
                meter.measure([&](int i) {
                   if constexpr (CT::Vector<T>)
-                     SIMD::Multiply(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+                     SIMD::Subtract(nx[i].mArray, ny[i].mArray, nr[i].mArray);
                   else
-                     SIMD::Multiply(nx[i], ny[i], nr[i]);
+                     SIMD::Subtract(nx[i], ny[i], nr[i]);
                });
             };
          #endif
       }
 
-      WHEN("Multiplied in reverse (with saturation)") {
-         ControlMul<true>(y, x, rCheck);
-         SIMD::Multiply<true>(y, x, r);
+      WHEN("Subtracted in reverse (with saturation)") {
+         ControlSub<true>(y, x, rCheck);
+         SIMD::Subtract<true>(y, x, r);
 
          REQUIRE(r == rCheck);
       }
 
-      WHEN("Multiplied in reverse (without saturation)") {
-         ControlMul<false>(y, x, rCheck);
-         SIMD::Multiply<false>(y, x, r);
+      WHEN("Subtracted in reverse (without saturation)") {
+         ControlSub<false>(y, x, rCheck);
+         SIMD::Subtract<false>(y, x, r);
 
          REQUIRE(r == rCheck);
       }
