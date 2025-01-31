@@ -59,7 +59,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 ///                                                                           
 ///   Detect available SIMD                                                   
 ///                                                                           
-/// By default, nothing is enabled                                            
+/// By default nothing is enabled                                             
 #define LANGULUS_SIMD_ENABLED() 0
 #define LANGULUS_SIMD_AVX512BW() 0
 #define LANGULUS_SIMD_AVX512CD() 0
@@ -302,696 +302,98 @@ namespace Langulus::SIMD
    using V128u16 = V128<std::uint16_t>;
    using V128u32 = V128<std::uint32_t>;
    using V128u64 = V128<std::uint64_t>;
-
-
-   template<>
-   struct V128<simde_float32> {
-      LANGULUS(TYPED) simde_float32;
-      static constexpr int CTTI_SIMD_Trait = 128;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float32);
-
-      simde__m128 m;
-
-      V128() noexcept = default;
-
-      LANGULUS(INLINED)
-      V128(const simde__m128& v) noexcept
-         : m {v} {}
-
-      LANGULUS(INLINED)
-      static V128 Zero() noexcept {
-         return simde_mm_setzero_ps();
-      }
-      LANGULUS(INLINED)
-      operator simde__m128& () noexcept {
-         return m;
-      }
-      LANGULUS(INLINED)
-      operator simde__m128 const& () const noexcept {
-         return m;
-      }
-
-   #if LANGULUS_SIMD(256BIT)
-      explicit operator V256<simde_float32>() const noexcept;
-   #endif
-
-      LANGULUS(INLINED)
-      V128 operator ! () const noexcept {
-         return simde_mm_castsi128_ps(
-            simde_mm_xor_si128(simde_mm_castps_si128(m), simde_mm_set1_epi32(0xffffffff))
-         );
-      }
-   };
-
-   template<>
-   struct V128<simde_float64> {
-      LANGULUS(TYPED) simde_float64;
-      static constexpr int CTTI_SIMD_Trait = 128;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float64);
-
-      simde__m128d m;
-
-      V128() noexcept = default;
-
-      LANGULUS(INLINED)
-      V128(const simde__m128d& v) noexcept
-         : m {v} {}
-
-      LANGULUS(INLINED)
-      static V128 Zero() noexcept {
-         return simde_mm_setzero_pd();
-      }
-      LANGULUS(INLINED)
-      operator simde__m128d& () noexcept {
-         return m;
-      }
-      LANGULUS(INLINED)
-      operator simde__m128d const& () const noexcept {
-         return m;
-      }
-
-   #if LANGULUS_SIMD(256BIT)
-      explicit operator V256<simde_float64>() const noexcept;
-   #endif
-
-      LANGULUS(INLINED)
-      V128 operator ! () const noexcept {
-         return simde_mm_castsi128_pd(
-            simde_mm_xor_si128(simde_mm_castpd_si128(m), simde_mm_set1_epi32(0xffffffff))
-         );
-      }
-   };
-
-   template<IntElement T>
-   struct V128<T> {
-      LANGULUS(TYPED) T;
-      static constexpr int CTTI_SIMD_Trait = 128;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
-
-      simde__m128i m;
-
-      V128() noexcept = default;
-
-      LANGULUS(INLINED)
-      V128(const simde__m128i& v) noexcept
-         : m {v} {}
-
-      LANGULUS(INLINED)
-      static V128 Zero() noexcept {
-         return simde_mm_setzero_si128();
-      }
-      LANGULUS(INLINED)
-      operator simde__m128i& () noexcept {
-         return m;
-      }
-      LANGULUS(INLINED)
-      operator simde__m128i const& () const noexcept {
-         return m;
-      }
-
-      LANGULUS(INLINED)
-      auto UnpackLo() const noexcept {
-         if constexpr (CT::SignedInteger8<T>)
-            return V128<std::int16_t>  {simde_mm_unpacklo_epi8 (m, Zero())};
-         else if constexpr (CT::UnsignedInteger8<T>)
-            return V128<std::uint16_t> {simde_mm_unpacklo_epi8 (m, Zero())};
-         else if constexpr (CT::SignedInteger16<T>)
-            return V128<std::int32_t>  {simde_mm_unpacklo_epi16(m, Zero())};
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return V128<std::uint32_t> {simde_mm_unpacklo_epi16(m, Zero())};
-         else if constexpr (CT::SignedInteger32<T>)
-            return V128<std::int64_t>  {simde_mm_unpacklo_epi32(m, Zero())};
-         else if constexpr (CT::UnsignedInteger32<T>)
-            return V128<std::uint64_t> {simde_mm_unpacklo_epi32(m, Zero())};
-         else
-            static_assert(false, "Can't unpack this type");
-      }
-
-      LANGULUS(INLINED)
-      auto UnpackHi() const noexcept {
-         if constexpr (CT::SignedInteger8<T>)
-            return V128<std::int16_t>  {simde_mm_unpackhi_epi8 (m, Zero())};
-         else if constexpr (CT::UnsignedInteger8<T>)
-            return V128<std::uint16_t> {simde_mm_unpackhi_epi8 (m, Zero())};
-         else if constexpr (CT::SignedInteger16<T>)
-            return V128<std::int32_t>  {simde_mm_unpackhi_epi16(m, Zero())};
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return V128<std::uint32_t> {simde_mm_unpackhi_epi16(m, Zero())};
-         else if constexpr (CT::SignedInteger32<T>)
-            return V128<std::int64_t>  {simde_mm_unpackhi_epi32(m, Zero())};
-         else if constexpr (CT::UnsignedInteger32<T>)
-            return V128<std::uint64_t> {simde_mm_unpackhi_epi32(m, Zero())};
-         else
-            static_assert(false, "Can't unpack this type");
-      }
-
-      LANGULUS(INLINED)
-      auto Pack() const noexcept {
-         if constexpr (CT::Integer8<T>)
-            return *this;
-         else if constexpr (CT::SignedInteger16<T>)
-            return V128<std::int8_t>      {simde_mm_packs_epi16 (m, Zero())};
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return V128<std::uint8_t>     {simde_mm_packus_epi16(m, Zero())};
-         else if constexpr (CT::SignedInteger32<T>)
-            return V128<std::int16_t>     {simde_mm_packs_epi32 (m, Zero())};
-         else if constexpr (CT::UnsignedInteger32<T>)
-            return V128<std::uint16_t>    {simde_mm_packus_epi32(m, Zero())};
-         else if constexpr (CT::SignedInteger64<T>) {
-            #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
-               return V128<std::int32_t>  {simde_mm_cvtepi64_epi32(m)};
-            #else
-               // Grab the 32-bit low halves of 64-bit elements         
-               auto combined = simde_mm_shuffle_ps(
-                  simde_mm_castsi128_ps(m),
-                  simde_mm_castsi128_ps(m),
-                  SIMDE_MM_SHUFFLE(2, 0, 2, 0)
-               );
-
-               // {b3, b2, a3, a2 | b1, b0, a1, a0} from high to low    
-               // Re-arrange pairs of 32-bit elements with vpermpd      
-               // (or vpermq if you want)                               
-               auto ordered = simde_mm_permute_pd(
-                  simde_mm_castps_pd(combined),
-                  SIMDE_MM_SHUFFLE(0, 0, 0, 1)
-               );
-               return V128<std::int32_t> {simde_mm_castpd_si128(ordered)};
-            #endif
-         }
-         else if constexpr (CT::UnsignedInteger64<T>) {
-            #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
-               return V128<std::uint32_t> {simde_mm_cvtepi64_epi32(m)};
-            #else
-               // Grab the 32-bit low halves of 64-bit elements         
-               auto combined = simde_mm_shuffle_ps(
-                  simde_mm_castsi128_ps(m),
-                  simde_mm_castsi128_ps(m),
-                  SIMDE_MM_SHUFFLE(2, 0, 2, 0)
-               );
-
-               // {b3, b2, a3, a2 | b1, b0, a1, a0} from high to low    
-               // Re-arrange pairs of 32-bit elements with vpermpd      
-               // (or vpermq if you want)                               
-               auto ordered = simde_mm_permute_pd(
-                  simde_mm_castps_pd(combined),
-                  SIMDE_MM_SHUFFLE(0, 0, 0, 1)
-               );
-               return V128<std::uint32_t> {simde_mm_castpd_si128(ordered)};
-            #endif
-         }
-         else static_assert(false, "Can't unpack this type");
-      }
-
-   #if LANGULUS_SIMD(256BIT)
-      explicit operator V256<T>() const noexcept;
-   #endif
-
-      LANGULUS(INLINED)
-      V128 operator ! () const noexcept {
-         return simde_mm_xor_si128(m, simde_mm_set1_epi32(0xffffffff));
-      }
-   };
 #endif
    
-#if LANGULUS_SIMD(256BIT)
-   template<>
-   struct V256<simde_float32> {
-      LANGULUS(TYPED) simde_float32;
-      static constexpr int CTTI_SIMD_Trait = 256;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float32);
 
-      simde__m256 m;
+   ///                                                                        
+   /// The following functions generate shuffle masks, often called immX      
+   /// paremeters in intrinsics. You should be careful how much bits each     
+   /// index takes, best found out by reading the operation code for the      
+   /// intrinsic it's applied to.                                             
+   ///                                                                        
+   /// Here's an example with _mm256_permute2f128_ps:                         
+   /// DEFINE SELECT4(src1, src2, control) {                                  
+   ///    CASE(control[1:0]) OF                        // uses control[1:0] - 
+   ///       0:  tmp[127:0] : = src1[127:0]            // that is two bits,   
+   ///       1:  tmp[127:0] : = src1[255:128]          // and checks value in 
+   ///       2:  tmp[127:0] : = src2[127:0]            // those bits [0;3]    
+   ///       3:  tmp[127:0] : = src2[255:128]                                 
+   ///    ESAC                                                                
+   ///    IF control[3]                                // however it also uses
+   ///       tmp[127:0] : = 0                          // fourth bit for      
+   ///    FI                                           // zeroing             
+   ///    RETURN tmp[127:0]                                                   
+   /// }                                                                      
+   /// dst[127:0]   : = SELECT4(a[255:0], b[255:0], imm8[3:0])  // so overall, the operation takes          
+   /// dst[255:128] : = SELECT4(a[255:0], b[255:0], imm8[7:4])  // 4 bits for two indices, thus we should   
+   /// dst[MAX:256] : = 0                                       // use Shuffle4(x,y) to set that up         
+   ///                                                                                                      
+   /// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm256_permute2f128_ps 
+   /// Other functions like _mm_shuffle_epi32 often use Shuffle2(x,y,z,w)     
+   /// The compiler should complain if a shuffle masks goes beyond the valid  
+   /// range for the specific intrinsic.                                      
+   ///                                                                        
 
-      V256() noexcept = default;
+   /// Shuffle configuration with up to eight indices, 4 bits each            
+   consteval int Shuffle4(
+      int a0    , int a1 = 0, int a2 = 0, int a3 = 0,
+      int a4 = 0, int a5 = 0, int a6 = 0, int a7 = 0
+   ) {
+      return (a7 << 28) | (a6 << 24) | (a5 << 20) | (a4 << 16)
+           | (a3 << 12) | (a2 <<  8) | (a1 <<  4) |  a0;
+   }
 
-      LANGULUS(INLINED)
-      V256(const simde__m256& v) noexcept
-         : m {v} {}
+   /// Shuffle configuration with up to four indices, 2 bits each             
+   consteval int Shuffle2(int a0, int a1, int a2, int a3) {
+      return (a3 << 6) | (a2 << 4) | (a1 << 2) | a0;
+   }
 
-      LANGULUS(INLINED)
-      static V256 Zero() noexcept {
-         return simde_mm256_setzero_ps();
-      }
-      LANGULUS(INLINED)
-      operator simde__m256& () noexcept {
-         return m;
-      }
-      LANGULUS(INLINED)
-      operator simde__m256 const& () const noexcept {
-         return m;
-      }
-
-      LANGULUS(INLINED)
-      V256 operator ! () const noexcept {
-         return simde_mm256_castsi256_ps(
-            simde_mm256_xor_si256(simde_mm256_castps_si256(m), simde_mm256_set1_epi32(0xffffffff))
-         );
-      }
-   };
-
-   #if LANGULUS_SIMD(256BIT)
-      LANGULUS(INLINED)
-      V128<simde_float32>::operator V256<simde_float32>() const noexcept {
-         return {simde_mm256_castps128_ps256(m)};
-      }
-   #endif
-
-
-   template<>
-   struct V256<simde_float64> {
-      LANGULUS(TYPED) simde_float64;
-      static constexpr int CTTI_SIMD_Trait = 256;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float64);
-
-      simde__m256d m;
-
-      V256() noexcept = default;
-
-      LANGULUS(INLINED)
-      V256(const simde__m256d& v) noexcept
-         : m {v} {}
-
-      LANGULUS(INLINED)
-      static V256 Zero() noexcept {
-         return simde_mm256_setzero_pd();
-      }
-      LANGULUS(INLINED)
-      operator simde__m256d& () noexcept {
-         return m;
-      }
-      LANGULUS(INLINED)
-      operator simde__m256d const& () const noexcept {
-         return m;
-      }
-
-      LANGULUS(INLINED)
-      V256 operator ! () const noexcept {
-         return simde_mm256_castsi256_pd(
-            simde_mm256_xor_si256(simde_mm256_castpd_si256(m), simde_mm256_set1_epi32(0xffffffff))
-         );
-      }
-   };
-
-   #if LANGULUS_SIMD(256BIT)
-      LANGULUS(INLINED)
-      V128<simde_float64>::operator V256<simde_float64>() const noexcept {
-         return {simde_mm256_castpd128_pd256(m)};
-      }
-   #endif
-
-
-   template<IntElement T>
-   struct V256<T> {
-      LANGULUS(TYPED) T;
-      static constexpr int CTTI_SIMD_Trait = 256;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
-
-      simde__m256i m;
-
-      V256() noexcept = default;
-
-      LANGULUS(INLINED)
-      V256(const simde__m256i& v) noexcept
-         : m {v} {}
-
-      LANGULUS(INLINED)
-      static V256 Zero() noexcept {
-         return simde_mm256_setzero_si256();
-      }
-      LANGULUS(INLINED)
-      operator simde__m256i& () noexcept {
-         return m;
-      }
-      LANGULUS(INLINED)
-      operator simde__m256i const& () const noexcept {
-         return m;
-      }
-
-      LANGULUS(INLINED)
-      auto UnpackLo() const noexcept {
-         if constexpr (CT::SignedInteger8<T>)
-            return V256<std::int16_t>  {simde_mm256_cvtepi8_epi16 (simde_mm256_extractf128_si256(m, 0))};
-         else if constexpr (CT::UnsignedInteger8<T>)
-            return V256<std::uint16_t> {simde_mm256_cvtepu8_epi16 (simde_mm256_extractf128_si256(m, 0))};
-         else if constexpr (CT::SignedInteger16<T>)
-            return V256<std::int32_t>  {simde_mm256_cvtepi16_epi32(simde_mm256_extractf128_si256(m, 0))};
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return V256<std::uint32_t> {simde_mm256_cvtepu16_epi32(simde_mm256_extractf128_si256(m, 0))};
-         else if constexpr (CT::SignedInteger32<T>)
-            return V256<std::int64_t>  {simde_mm256_cvtepi32_epi64(simde_mm256_extractf128_si256(m, 0))};
-         else if constexpr (CT::UnsignedInteger32<T>)
-            return V256<std::uint64_t> {simde_mm256_cvtepu32_epi64(simde_mm256_extractf128_si256(m, 0))};
-         else
-            static_assert(false, "Can't unpack this type");
-      }
-
-      LANGULUS(INLINED)
-      auto UnpackHi() const noexcept {
-         if constexpr (CT::SignedInteger8<T>)
-            return V256<std::int16_t>  {simde_mm256_cvtepi8_epi16 (simde_mm256_extractf128_si256(m, 1))};
-         else if constexpr (CT::UnsignedInteger8<T>)
-            return V256<std::uint16_t> {simde_mm256_cvtepu8_epi16 (simde_mm256_extractf128_si256(m, 1))};
-         else if constexpr (CT::SignedInteger16<T>)
-            return V256<std::int32_t>  {simde_mm256_cvtepi16_epi32(simde_mm256_extractf128_si256(m, 1))};
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return V256<std::uint32_t> {simde_mm256_cvtepu16_epi32(simde_mm256_extractf128_si256(m, 1))};
-         else if constexpr (CT::SignedInteger32<T>)
-            return V256<std::int64_t>  {simde_mm256_cvtepi32_epi64(simde_mm256_extractf128_si256(m, 1))};
-         else if constexpr (CT::UnsignedInteger32<T>)
-            return V256<std::uint64_t> {simde_mm256_cvtepu32_epi64(simde_mm256_extractf128_si256(m, 1))};
-         else
-            static_assert(false, "Can't unpack this type");
-      }
-
-      LANGULUS(INLINED)
-      auto Pack() const noexcept {
-         if constexpr (CT::Integer8<T>)
-            return *this;
-         else if constexpr (CT::SignedInteger16<T>) {
-            const auto lo_lane = simde_mm256_castsi256_si128(m);
-            const auto hi_lane = simde_mm256_extracti128_si256(m, 1);
-            return V256<std::int8_t> {simde_mm256_castsi128_si256(
-               simde_mm_packs_epi16(lo_lane, hi_lane)
-            )};
-         }
-         else if constexpr (CT::UnsignedInteger16<T>) {
-            const auto lo_lane = simde_mm256_castsi256_si128(m);
-            const auto hi_lane = simde_mm256_extracti128_si256(m, 1);
-            return V256<std::uint8_t> {simde_mm256_castsi128_si256(
-               simde_mm_packus_epi16(lo_lane, hi_lane)
-            )};
-         }
-         else if constexpr (CT::SignedInteger32<T>)
-            return V256<std::int16_t>     {simde_mm256_packs_epi32 (m, simde_mm256_permute2x128_si256(m, m, 1))};
-         else if constexpr (CT::UnsignedInteger32<T>)
-            return V256<std::uint16_t>    {simde_mm256_packus_epi32(m, simde_mm256_permute2x128_si256(m, m, 1))};
-         else if constexpr (CT::SignedInteger64<T>) {
-            #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
-               return V128<std::int32_t>  {simde_mm256_cvtepi64_epi32(m)};
-            #else
-               // Grab the 32-bit low halves of 64-bit elements         
-               auto combined = simde_mm256_shuffle_ps(
-                  simde_mm256_castsi256_ps(m),
-                  simde_mm256_castsi256_ps(m),
-                  SIMDE_MM_SHUFFLE(2, 0, 2, 0)
-               );
-
-               // {b3,b2, a3,a2 | b1,b0, a1,a0}  from high to low       
-               // Re-arrange pairs of 32-bit elements with vpermpd      
-               // (or vpermq if you want)                               
-               auto ordered = simde_mm256_permute4x64_pd(
-                  simde_mm256_castps_pd(combined),
-                  SIMDE_MM_SHUFFLE(3, 1, 2, 0)
-               );
-
-               return V256<std::int32_t>  {simde_mm256_castpd_si256(ordered)};
-            #endif
-         }
-         else if constexpr (CT::UnsignedInteger64<T>) {
-            #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
-               return V128<std::uint32_t> {simde_mm256_cvtepi64_epi32(m)};
-            #else
-               // Grab the 32-bit low halves of 64-bit elements         
-               auto combined = simde_mm256_shuffle_ps(
-                  simde_mm256_castsi256_ps(m),
-                  simde_mm256_castsi256_ps(m),
-                  SIMDE_MM_SHUFFLE(2, 0, 2, 0)
-               );
-
-               // {b3,b2, a3,a2 | b1,b0, a1,a0}  from high to low       
-               // Re-arrange pairs of 32-bit elements with vpermpd      
-               // (or vpermq if you want)                               
-               auto ordered = simde_mm256_permute4x64_pd(
-                  simde_mm256_castps_pd(combined),
-                  SIMDE_MM_SHUFFLE(3, 1, 2, 0)
-               );
-
-               return V256<std::uint32_t>  {simde_mm256_castpd_si256(ordered)};
-            #endif
-         }
-         else static_assert(false, "Can't unpack this type");
-      }
-
-      LANGULUS(INLINED)
-      V256 operator ! () const noexcept {
-         return simde_mm256_xor_si256(m, simde_mm256_set1_epi32(0xffffffff));
-      }
-   };
-
-   #if LANGULUS_SIMD(256BIT)
-      template<IntElement T> LANGULUS(INLINED)
-      V128<T>::operator V256<T>() const noexcept {
-         return {simde_mm256_castsi128_si256(m)};
-      }
-   #endif
-
-#endif
-
-#if LANGULUS_SIMD(512BIT)
-   template<>
-   struct V512<simde_float32> {
-      LANGULUS(TYPED) simde_float32;
-      static constexpr int CTTI_SIMD_Trait = 512;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float32);
-
-      simde__m512 m;
-
-      V512() noexcept = default;
-
-      LANGULUS(INLINED)
-      V512(const simde__m512& v) noexcept
-         : m {v} {}
-
-      LANGULUS(INLINED)
-      static V512 Zero() noexcept {
-         return simde_mm512_setzero_ps();
-      }
-      LANGULUS(INLINED)
-      operator simde__m512& () noexcept {
-         return m;
-      }
-      LANGULUS(INLINED)
-      operator simde__m512 const& () const noexcept {
-         return m;
-      }
-   };
-
-   template<>
-   struct V512<simde_float64> {
-      LANGULUS(TYPED) simde_float64;
-      static constexpr int CTTI_SIMD_Trait = 512;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float64);
-
-      simde__m512d m;
-
-      V512() noexcept = default;
-
-      LANGULUS(INLINED)
-      V512(const simde__m512d& v) noexcept
-         : m {v} {}
-
-      LANGULUS(INLINED)
-      static V512 Zero() noexcept {
-         return simde_mm512_setzero_pd();
-      }
-      LANGULUS(INLINED)
-      operator simde__m512d& () noexcept {
-         return m;
-      }
-      LANGULUS(INLINED)
-      operator simde__m512d const& () const noexcept {
-         return m;
-      }
-   };
-
-   template<IntElement T>
-   struct V512<T> {
-      LANGULUS(TYPED) T;
-      static constexpr int CTTI_SIMD_Trait = 512;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
-
-      simde__m512i m;
-
-      V512() noexcept = default;
-
-      LANGULUS(INLINED)
-      V512(const simde__m512i& v) noexcept
-         : m {v} {}
-
-      LANGULUS(INLINED)
-      static V512 Zero() noexcept {
-         return simde_mm512_setzero_si512();
-      }
-      LANGULUS(INLINED)
-      operator simde__m512i& () noexcept {
-         return m;
-      }
-      LANGULUS(INLINED)
-      operator simde__m512i const& () const noexcept {
-         return m;
-      }
-      
-      LANGULUS(INLINED)
-      auto UnpackLo() const noexcept {
-         if constexpr (CT::SignedInteger8<T>)
-            return V512<std::int16_t>  {simde_mm512_unpacklo_epi8 (m, Zero())};
-         else if constexpr (CT::UnsignedInteger8<T>)
-            return V512<std::uint16_t> {simde_mm512_unpacklo_epi8 (m, Zero())};
-         else if constexpr (CT::SignedInteger16<T>)
-            return V512<std::int32_t>  {simde_mm512_unpacklo_epi16(m, Zero())};
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return V512<std::uint32_t> {simde_mm512_unpacklo_epi16(m, Zero())};
-         else if constexpr (CT::SignedInteger32<T>)
-            return V512<std::int64_t>  {simde_mm512_unpacklo_epi32(m, Zero())};
-         else if constexpr (CT::UnsignedInteger32<T>)
-            return V512<std::uint64_t> {simde_mm512_unpacklo_epi32(m, Zero())};
-         else
-            static_assert(false, "Can't unpack this type");
-      }
-
-      LANGULUS(INLINED)
-      auto UnpackHi() const noexcept {
-         if constexpr (CT::SignedInteger8<T>)
-            return V512<std::int16_t>  {simde_mm512_unpackhi_epi8 (m, Zero())};
-         else if constexpr (CT::UnsignedInteger8<T>)
-            return V512<std::uint16_t> {simde_mm512_unpackhi_epi8 (m, Zero())};
-         else if constexpr (CT::SignedInteger16<T>)
-            return V512<std::int32_t>  {simde_mm512_unpackhi_epi16(m, Zero())};
-         else if constexpr (CT::UnsignedInteger16<T>)
-            return V512<std::uint32_t> {simde_mm512_unpackhi_epi16(m, Zero())};
-         else if constexpr (CT::SignedInteger32<T>)
-            return V512<std::int64_t>  {simde_mm512_unpackhi_epi32(m, Zero())};
-         else if constexpr (CT::UnsignedInteger32<T>)
-            return V512<std::uint64_t> {simde_mm512_unpackhi_epi32(m, Zero())};
-         else
-            static_assert(false, "Can't unpack this type");
-      }
-
-      LANGULUS(INLINED)
-      auto Pack() const noexcept {
-         if constexpr (CT::Integer8<T>)
-            return *this;
-         else if constexpr (CT::SignedInteger16<T>) {
-            const auto lo_lane = simde_mm512_castsi512_si256(m);
-            const auto hi_lane = simde_mm512_extracti256_si512(m, 1);
-            return V256<std::int8_t> {
-               simde_mm256_packs_epi16(lo_lane, hi_lane)
-            }.Pack();
-         }
-         else if constexpr (CT::UnsignedInteger16<T>) {
-            const auto lo_lane = simde_mm512_castsi512_si256(m);
-            const auto hi_lane = simde_mm512_extracti256_si512(m, 1);
-            return V256<std::uint8_t> {
-               simde_mm256_packus_epi16(lo_lane, hi_lane)
-            }.Pack();
-         }
-         else if constexpr (CT::SignedInteger32<T>)
-            return V512<std::int16_t>  {simde_mm512_packs_epi32 (m, Zero())};
-         else if constexpr (CT::UnsignedInteger32<T>)
-            return V512<std::uint16_t> {simde_mm512_packus_epi32(m, Zero())};
-         else if constexpr (CT::SignedInteger64<T>)
-            return V256<std::int32_t>  {simde_mm512_cvtepi64_epi32(m)};
-         else if constexpr (CT::UnsignedInteger64<T>)
-            return V256<std::uint32_t> {simde_mm512_cvtepi64_epi32(m)};
-         else
-            static_assert(false, "Can't pack this type");
-      }
-   };
-#endif
+   /// Shuffle configuration with up to two indices, 1 bit each               
+   consteval int Shuffle1(int a0, int a1) {
+      return (a1 << 1) | a0;
+   }
 
 } // namespace Langulus::SIMD
 
-namespace Langulus::CT
-{
 
-#if LANGULUS_SIMD(128BIT)
-   /// Concept for 128bit SIMD float registers                                
-   template<class...T>
-   concept SIMD128f = ((Deref<T>::CTTI_SIMD_Trait == 128
-       and CT::Float<TypeOf<T>>) and ...);
-
-   /// Concept for 128bit SIMD double registers                               
-   template<class...T>
-   concept SIMD128d = ((Deref<T>::CTTI_SIMD_Trait == 128
-       and CT::Double<TypeOf<T>>) and ...);
-
-   /// Concept for 128bit SIMD integer/bool registers                         
-   template<class...T>
-   concept SIMD128i = ((Deref<T>::CTTI_SIMD_Trait == 128
-       and CT::Integer<TypeOf<T>>) and ...);
-
-   /// Concept for 128bit SIMD registers                                      
-   template<class...T>
-   concept SIMD128  = ((Deref<T>::CTTI_SIMD_Trait == 128) and ...);
-#else
-   template<class...T>
-   concept SIMD128f = false;
-   template<class...T>
-   concept SIMD128d = false;
-   template<class...T>
-   concept SIMD128i = false;
-   template<class...T>
-   concept SIMD128  = false;
+/// Include the register types, which are designed to be seamlessly           
+/// interchangable with the intrinsic types with zero overhead                
+#if LANGULUS_SIMD(512BIT)
+   #include "registers/V512.hpp"
 #endif
 
 #if LANGULUS_SIMD(256BIT)
-   /// Concept for 256bit SIMD float registers                                
-   template<class...T>
-   concept SIMD256f = ((Deref<T>::CTTI_SIMD_Trait == 256
-       and CT::Float<TypeOf<T>>) and ...);
-
-   /// Concept for 256bit SIMD double registers                               
-   template<class...T>
-   concept SIMD256d = ((Deref<T>::CTTI_SIMD_Trait == 256
-       and CT::Double<TypeOf<T>>) and ...);
-
-   /// Concept for 256bit SIMD integer/bool registers                         
-   template<class...T>
-   concept SIMD256i = ((Deref<T>::CTTI_SIMD_Trait == 256
-       and CT::Integer<TypeOf<T>>) and ...);
-
-   /// Concept for 256bit SIMD registers                                      
-   template<class...T>
-   concept SIMD256  = ((Deref<T>::CTTI_SIMD_Trait == 256) and ...);
-#else
-   template<class...T>
-   concept SIMD256f = false;
-   template<class...T>
-   concept SIMD256d = false;
-   template<class...T>
-   concept SIMD256i = false;
-   template<class...T>
-   concept SIMD256  = false;
+   #include "registers/V256.hpp"
 #endif
 
-#if LANGULUS_SIMD(512BIT)
-   /// Concept for 512bit SIMD float registers                                
-   template<class...T>
-   concept SIMD512f = ((Deref<T>::CTTI_SIMD_Trait == 512
-       and CT::Float<TypeOf<T>>) and ...);
+#if LANGULUS_SIMD(128BIT)
+   #include "registers/V128.hpp"
+#endif
 
-   /// Concept for 512bit SIMD double registers                               
-   template<class...T>
-   concept SIMD512d = ((Deref<T>::CTTI_SIMD_Trait == 512
-       and CT::Double<TypeOf<T>>) and ...);
 
-   /// Concept for 512bit SIMD integer/bool registers                         
-   template<class...T>
-   concept SIMD512i = ((Deref<T>::CTTI_SIMD_Trait == 512
-       and CT::Integer<TypeOf<T>>) and ...);
+/// Add some SIMD related concepts to the CT library                          
+namespace Langulus::CT
+{
 
-   /// Concept for 512bit SIMD registers                                      
-   template<class...T>
-   concept SIMD512  = ((Deref<T>::CTTI_SIMD_Trait == 512) and ...);
-#else
-   template<class...T>
-   concept SIMD512f = false;
-   template<class...T>
-   concept SIMD512d = false;
-   template<class...T>
-   concept SIMD512i = false;
-   template<class...T>
-   concept SIMD512  = false;
+#if not LANGULUS_SIMD(128BIT)
+   template<class...T> concept SIMD128f = false;
+   template<class...T> concept SIMD128d = false;
+   template<class...T> concept SIMD128i = false;
+   template<class...T> concept SIMD128  = false;
+#endif
+
+#if not LANGULUS_SIMD(256BIT)
+   template<class...T> concept SIMD256f = false;
+   template<class...T> concept SIMD256d = false;
+   template<class...T> concept SIMD256i = false;
+   template<class...T> concept SIMD256  = false;
+#endif
+
+#if not LANGULUS_SIMD(512BIT)
+   template<class...T> concept SIMD512f = false;
+   template<class...T> concept SIMD512d = false;
+   template<class...T> concept SIMD512i = false;
+   template<class...T> concept SIMD512  = false;
 #endif
 
    /// Concept for SIMD registers                                             
@@ -1143,386 +545,31 @@ namespace Langulus::SIMD
    using InvocableResult2 = Deptr<
       decltype(Inner::InvocableResultInner2<F, T>())>;
 
-   /// Shuffle eight indices                                                  
-   consteval int Shuffle(
-      int z1, int y1, int x1, int w1,
-      int z0, int y0, int x0, int w0
-   ) {
-      // 8 indices, 4 bits each                                         
-      return (z1 << 28) | (y1 << 24) | (x1 << 20) | (w1 << 16)
-           | (z0 << 12) | (y0 <<  8) | (x0 <<  4) |  w0;
-   }
-
-   /// Shuffle four indices                                                   
-   consteval int Shuffle(int z, int y, int x, int w) {
-      // 4 indices, 2 bits each                                         
-      return (z << 6) | (y << 4) | (x << 2) | w;
-   }
-
-   /// Shuffle two indices                                                    
-   consteval int Shuffle(int x, int w) {
-      // 2 indices, 1 bit each                                          
-      return (x << 1) | w;
-   }
-
-#if LANGULUS_SIMD(128BIT)
-   ///                                                                        
-   LANGULUS(INLINED)
-   V128f _mm_halfflip(const V128f what) noexcept {
-      return {simde_mm_permute_ps(what.m, Shuffle(2, 3, 0, 1))};
-   }
-
-   LANGULUS(INLINED)
-   V128d _mm_halfflip(const V128d what) noexcept {
-      return {simde_mm_permute_pd(what.m, Shuffle(1, 0))};
-   }
-
-   template<CT::Integer T> LANGULUS(INLINED)
-   V128<T> _mm_halfflip(const V128<T> what) noexcept {
-      if constexpr (sizeof(T) == 4) {
-         constexpr int8_t imm8 = static_cast<int8_t>(Shuffle(0, 1, 2, 3));
-         return simde_mm_shuffle_epi32(what.m, imm8);
+   /// Clamp a real value inside the interval [0:1]                           
+   /// Clamp integers in the numerical limits of provided AS                  
+   ///   @param v - saturate the value by converting T to a smaller type and  
+   ///      clamping to the min/max if value exceeds the smaller range        
+   template<class AS, class T> LANGULUS(INLINED)
+   constexpr decltype(auto) Saturate(const T& v) noexcept {
+      if constexpr (CT::Real<T>)
+         return T {v < T {0} ? T {0} : v > T {1} ? T {1} : v};
+      else if constexpr (CT::Integer<T> and sizeof(AS) < sizeof(T)) {
+         constexpr T low = static_cast<T>(::std::numeric_limits<AS>::min());
+         constexpr T hi  = static_cast<T>(::std::numeric_limits<AS>::max());
+         return T {v > hi ? hi : (v < low ? low : v)};
       }
-      else static_assert(false, "TODO");
+      else return v;
    }
-#endif
-
-#if LANGULUS_SIMD(256BIT)
-   LANGULUS(INLINED)
-   V256f _mm_halfflip(const V256f what) noexcept {
-      return {simde_mm256_permute2f128_ps(what.m, what.m, 0x20)};
-   }
-
-   LANGULUS(INLINED)
-   V256d _mm_halfflip(const V256d what) noexcept {
-      return {simde_mm256_permute2f128_pd(what.m, what.m, 0x20)};
-   }
-
-   template<CT::Integer T> LANGULUS(INLINED)
-   V256<T> _mm_halfflip(const V256<T> what) noexcept {
-      return {simde_mm256_permute2x128_si256(what.m, what.m, 1)};
-   }
-#endif
-
-   /*inline simde__m512 _mm_halfflip(const simde__m512& what) noexcept {
-      return _mm512_shuffle_f32x4(what, what, _MM_SHUFFLE(2, 3, 0, 1));   // AVX512F
-   }
-
-   inline simde__m512d _mm_halfflip(const simde__m512d& what) noexcept {
-      return simde_mm512_shuffle_f64x2(what, what, _MM_SHUFFLE(2, 3, 0, 1));   // AVX512F
-   }
-
-   inline simde__m512i _mm_halfflip(const simde__m512i& what) noexcept {
-      return simde_mm512_shuffle_i64x2(what, what, _MM_SHUFFLE(2, 3, 0, 1));   // AVX512F
-   }*/
-
-#if LANGULUS_SIMD(128BIT)
-   ///                                                                        
-   LANGULUS(INLINED)
-   int _mm_hmax_epu8(const V128u8 v) noexcept {
-      auto vmax = v.m;
-      vmax = simde_mm_max_epu8(vmax, simde_mm_alignr_epi8(vmax, vmax, 1)); // SSSE3 + SSE2
-      vmax = simde_mm_max_epu8(vmax, simde_mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
-      vmax = simde_mm_max_epu8(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
-      vmax = simde_mm_max_epu8(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      return simde_mm_extract_epi8(vmax, 0); // SSE4.1
-   }
-
-   LANGULUS(INLINED)
-   int _mm_hmax_epu16(const V128u16 v) noexcept {
-      auto vmax = v.m;
-      vmax = simde_mm_max_epu16(vmax, simde_mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
-      vmax = simde_mm_max_epu16(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
-      vmax = simde_mm_max_epu16(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      return simde_mm_extract_epi16(vmax, 0); // SSE2
-   }
-
-   LANGULUS(INLINED)
-   int _mm_hmax_epu32(const V128u32 v) noexcept {
-      auto vmax = v.m;
-      vmax = simde_mm_max_epu32(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
-      vmax = simde_mm_max_epu32(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      return simde_mm_extract_epi32(vmax, 0); // SSE4.1
-   }
-
-   /*inline uint64_t _mm_hmax_epu64(const simde__m128i v) noexcept {
-      simde__m128i vmax = v;
-      vmax = _mm_max_epu64(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      #if LANGULUS_BITNESS() == 32
-         alignas(16) uint64_t stored[2];
-         simde_mm_store_si128(reinterpret_cast<simde__m128i*>(stored), v);      // SSE2
-         return stored[0];
-      #else
-         const auto result = _mm_extract_epi64(vmax, 0); // SSE4.1
-         return reinterpret_cast<const uint64_t&>(result);
-      #endif
-   }*/
-
-   LANGULUS(INLINED)
-   int _mm_hmax_epi8(const V128i8 v) noexcept {
-      auto vmax = v.m;
-      vmax = simde_mm_max_epi8(vmax, simde_mm_alignr_epi8(vmax, vmax, 1)); // SSSE3 + SSE2
-      vmax = simde_mm_max_epi8(vmax, simde_mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
-      vmax = simde_mm_max_epi8(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
-      vmax = simde_mm_max_epi8(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      return simde_mm_extract_epi8(vmax, 0); // SSE4.1
-   }
-
-   LANGULUS(INLINED)
-   int _mm_hmax_epi16(const V128i16 v) noexcept {
-      auto vmax = v.m;
-      vmax = simde_mm_max_epi16(vmax, simde_mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
-      vmax = simde_mm_max_epi16(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
-      vmax = simde_mm_max_epi16(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      return simde_mm_extract_epi16(vmax, 0); // SSE2
-   }
-
-   LANGULUS(INLINED)
-   int _mm_hmax_epi32(const V128i32 v) noexcept {
-      auto vmax = v.m;
-      vmax = simde_mm_max_epi32(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(1, 2, 3, 0))); // SSE2
-      vmax = simde_mm_max_epi32(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      return simde_mm_extract_epi32(vmax, 0);   // SSE2
-   }
-
-   /*inline int64_t _mm_hmax_epi64(const simde__m128i v) noexcept {
-      simde__m128i vmax = v;
-      vmax = _mm_max_epi64(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
-      #if LANGULUS_BITNESS() == 32
-         alignas(16) int64_t stored[2];
-         simde_mm_store_si128(reinterpret_cast<simde__m128i*>(stored), v);      // SSE2
-         return stored[0];
-      #else
-         const auto result = _mm_extract_epi64(vmax, 0); // SSE4.1
-         return reinterpret_cast<const int64_t&>(result);
-      #endif
-   }*/
-
-   
-   LANGULUS(INLINED)
-   simde__m128i lgls_blendv_epi32(simde__m128i a, simde__m128i b, simde__m128i mask) {
-      return simde_mm_castps_si128(simde_mm_blendv_ps(
-         simde_mm_castsi128_ps(a),
-         simde_mm_castsi128_ps(b),
-         simde_mm_castsi128_ps(mask)
-      ));
-   }
-#endif
-
-#if LANGULUS_SIMD(256BIT)
-   LANGULUS(INLINED)
-   simde__m256i lgls_blendv_epi32(simde__m256i a, simde__m256i b, simde__m256i mask) {
-      return simde_mm256_castps_si256(simde_mm256_blendv_ps(
-         simde_mm256_castsi256_ps(a),
-         simde_mm256_castsi256_ps(b),
-         simde_mm256_castsi256_ps(mask)
-      ));
-   }
-#endif
-
-#if LANGULUS_SIMD(128BIT)
-   /// Pack 16bit integers (signed or not) to 8bit integers with truncation   
-   ///   @param low - lower eight 16bit integers                              
-   ///   @param high - higher eight 16bit integers                            
-   ///   @return the combined 16 truncated 8bit equivalents                   
-   template<CT::Integer16 T> LANGULUS(INLINED)
-   auto lgls_pack_epi16(V128<T> low, V128<T> high) {
-      #if LANGULUS_SIMD(512BIT)
-         const auto r = simde_mm_or_si128(
-            simde_mm_cvtepi16_epi8(low.m), 
-            _mm_halfflip(simde_mm_cvtepi16_epi8(high.m))
-         );
-      #else
-         const auto maskLo = simde_mm_set_epi8(
-            -1, -1, -1, -1, -1, -1, -1, -1,
-            14, 12, 10, 8, 6, 4, 2, 0
-         );
-         const auto maskHi = simde_mm_set_epi8(
-            14, 12, 10, 8, 6, 4, 2, 0,
-            -1, -1, -1, -1, -1, -1, -1, -1
-         );
-
-         const auto r = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(low.m,  maskLo),
-            simde_mm_shuffle_epi8(high.m, maskHi)
-         );
-      #endif
-
-      if constexpr (CT::Signed<T>)
-         return V128i8 {r};
-      else
-         return V128u8 {r};
-   }
-#endif
-
-#if LANGULUS_SIMD(256BIT)
-   /// Pack 16bit integers (signed or not) to 8bit integers with truncation   
-   ///   @param low - lower sixteen 16bit integers                            
-   ///   @param high - higher sixteen 16bit integers                          
-   ///   @return the combined 32 truncated 8bit equivalents                   
-   template<CT::Integer16 T> LANGULUS(INLINED)
-   auto lgls_pack_epi16(V256<T> low, V256<T> high) {
-      #if LANGULUS_SIMD(512BIT)
-         const auto r = simde_mm256_or_si256(
-            simde_mm256_cvtepi16_epi8(low), 
-            _mm_halfflip(simde_mm256_cvtepi16_epi8(high))
-         );
-      #else
-         const auto maskLo = simde_mm_set_epi8(
-            -1, -1, -1, -1, -1, -1, -1, -1,
-            14, 12, 10, 8, 6, 4, 2, 0
-         );
-         const auto maskHi = simde_mm_set_epi8(
-            14, 12, 10, 8, 6, 4, 2, 0,
-            -1, -1, -1, -1, -1, -1, -1, -1
-         );
-
-         const auto C1 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 0), maskLo),
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 1), maskHi)
-         );
-         const auto C2 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 0), maskLo),
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 1), maskHi)
-         );
-
-         const auto C = simde_mm256_inserti128_si256(simde_mm256_setzero_si256(), C1, 0);
-         const auto r = simde_mm256_inserti128_si256(C, C2, 1);
-      #endif
-
-      if constexpr (CT::Signed<T>)
-         return V256i8 {r};
-      else
-         return V256u8 {r};
-   }
-#endif
-
-   /*inline simde__m512i lgls_blendv_epi32(const simde__m512i& a, const simde__m512i& b, const simde__m512i& mask) {
-      use _mm512_mask_blend_ instead
-      return simde_mm512_castps_si512(simde_mm512_blendv_ps(
-         simde_mm512_castsi512_ps(a),
-         simde_mm512_castsi512_ps(b),
-         simde_mm512_castsi512_ps(mask)
-      ));
-   }*/
-
-#if LANGULUS_SIMD(128BIT)
-   /// Pack 32bit integers (signed or not) to 16bit integers with truncation  
-   ///   @param low - lower four 32bit integers                               
-   ///   @param high - higher four 32bit integers                             
-   ///   @return the combined 8 truncated 16bit equivalents                   
-   template<CT::Integer32 T> LANGULUS(INLINED)
-   auto lgls_pack_epi32(V128<T> low, V128<T> high) {
-      #if LANGULUS_SIMD(512BIT)
-         const auto r = simde_mm_or_si128(
-            simde_mm_cvtepi32_epi16(low), 
-            _mm_halfflip(simde_mm_cvtepi32_epi16(high))
-         );
-      #else
-         const auto maskLo = simde_mm_setr_epi8(
-            0, 1, 4, 5, 8, 9, 12, 13, -1, -1, -1, -1, -1, -1, -1, -1
-         );
-         const auto maskHi = simde_mm_setr_epi8(
-            -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 4, 5, 8, 9, 12, 13
-         );
-
-         const auto r = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(low,  maskLo),
-            simde_mm_shuffle_epi8(high, maskHi)
-         );
-      #endif
-
-      if constexpr (CT::Signed<T>)
-         return V128i16 {r};
-      else
-         return V128u16 {r};
-   }
-#endif
-
-#if LANGULUS_SIMD(256BIT)
-   /// Pack 32bit integers (signed or not) to 16bit integers with truncation  
-   ///   @param low - lower eight 32bit integers                              
-   ///   @param high - higher eight 32bit integers                            
-   ///   @return the combined 16 truncated 16bit equivalents                  
-   template<CT::Integer32 T> LANGULUS(INLINED)
-   auto lgls_pack_epi32(V256<T> low, V256<T> high) {
-      #if LANGULUS_SIMD(512BIT)
-         const auto r = simde_mm_or_si128(
-            simde_mm_cvtepi32_epi16(low), 
-            _mm_halfflip(simde_mm_cvtepi32_epi16(high))
-         );
-      #else
-         const auto maskLo = simde_mm_set_epi8(
-            -1, -1, -1, -1, -1, -1, -1, -1,
-            13, 12, 9, 8, 5, 4, 1, 0
-         );
-         const auto maskHi = simde_mm_set_epi8(
-            13, 12, 9, 8, 5, 4, 1, 0,
-            -1, -1, -1, -1, -1, -1, -1, -1
-         );
-
-         const auto C1 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 0), maskLo),
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(low, 1), maskHi)
-         );
-         const auto C2 = simde_mm_or_si128(
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 0), maskLo),
-            simde_mm_shuffle_epi8(simde_mm256_extracti128_si256(high, 1), maskHi)
-         );
-
-         auto C = simde_mm256_inserti128_si256(simde_mm256_setzero_si256(), C1, 0);
-         const auto r = simde_mm256_inserti128_si256(C, C2, 1);
-      #endif
-
-      if constexpr (CT::Signed<T>)
-         return V256i16 {r};
-      else
-         return V256u16 {r};
-   }
-
-   /// Pack 64bit integers (signed or not) to 32bit integers with truncation  
-   /// https://stackoverflow.com/questions/69408063                           
-   ///   @param a - lower four 64bit integers                                 
-   ///   @param b - higher four 64bit integers                                
-   ///   @return the combined 4 truncated 32bit equivalents                   
-   template<CT::Integer64 T> LANGULUS(INLINED)
-   auto lgls_pack_epi64(V256<T> a, V256<T> b) {
-      #if LANGULUS_SIMD(512BIT)
-         const auto r = _mm256_cvtepi64_epi32(a, b);
-      #else
-         // Grab the 32-bit low halves of 64-bit elements into one vector
-         auto combined = _mm256_shuffle_ps(
-            _mm256_castsi256_ps(a.m),
-            _mm256_castsi256_ps(b.m),
-            _MM_SHUFFLE(2, 0, 2, 0)
-         );
-
-         // {b3,b2, a3,a2 | b1,b0, a1,a0}  from high to low             
-         // Re-arrange pairs of 32-bit elements with vpermpd            
-         // (or vpermq if you want)                                     
-         auto ordered = _mm256_permute4x64_pd(
-            _mm256_castps_pd(combined),
-            _MM_SHUFFLE(3, 1, 2, 0)
-         );
-
-         const auto r = _mm256_castpd_si256(ordered);
-      #endif
-
-      if constexpr (CT::Signed<T>)
-         return V256i32 {r};
-      else
-         return V256u32 {r};
-   }
-#endif
-
-   /*inline simde__m512i lgls_pack_epi32(const simde__m512i& a, const simde__m512i& b, const simde__m512i& mask) {
-      use _mm512_mask_blend_ instead
-      return simde_mm512_castps_si512(simde_mm512_blendv_ps(
-         simde_mm512_castsi512_ps(a),
-         simde_mm512_castsi512_ps(b),
-         simde_mm512_castsi512_ps(mask)
-      ));
-   }*/
 
 } // namespace Langulus::SIMD
 
+namespace Langulus::CT
+{
+   /// Anything that is saturated                                             
+   /// Notice that only one of the types has to be saturated                  
+   template<class...T>
+   concept Saturated = ((Decay<Deint<T>>::CTTI_SaturatedTrait) or ...);
+
+   template<class...T>
+   concept Unsaturated = ((not Saturated<T>) and ...);
+}

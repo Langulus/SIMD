@@ -75,7 +75,7 @@ namespace Langulus::SIMD
             "Destination array must be smaller or equal of the register size");
          static_assert(CountOf<TO> > 1,
             "Storing a single element is suboptimial - don't use SIMD in the first place");
-         static_assert(CT::Similar<T, TypeOf<TO_T>> or CT::Bool<TO_T>,
+         static_assert(sizeof(T) == sizeof(TypeOf<TO_T>) /*CT::Similar<T, TypeOf<TO_T>>*/ or CT::Bool<TO_T>,
             "Storing doesn't parform conversion, so destination must be "
             "of similar type as the register");
 
@@ -382,6 +382,33 @@ namespace Langulus::SIMD
    constexpr auto OP(const LHS& lhs, const RHS& rhs) noexcept { \
       OUT out; \
       OP(DeintCast(lhs), DeintCast(rhs), out); \
+      if constexpr (::std::derived_from<Decay<LHS>, Decay<RHS>>) \
+         return LHS {out}; \
+      else if constexpr (::std::derived_from<Decay<RHS>, Decay<LHS>>) \
+         return RHS {out}; \
+      else \
+         return out; \
+   }
+
+///                                                                           
+#define LANGULUS_SIMD_ARITHMETHIC_WITH_SATURATION_API(OP) \
+   template<bool SATURATE = false, class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED) \
+   constexpr void OP(const LHS& lhs, const RHS& rhs, OUT& out) noexcept { \
+      constexpr bool saturated = SATURATE or CT::Saturated<LHS, RHS>; \
+      IF_CONSTEXPR() { \
+         Store(Inner::OP##Constexpr<saturated, OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
+      } \
+      else if constexpr (CT::SIMD<OUT>) \
+         out = Inner::OP<saturated, OUT>(lhs, rhs); \
+      else \
+         Store(Inner::OP<saturated, OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
+   } \
+   template<bool SATURATE = false, class LHS, class RHS, CT::NoIntent OUT = LosslessArray<LHS, RHS>> \
+   LANGULUS(INLINED) \
+   constexpr auto OP(const LHS& lhs, const RHS& rhs) noexcept { \
+      constexpr bool saturated = SATURATE or CT::Saturated<LHS, RHS>; \
+      OUT out; \
+      OP<SATURATE or saturated>(DeintCast(lhs), DeintCast(rhs), out); \
       if constexpr (::std::derived_from<Decay<LHS>, Decay<RHS>>) \
          return LHS {out}; \
       else if constexpr (::std::derived_from<Decay<RHS>, Decay<LHS>>) \
