@@ -6,6 +6,8 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
+#include "../../../source/Common.hpp"
+
 #include "../../../source/SetGet.hpp"
 #include "../../../source/Fill.hpp"
 #include "../../../source/Store.hpp"
@@ -15,6 +17,7 @@
 #include "../../../source/unary/Floor.hpp"
 #include "../../../source/unary/Ceil.hpp"
 #include "../../../source/unary/Round.hpp"
+#include "../../../source/unary/Not.hpp"
 
 #include "../../../source/binary/Add.hpp"
 #include "../../../source/binary/Divide.hpp"

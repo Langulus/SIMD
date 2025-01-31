@@ -27,10 +27,11 @@ namespace Langulus::SIMD
       ///   @return the resulting register                                    
       template<bool SATURATE, CT::SIMD R> LANGULUS(INLINED)
       auto MultiplySIMD(R lhs, R rhs) noexcept {
-         using T = TypeOf<R>;
          (void)lhs; (void)rhs;
 
+      #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<R>) {
+            using T = TypeOf<R>;
             if constexpr (CT::Integer8<T>) {
                auto lhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(lhs) : simde_mm_cvtepu8_epi16(lhs);
                auto rhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(rhs) : simde_mm_cvtepu8_epi16(rhs);
@@ -126,7 +127,11 @@ namespace Langulus::SIMD
             }
             else static_assert(false, "Unsupported type for 16-byte package");
          }
-         else if constexpr (CT::SIMD256<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<R>) {
+            using T = TypeOf<R>;
             if constexpr (CT::Integer8<T>) {
                auto lhsi16 = CT::Signed<T> ? simde_mm256_cvtepi8_epi16(_mm256_castsi256_si128(lhs)) : simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(lhs));
                auto rhsi16 = CT::Signed<T> ? simde_mm256_cvtepi8_epi16(_mm256_castsi256_si128(rhs)) : simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(rhs));
@@ -203,7 +208,11 @@ namespace Langulus::SIMD
             }
             else static_assert(false, "Unsupported type for 32-byte package");
          }
-         else if constexpr (CT::SIMD512<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<R>) {
+            using T = TypeOf<R>;
             if constexpr (CT::Integer8<T>)
                return Unsupported {};
             else if constexpr (CT::Integer16<T>)
@@ -219,14 +228,17 @@ namespace Langulus::SIMD
             else
                static_assert(false, "Unsupported type for 64-byte package");
          }
-         else static_assert(false, "Unsupported type");
+         else
+      #endif
+         static_assert(false, "Unsupported type");
       }
       
       /// Fallback multiplication                                             
       template<bool SATURATE, class E> LANGULUS(INLINED)
       constexpr E MultiplyFallback(const E& lhs, const E& rhs) noexcept {
-         using WIDER = WiderSigned<E>;
          if constexpr (SATURATE) {
+            using WIDER = WiderSigned<E>;
+
             if constexpr (sizeof(WIDER) == sizeof(E) and CT::Integer<E>) {
                // If WIDER type isn't wider, perform the saturation     
                // by hand                                               
@@ -240,7 +252,10 @@ namespace Langulus::SIMD
                else
                   return lhs > hi/-rhs ? hi : (lhs < low/-rhs ? low : lhs * rhs);
             }
-            else return Saturate<E>(static_cast<WIDER>(lhs) * static_cast<WIDER>(rhs));
+            else if constexpr (CT::Integer<E>)
+               return Saturate<E>(static_cast<WIDER>(lhs) * static_cast<WIDER>(rhs));
+            else
+               return Saturate<E>(lhs * rhs);
          }
          else return lhs * rhs;
       }

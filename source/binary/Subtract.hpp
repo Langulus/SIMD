@@ -164,8 +164,9 @@ namespace Langulus::SIMD
       ///   @tparam SATURATE - whether to clamp to max if overflow occurs     
       template<bool SATURATE, class E> LANGULUS(INLINED)
       constexpr E SubtractFallback(const E& lhs, const E& rhs) noexcept {
-         using WIDER = WiderSigned<E>;
          if constexpr (SATURATE) {
+            using WIDER = WiderSigned<E>;
+
             if constexpr (sizeof(WIDER) == sizeof(E) and CT::Integer<E>) {
                // If WIDER type isn't wider, perform the saturation     
                // by hand                                               
@@ -177,7 +178,10 @@ namespace Langulus::SIMD
                else
                   return lhs > hi  + rhs ? hi  : lhs - rhs;
             }
-            else return Saturate<E>(static_cast<WIDER>(lhs) - static_cast<WIDER>(rhs));
+            else if constexpr (CT::Integer<E>)
+               return Saturate<E>(static_cast<WIDER>(lhs) - static_cast<WIDER>(rhs));
+            else
+               return Saturate<E>(lhs - rhs);
          }
          else return lhs - rhs;
       }
