@@ -53,22 +53,32 @@ namespace Langulus::SIMD
             LANGULUS_SIMD_VERBOSE("No conversion required");
             return in;
          }
-         else if constexpr (CT::SIMD128<R>) {
+         else
+         #if LANGULUS_SIMD(128BIT)
+         if constexpr (CT::SIMD128<R>) {
             if      constexpr (CT::Float<T>)    return ConvertFrom128f<TO>(in);
             else if constexpr (CT::Double<T>)   return ConvertFrom128d<TO>(in);
             else if constexpr (CT::Integer<T>)  return ConvertFrom128i<TO>(in);
          }
-         else if constexpr (CT::SIMD256<R>) {
+         else
+         #endif
+         #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::Float<T>)    return ConvertFrom256f<TO>(in);
             else if constexpr (CT::Double<T>)   return ConvertFrom256d<TO>(in);
             else if constexpr (CT::Integer<T>)  return ConvertFrom256i<TO>(in);
          }
-         else if constexpr (CT::SIMD512<R>) {
+         else
+         #endif
+         #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::Float<T>)    return ConvertFrom512f<TO>(in);
             else if constexpr (CT::Double<T>)   return ConvertFrom512d<TO>(in);
             else if constexpr (CT::Integer<T>)  return ConvertFrom512i<TO>(in);
          }
-         else static_assert(false, "Can't convert from unsupported");
+         else
+         #endif
+         static_assert(false, "Can't convert from unsupported");
       }
 
       /// Convert scalars/arrays at compile-time, if possible                 
