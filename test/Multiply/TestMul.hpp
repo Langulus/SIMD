@@ -10,7 +10,6 @@
 
 
 /// Scalar * Scalar  (either dense or sparse, wrapped or not)                 
-///   @attention 8bit integers are always multiplied with saturation          
 template<bool SATURATE, CT::Scalar LHS, CT::Scalar RHS, CT::Scalar OUT> LANGULUS(INLINED)
 void ControlMul(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
    auto& fout = FundamentalCast(out);

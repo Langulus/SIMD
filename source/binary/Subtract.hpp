@@ -21,7 +21,7 @@ namespace Langulus::SIMD
       }
 
       /// Subtract two registers                                              
-      ///   @tparam SATURATE - whether to clamp to max if overflow occurs     
+      ///   @tparam SATURATE - whether to clamp to [min;max]                  
       ///   @param lhs - left register                                        
       ///   @param rhs - right register                                       
       ///   @return the resulting register                                    
