@@ -247,10 +247,13 @@ namespace Langulus::SIMD
 
                constexpr E low = ::std::numeric_limits<E>::min();
                constexpr E hi  = ::std::numeric_limits<E>::max();
-               if (rhs > 0)
-                  return lhs > hi/rhs ? hi : (lhs < low/rhs ? low : lhs * rhs);
-               else
-                  return lhs > hi/-rhs ? hi : (lhs < low/-rhs ? low : lhs * rhs);
+               if constexpr (CT::Signed<E>) {
+                  if (rhs > 0)
+                     return lhs > hi / rhs ? hi : (lhs < low / rhs ? low : lhs * rhs);
+                  else
+                     return lhs > hi / -rhs ? hi : (lhs < low / -rhs ? low : lhs * rhs);
+               }
+               else return lhs > hi / rhs ? hi : (lhs < low / rhs ? low : lhs * rhs);
             }
             else if constexpr (CT::Integer<E>)
                return Saturate<E>(static_cast<WIDER>(lhs) * static_cast<WIDER>(rhs));

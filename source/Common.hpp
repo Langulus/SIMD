@@ -549,15 +549,15 @@ namespace Langulus::SIMD
    ///   @param v - saturate the value by converting T to a smaller type and  
    ///      clamping to the min/max if value exceeds the smaller range        
    template<class AS, class T> LANGULUS(INLINED)
-   constexpr decltype(auto) Saturate(const T& v) noexcept {
+   constexpr AS Saturate(const T& v) noexcept {
       if constexpr (CT::Real<T>)
-         return T {v < T {0} ? T {0} : v > T {1} ? T {1} : v};
+         return static_cast<AS>(v < T {0} ? T {0} : v > T {1} ? T {1} : v);
       else if constexpr (CT::Integer<T> and sizeof(AS) < sizeof(T)) {
          constexpr T low = static_cast<T>(::std::numeric_limits<AS>::min());
          constexpr T hi  = static_cast<T>(::std::numeric_limits<AS>::max());
-         return T {v > hi ? hi : (v < low ? low : v)};
+         return static_cast<AS>(v > hi ? hi : (v < low ? low : v));
       }
-      else return v;
+      else return static_cast<AS>(v);
    }
 
 } // namespace Langulus::SIMD
