@@ -47,5 +47,5 @@ void ControlAdd(const LHS& lhs, const RHS& rhsArray, OUT& out) noexcept {
 /// Vector + Scalar  (either dense or sparse, wrapped or not)                 
 template<bool SATURATE, CT::Vector LHS, CT::Scalar RHS, CT::Vector OUT> LANGULUS(INLINED)
 void ControlAdd(const LHS& lhsArray, const RHS& rhs, OUT& out) noexcept {
-   return ControlAdd<SATURATE>(rhs, lhsArray, out);
+   ControlAdd<SATURATE>(rhs, lhsArray, out);
 }

@@ -47,5 +47,5 @@ void ControlMul(const LHS& lhs, const RHS& rhsArray, OUT& out) noexcept {
 /// Vector * Scalar  (either dense or sparse, wrapped or not)                 
 template<bool SATURATE, CT::Vector LHS, CT::Scalar RHS, CT::Vector OUT> LANGULUS(INLINED)
 void ControlMul(const LHS& lhsArray, const RHS& rhs, OUT& out) noexcept {
-   return ControlMul<SATURATE>(rhs, lhsArray, out);
+   ControlMul<SATURATE>(rhs, lhsArray, out);
 }

@@ -34,17 +34,11 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
       }
 
       WHEN("Multiplied as constexpr (with saturation)") {
-         constexpr T lhs {0};
-         constexpr T rhs {5};
-         constexpr T res {0};
-         static_assert(SIMD::Multiply<true>(lhs, rhs) == res);
+         static_assert(SIMD::Multiply<true>(T {0}, T {5}) == T {0});
       }
 
       WHEN("Multiplied as constexpr (without saturation)") {
-         constexpr T lhs {0};
-         constexpr T rhs {5};
-         constexpr T res {0};
-         static_assert(SIMD::Multiply<false>(lhs, rhs) == res);
+         static_assert(SIMD::Multiply<false>(T {0}, T {5}) == T {0});
       }
 
       WHEN("Multiplied (with saturation)") {

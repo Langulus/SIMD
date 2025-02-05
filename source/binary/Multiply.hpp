@@ -234,6 +234,7 @@ namespace Langulus::SIMD
       }
       
       /// Fallback multiplication                                             
+      ///   @tparam SATURATE - whether to clamp to max if overflow occurs     
       template<bool SATURATE, class E> LANGULUS(INLINED)
       constexpr E MultiplyFallback(const E& lhs, const E& rhs) noexcept {
          if constexpr (SATURATE) {
@@ -249,11 +250,11 @@ namespace Langulus::SIMD
                constexpr E hi  = ::std::numeric_limits<E>::max();
                if constexpr (CT::Signed<E>) {
                   if (rhs > 0)
-                     return lhs > hi / rhs ? hi : (lhs < low / rhs ? low : lhs * rhs);
+                     return (lhs > hi / rhs) ? hi : ((lhs < low / rhs) ? low : lhs * rhs);
                   else
-                     return lhs > hi / -rhs ? hi : (lhs < low / -rhs ? low : lhs * rhs);
+                     return (lhs > hi / (-rhs)) ? hi : ((lhs < low / (-rhs)) ? low : lhs * rhs);
                }
-               else return lhs > hi / rhs ? hi : (lhs < low / rhs ? low : lhs * rhs);
+               else return (lhs > hi / rhs) ? hi : ((lhs < low / rhs) ? low : lhs * rhs);
             }
             else if constexpr (CT::Integer<E>)
                return Saturate<E>(static_cast<WIDER>(lhs) * static_cast<WIDER>(rhs));
