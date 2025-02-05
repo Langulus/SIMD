@@ -75,7 +75,7 @@ namespace Langulus::SIMD
             "Destination array must be smaller or equal of the register size");
          static_assert(CountOf<TO> > 1,
             "Storing a single element is suboptimial - don't use SIMD in the first place");
-         static_assert(sizeof(T) == sizeof(TypeOf<TO_T>) /*CT::Similar<T, TypeOf<TO_T>>*/ or CT::Bool<TO_T>,
+         static_assert(sizeof(T) == sizeof(TypeOf<TO_T>) or CT::Bool<TO_T>,
             "Storing doesn't parform conversion, so destination must be "
             "of similar type as the register");
 
@@ -355,12 +355,6 @@ namespace Langulus::SIMD
       //else
       //   static_assert(false, "Source not supported");
    }
-
-   /// This exists only so that we're able to compile                         
-   /*LANGULUS(INLINED)
-   constexpr void Store(const CT::NoIntent auto& from, CT::SIMD auto& to) noexcept {
-      Logger::Fatal("Shouldn't be reached: ", LANGULUS_LOCATION());
-   }*/
 
 } // namespace Langulus::SIMD
 
