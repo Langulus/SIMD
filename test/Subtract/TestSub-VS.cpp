@@ -38,15 +38,11 @@ TEMPLATE_TEST_CASE("Vector - Scalar", "[subtract]"
       else InitOne(y, -5);
 
       WHEN("Subtracted as constexpr (with saturation)") {
-         constexpr T lhs = E {0};
-         constexpr E rhs = E {5};
-         static_assert(SIMD::Subtract<true>(lhs, rhs) == T {CT::Signed<TypeOf<T>> and not CT::Real<TypeOf<T>> ? -5 : 0});
+         static_assert(SIMD::Subtract<true>(T {0}, E {5}) == T {CT::Signed<TypeOf<T>> and not CT::Real<TypeOf<T>> ? -5 : 0});
       }
 
       WHEN("Subtracted as constexpr (without saturation)") {
-         constexpr T lhs = E {0};
-         constexpr E rhs = E {5};
-         static_assert(SIMD::Subtract<false>(lhs, rhs) == static_cast<T>(-5));
+         static_assert(SIMD::Subtract<false>(T {0}, E {5}) == static_cast<T>(-5));
       }
 
       WHEN("Subtracted (with saturation)") {
