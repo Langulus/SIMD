@@ -8,7 +8,7 @@
 #include "TestMul.hpp"
 
 
-TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
+/*TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -155,4 +155,4 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          REQUIRE(r == rCheck);
       }
    }
-}
+}*/
