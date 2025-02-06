@@ -38,17 +38,11 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
       else InitOne(y, -5);
 
       WHEN("Multiplied as constexpr (with saturation)") {
-         constexpr T lhs = E {0};
-         constexpr E rhs = E {5};
-         constexpr T res = E {0};
-         static_assert(SIMD::Multiply<true>(lhs, rhs) == res);
+         static_assert(SIMD::Multiply<true>(T {0}, E {5}) == T {0});
       }
 
       WHEN("Multiplied as constexpr (without saturation)") {
-         constexpr T lhs = E {0};
-         constexpr E rhs = E {5};
-         constexpr T res = E {0};
-         static_assert(SIMD::Multiply<false>(lhs, rhs) == res);
+         static_assert(SIMD::Multiply<false>(T {0}, E {5}) == T {0});
       }
 
       WHEN("Multiplied (with saturation)") {
