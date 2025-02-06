@@ -8,7 +8,7 @@
 #include "TestAdd.hpp"
 
 
-/*TEMPLATE_TEST_CASE("Vector + Scalar", "[add]"
+TEMPLATE_TEST_CASE("Vector + Scalar", "[add]"
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -159,4 +159,4 @@
          REQUIRE(r == rCheck);
       }
    }
-}*/
+}
