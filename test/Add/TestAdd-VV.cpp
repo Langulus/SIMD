@@ -34,15 +34,11 @@ TEMPLATE_TEST_CASE("Vector + Vector", "[add]"
       }
 
       WHEN("Added as constexpr (with saturation)") {
-         constexpr T lhs {0};
-         constexpr T rhs {5};
-         static_assert(SIMD::Add<true>(lhs, rhs) == T {CT::Real<TypeOf<T>> ? 1 : 5});
+         static_assert(SIMD::Add<true>(T {0}, T {5}) == T {CT::Real<TypeOf<T>> ? 1 : 5});
       }
 
       WHEN("Added as constexpr (without saturation)") {
-         constexpr T lhs {0};
-         constexpr T rhs {5};
-         static_assert(SIMD::Add<false>(lhs, rhs) == static_cast<T>(5));
+         static_assert(SIMD::Add<false>(T {0}, T {5}) == static_cast<T>(5));
       }
 
       WHEN("Added (with saturation)") {
