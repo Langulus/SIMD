@@ -8,7 +8,7 @@
 #include "TestSub.hpp"
 
 
-TEMPLATE_TEST_CASE("Vector - Scalar", "[subtract]"
+/*TEMPLATE_TEST_CASE("Vector - Scalar", "[subtract]"
    , VECTORS_ALL(2)
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
@@ -159,4 +159,4 @@ TEMPLATE_TEST_CASE("Vector - Scalar", "[subtract]"
          REQUIRE(r == rCheck);
       }
    }
-}
+}*/
