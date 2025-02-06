@@ -10,7 +10,7 @@
 
 
 /// Scalar - Scalar  (either dense or sparse, wrapped or not)                 
-/*template<bool SATURATE, CT::Scalar LHS, CT::Scalar RHS, CT::Scalar OUT> LANGULUS(INLINED)
+template<bool SATURATE, CT::Scalar LHS, CT::Scalar RHS, CT::Scalar OUT> LANGULUS(INLINED)
 void ControlSub(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
    auto& fout = FundamentalCast(out);
    fout = SIMD::Inner::SubtractFallback<SATURATE>(FundamentalCast(lhs), FundamentalCast(rhs));
@@ -55,4 +55,4 @@ void ControlSub(const LHS& lhsArray, const RHS& rhs, OUT& out) noexcept {
    const auto lhsEnd = lhs + LHS::MemberCount;
    while (lhs != lhsEnd)
       ControlSub<SATURATE>(*lhs++, rhs, *r++);
-}*/
+}
