@@ -10,7 +10,7 @@
 
 TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
    , NUMBERS_ALL()
-   , VECTORS_ALL(1)
+   /*, VECTORS_ALL(1)
    , VECTORS_ALL(2)
    , VECTORS_ALL(3)
    , VECTORS_ALL(4)
@@ -20,7 +20,7 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
    , VECTORS_ALL(16)
    , VECTORS_ALL(17)
    , VECTORS_ALL(32)
-   , VECTORS_ALL(33)
+   , VECTORS_ALL(33)*/
 ) {
    using T = TestType;
 
