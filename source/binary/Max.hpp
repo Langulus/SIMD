@@ -29,6 +29,7 @@ namespace Langulus::SIMD
          using T = TypeOf<R>;
          (void)lhs; (void)rhs;
 
+      #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<R>) {
             if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm_max_epi8    (lhs, rhs)};
             else if constexpr (CT::UnsignedInteger8<T>)  return R {simde_mm_max_epu8    (lhs, rhs)};
@@ -54,7 +55,10 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)            return R {simde_mm_max_pd      (lhs, rhs)};
             else static_assert(false, "Unsupported type for 16-byte package");
          }
-         else if constexpr (CT::SIMD256<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm256_max_epi8 (lhs, rhs)};
             else if constexpr (CT::UnsignedInteger8<T>)  return R {simde_mm256_max_epu8 (lhs, rhs)};
             else if constexpr (CT::SignedInteger16<T>)   return R {simde_mm256_max_epi16(lhs, rhs)};
@@ -79,7 +83,10 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)            return R {simde_mm256_max_pd   (lhs, rhs)};
             else static_assert(false, "Unsupported type for 32-byte package");
          }
-         else if constexpr (CT::SIMD512<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm512_max_epi8 (lhs, rhs)};
             else if constexpr (CT::UnsignedInteger8<T>)  return R {simde_mm512_max_epu8 (lhs, rhs)};
             else if constexpr (CT::SignedInteger16<T>)   return R {simde_mm512_max_epi16(lhs, rhs)};
@@ -92,7 +99,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)            return R {simde_mm512_max_pd   (lhs, rhs)};
             else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else static_assert(false, "Unsupported type");
+         else
+      #endif
+         static_assert(false, "Unsupported type");
       }
       
       /// Get biggest values as constexpr, if possible                        

@@ -37,6 +37,7 @@ namespace Langulus::SIMD
          static_assert(CT::IntegerX<T>, "Can only shift integers");
          (void)lhs; (void)rhs;
 
+      #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<R>) {
             if constexpr (CT::Integer8<T>) {
                #if LANGULUS_SIMD(256BIT) or LANGULUS_SIMD(512BIT)
@@ -74,7 +75,10 @@ namespace Langulus::SIMD
             }
             else static_assert(false, "Unsupported type for 16-byte package");
          }
-         else if constexpr (CT::SIMD256<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<R>) {
             if constexpr (CT::Integer8<T>) {
                auto lo = ShiftLeftSIMD(lhs.UnpackLo(), rhs.UnpackLo());
                auto hi = ShiftLeftSIMD(lhs.UnpackHi(), rhs.UnpackHi());
@@ -93,7 +97,10 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer64<T>)         return R {simde_mm256_sllv_epi64(lhs, rhs)};
             else static_assert(false, "Unsupported type for 32-byte package");
          }
-         else if constexpr (CT::SIMD512<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<R>) {
             if constexpr (CT::Integer8<T>) {
                auto lo = ShiftLeftSIMD(lhs.UnpackLo(), rhs.UnpackLo());
                auto hi = ShiftLeftSIMD(lhs.UnpackHi(), rhs.UnpackHi());
@@ -104,7 +111,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::Integer64<T>)         return R {simde_mm512_sllv_epi64(lhs, rhs)};
             else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else static_assert(false, "Unsupported type");
+         else
+      #endif
+         static_assert(false, "Unsupported type");
       }
       
       /// Bitwise left shift values as constexpr, if possible                 
