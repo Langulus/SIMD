@@ -32,6 +32,7 @@ namespace Langulus::SIMD
          using T = TypeOf<R>;
          (void)lhs; (void)rhs;
 
+      #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<R>) {
             // Check if anything in 'rhs' is zero                       
             if constexpr (CT::Integer<T>) {
@@ -61,7 +62,10 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)            return simde_mm_div_pd     (lhs, rhs);
             else static_assert(false, "Unsupported type for 16-byte package");
          }
-         else if constexpr (CT::SIMD256<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<R>) {
             // Check if anything in 'rhs' is zero                       
             if constexpr (CT::Integer<T>) {
                if (simde_mm256_movemask_epi8(EqualsSIMD(rhs, rhs.Zero())))
@@ -90,7 +94,10 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)            return simde_mm256_div_pd     (lhs, rhs);
             else static_assert(false, "Unsupported type for 32-byte package");
          }
-         else if constexpr (CT::SIMD512<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<R>) {
             // Check if anything in 'rhs' is zero                       
             if constexpr (CT::Integer<T>) {
                if (EqualsSIMD(rhs, rhs.Zero()))
@@ -119,7 +126,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)            return simde_mm512_div_pd     (lhs, rhs);
             else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else static_assert(false, "Unsupported type");
+         else
+      #endif
+         static_assert(false, "Unsupported type");
       }
 
       
