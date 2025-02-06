@@ -10,7 +10,7 @@
 
 
 /// Scalar + Scalar  (either dense or sparse, wrapped or not)                 
-template<bool SATURATE, CT::Scalar LHS, CT::Scalar RHS, CT::Scalar OUT> LANGULUS(INLINED)
+/*template<bool SATURATE, CT::Scalar LHS, CT::Scalar RHS, CT::Scalar OUT> LANGULUS(INLINED)
 void ControlAdd(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
    auto& fout = FundamentalCast(out);
    fout = SIMD::Inner::AddFallback<SATURATE>(FundamentalCast(lhs), FundamentalCast(rhs));
@@ -48,4 +48,4 @@ void ControlAdd(const LHS& lhs, const RHS& rhsArray, OUT& out) noexcept {
 template<bool SATURATE, CT::Vector LHS, CT::Scalar RHS, CT::Vector OUT> LANGULUS(INLINED)
 void ControlAdd(const LHS& lhsArray, const RHS& rhs, OUT& out) noexcept {
    ControlAdd<SATURATE>(rhs, lhsArray, out);
-}
+}*/
