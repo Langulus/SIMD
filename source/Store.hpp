@@ -23,6 +23,7 @@ namespace Langulus::SIMD
          using R  = Deref<decltype(from)>;
          using T  = TypeOf<R>;
 
+      #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<R>) {
             if      constexpr (CT::Integer8<T>)    to = simde_mm_movemask_epi8   (from);
             else if constexpr (CT::Integer16<T>)   to = simde_mm_movemask_epi8   (simde_mm_packs_epi16(from, from.Zero()));
@@ -32,7 +33,10 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)      to = simde_mm_movemask_pd     (from);
             else static_assert(false, "Unsupported type");
          }
-         else if constexpr (CT::SIMD256<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::Integer8<T>)    to = simde_mm256_movemask_epi8(from);
             else if constexpr (CT::Integer16<T>) {
                const auto lo_lane = simde_mm256_castsi256_si128(from);
@@ -45,7 +49,10 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)      to = simde_mm256_movemask_pd  (from);
             else static_assert(false, "Unsupported type");
          }
-         else if constexpr (CT::SIMD512<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::Integer8<T>)    to = simde_mm512_movemask_epi8(from);
             else if constexpr (CT::Integer16<T>) {
                const auto lo_lane = simde_mm512_castsi512_si256(from);
@@ -58,7 +65,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)      to = simde_mm512_movemask_pd  (from);
             else static_assert(false, "Unsupported type");
          }
-         else static_assert(false, "Unsupported register");
+         else
+      #endif
+         static_assert(false, "Unsupported register");
       }
 
       /// Save a register to a vector in memory                               
@@ -85,7 +94,9 @@ namespace Langulus::SIMD
             StoreSIMD(from, mask);
             mask.AsVector(to);
          }
-         else if constexpr (CT::SIMD128<R>) {
+         else
+      #if LANGULUS_SIMD(128BIT)
+         if constexpr (CT::SIMD128<R>) {
             if constexpr (CT::Float<T>) {
                // To float array                                        
                if constexpr (sizeof(to) == sizeof(from)) {
@@ -140,7 +151,10 @@ namespace Langulus::SIMD
             }
             else static_assert(false, "Unsupported output");
          }
-         else if constexpr (CT::SIMD256<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<R>) {
             if constexpr (CT::Float<T>) {
                // To float array                                        
                if constexpr (sizeof(to) == sizeof(from)) {
@@ -200,7 +214,10 @@ namespace Langulus::SIMD
             }
             else static_assert(false, "Unsupported output");
          }
-         else if constexpr (CT::SIMD512<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<R>) {
             if constexpr (CT::Float<T>) {
                // To float array                                        
                if constexpr (sizeof(to) == sizeof(from)) {
@@ -260,7 +277,9 @@ namespace Langulus::SIMD
             }
             else static_assert(false, "Unsupported output");
          }
-         else static_assert(false, "Unsupported register");
+         else
+      #endif
+         static_assert(false, "Unsupported register");
       }
 
       /// Fallback store routine, doesn't use SIMD, hopefully constexpr       
