@@ -46,45 +46,13 @@ TEMPLATE_TEST_CASE("Ceil", "[ceil]"
          InitOne(x, 1.2);
 
       WHEN("Ceiled as constexpr") {
-         {
-            constexpr T lhs = static_cast<T>(-1.0f);
-            constexpr T res = static_cast<T>(-1.0f);
-            static_assert(SIMD::Ceil(lhs) == res);
-         }
-
-         {
-            constexpr T lhs = static_cast<T>(-0.5f);
-            constexpr T res = static_cast<T>( 0.0f);
-            static_assert(SIMD::Ceil(lhs) == res);
-         }
-
-         {
-            constexpr T lhs = 0;
-            constexpr T res = 0;
-            static_assert(SIMD::Ceil(lhs) == res);
-         }
-
-         {
-            constexpr T lhs = static_cast<T>(1.0f);
-            constexpr T res = static_cast<T>(1.0f);
-            static_assert(SIMD::Ceil(lhs) == res);
-         }
-
-         {
-            constexpr T lhs = static_cast<T>(1.2f);
-            constexpr T res = static_cast<T>(2.0f);
-            static_assert(SIMD::Ceil(lhs) == res);
-         }
-         {
-            constexpr T lhs = static_cast<T>(1.5f);
-            constexpr T res = static_cast<T>(2.0f);
-            static_assert(SIMD::Ceil(lhs) == res);
-         }
-         {
-            constexpr T lhs = static_cast<T>(2.0f);
-            constexpr T res = static_cast<T>(2.0f);
-            static_assert(SIMD::Ceil(lhs) == res);
-         }
+         static_assert(SIMD::Ceil(T {-1})  == T {-1});
+         static_assert(SIMD::Ceil(T {-0.5f})== T {0});
+         static_assert(SIMD::Ceil(T {0})   == T {0});
+         static_assert(SIMD::Ceil(T {1})   == T {1});
+         static_assert(SIMD::Ceil(T {1.2f}) == T {2});
+         static_assert(SIMD::Ceil(T {1.5f}) == T {2});
+         static_assert(SIMD::Ceil(T {2})   == T {2});
       }
 
       WHEN("Ceiled") {
