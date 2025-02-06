@@ -31,6 +31,7 @@ namespace Langulus::SIMD
          (void)lhs; (void)rhs;
          
          if constexpr (SATURATE) {
+         #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<R>) {
                if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm_subs_epi8    (lhs, rhs)};
                else if constexpr (CT::UnsignedInteger8<T>)  return R {simde_mm_subs_epu8    (lhs, rhs)};
@@ -64,7 +65,10 @@ namespace Langulus::SIMD
                }
                else static_assert(false, "Unsupported type for 16-byte package");
             }
-            else if constexpr (CT::SIMD256<R>) {
+            else
+         #endif
+         #if LANGULUS_SIMD(256BIT)
+            if constexpr (CT::SIMD256<R>) {
                if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm256_subs_epi8 (lhs, rhs)};
                else if constexpr (CT::UnsignedInteger8<T>)  return R {simde_mm256_subs_epu8 (lhs, rhs)};
                else if constexpr (CT::SignedInteger16<T>)   return R {simde_mm256_subs_epi16(lhs, rhs)};
@@ -97,7 +101,10 @@ namespace Langulus::SIMD
                }
                else static_assert(false, "Unsupported type for 32-byte package");
             }
-            else if constexpr (CT::SIMD512<R>) {
+            else
+         #endif
+         #if LANGULUS_SIMD(512BIT)
+            if constexpr (CT::SIMD512<R>) {
                if      constexpr (CT::SignedInteger8<T>)    return R {simde_mm512_subs_epi8 (lhs, rhs)};
                else if constexpr (CT::UnsignedInteger8<T>)  return R {simde_mm512_subs_epu8 (lhs, rhs)};
                else if constexpr (CT::SignedInteger16<T>)   return R {simde_mm512_subs_epi16(lhs, rhs)};
@@ -126,9 +133,12 @@ namespace Langulus::SIMD
                }
                else static_assert(false, "Unsupported type for 64-byte package");
             }
-            else static_assert(false, "Unsupported type");
+            else
+         #endif
+            static_assert(false, "Unsupported type");
          }
          else {
+         #if LANGULUS_SIMD(128BIT)
             if constexpr (CT::SIMD128<R>) {
                if      constexpr (CT::Integer8<T>)    return R {simde_mm_sub_epi8    (lhs, rhs)};
                else if constexpr (CT::Integer16<T>)   return R {simde_mm_sub_epi16   (lhs, rhs)};
@@ -138,7 +148,10 @@ namespace Langulus::SIMD
                else if constexpr (CT::Double<T>)      return R {simde_mm_sub_pd      (lhs, rhs)};
                else static_assert(false, "Unsupported type for 16-byte package");
             }
-            else if constexpr (CT::SIMD256<R>) {
+            else
+         #endif
+         #if LANGULUS_SIMD(256BIT)
+            if constexpr (CT::SIMD256<R>) {
                if      constexpr (CT::Integer8<T>)    return R {simde_mm256_sub_epi8 (lhs, rhs)};
                else if constexpr (CT::Integer16<T>)   return R {simde_mm256_sub_epi16(lhs, rhs)};
                else if constexpr (CT::Integer32<T>)   return R {simde_mm256_sub_epi32(lhs, rhs)};
@@ -147,7 +160,10 @@ namespace Langulus::SIMD
                else if constexpr (CT::Double<T>)      return R {simde_mm256_sub_pd   (lhs, rhs)};
                else static_assert(false, "Unsupported type for 32-byte package");
             }
-            else if constexpr (CT::SIMD512<R>) {
+            else
+         #endif
+         #if LANGULUS_SIMD(512BIT)
+            if constexpr (CT::SIMD512<R>) {
                if      constexpr (CT::Integer8<T>)    return R {simde_mm512_sub_epi8 (lhs, rhs)};
                else if constexpr (CT::Integer16<T>)   return R {simde_mm512_sub_epi16(lhs, rhs)};
                else if constexpr (CT::Integer32<T>)   return R {simde_mm512_sub_epi32(lhs, rhs)};
@@ -156,7 +172,9 @@ namespace Langulus::SIMD
                else if constexpr (CT::Double<T>)      return R {simde_mm512_sub_pd   (lhs, rhs)};
                else static_assert(false, "Unsupported type for 64-byte package");
             }
-            else static_assert(false, "Unsupported type");
+            else
+         #endif
+            static_assert(false, "Unsupported type");
          }
       }
 

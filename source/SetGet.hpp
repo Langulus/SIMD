@@ -33,8 +33,7 @@ namespace Langulus::SIMD
          if constexpr (REVERSE) {
             if constexpr (MAXS - IDX - 1 < S) {
                LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", values[MAXS - IDX - 1]);
-               //return reinterpret_cast<const R&>(values[MAXS - IDX - 1]);
-               return static_cast<R>(values[MAXS - IDX - 1]);
+               return reinterpret_cast<const R&>(values[MAXS - IDX - 1]);
             }
             else {
                LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", static_cast<R>(DEF));
@@ -44,8 +43,7 @@ namespace Langulus::SIMD
          else {
             if constexpr (IDX < S) {
                LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", values[IDX]);
-               //return reinterpret_cast<const R&>(values[IDX]);
-               return static_cast<R>(values[IDX]);
+               return reinterpret_cast<const R&>(values[IDX]);
             }
             else {
                LANGULUS_SIMD_VERBOSE("Setting [", IDX, "] to ", static_cast<R>(DEF));
