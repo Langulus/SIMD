@@ -93,7 +93,6 @@ namespace Langulus::SIMD
             }
             else
          #endif
-
          #if LANGULUS_SIMD(256BIT)
             if constexpr (RS <= 32) {
                LANGULUS_SIMD_VERBOSE(
@@ -110,7 +109,6 @@ namespace Langulus::SIMD
             }
             else
          #endif
-
          #if LANGULUS_SIMD(512BIT)
             if constexpr (RS <= 64) {
                LANGULUS_SIMD_VERBOSE(

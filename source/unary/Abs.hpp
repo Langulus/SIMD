@@ -31,6 +31,7 @@ namespace Langulus::SIMD
             "Suboptimal and pointless for unsigned values");
          (void)v;
 
+      #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<R>) {
             if      constexpr (CT::SignedInteger8<T>)  return R {simde_mm_abs_epi8(v)};
             else if constexpr (CT::SignedInteger16<T>) return R {simde_mm_abs_epi16(v)};
@@ -40,7 +41,10 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)          return R {simde_mm_andnot_pd(simde_mm_set1_pd(-0.0F), v)};
             else static_assert(false, "Unsupported type for 16-byte package");
          }
-         else if constexpr (CT::SIMD256<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(256BIT)
+         if constexpr (CT::SIMD256<R>) {
             if      constexpr (CT::SignedInteger8<T>)  return R {simde_mm256_abs_epi8(v)};
             else if constexpr (CT::SignedInteger16<T>) return R {simde_mm256_abs_epi16(v)};
             else if constexpr (CT::SignedInteger32<T>) return R {simde_mm256_abs_epi32(v)};
@@ -49,7 +53,10 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)          return R {simde_mm256_andnot_pd(simde_mm256_set1_pd(-0.0F), v)};
             else static_assert(false, "Unsupported type for 32-byte package");
          }
-         else if constexpr (CT::SIMD512<R>) {
+         else
+      #endif
+      #if LANGULUS_SIMD(512BIT)
+         if constexpr (CT::SIMD512<R>) {
             if      constexpr (CT::SignedInteger8<T>)  return R {simde_mm512_abs_epi8(v)};
             else if constexpr (CT::SignedInteger16<T>) return R {simde_mm512_abs_epi16(v)};
             else if constexpr (CT::SignedInteger32<T>) return R {simde_mm512_abs_epi32(v)};
@@ -58,7 +65,9 @@ namespace Langulus::SIMD
             else if constexpr (CT::Double<T>)          return R {simde_mm512_andnot_pd(simde_mm512_set1_pd(-0.0F), v)};
             else static_assert(false, "Unsupported type for 64-byte package");
          }
-         else static_assert(false, "Unsupported type");
+         else
+      #endif
+         static_assert(false, "Unsupported type");
       }
       
       /// Get absolute values as constexpr, if possible                       

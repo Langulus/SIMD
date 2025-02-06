@@ -37,22 +37,31 @@ namespace Langulus::SIMD
             //TODO hopefully it is fixed in the future                  
             return Unsupported {};
          #else
-            if constexpr (CT::SIMD128<R>) {
-               if      constexpr (CT::Float<T>)    return R {simde_mm_ceil_ps   (value)};
-               else if constexpr (CT::Double<T>)   return R {simde_mm_ceil_pd   (value)};
-               else static_assert(false, "Unsupported type for 16-byte package");
-            }
-            else if constexpr (CT::SIMD256<R>) {
-               if      constexpr (CT::Float<T>)    return R {simde_mm256_ceil_ps(value)};
-               else if constexpr (CT::Double<T>)   return R {simde_mm256_ceil_pd(value)};
-               else static_assert(false, "Unsupported type for 32-byte package");
-            }
-            else if constexpr (CT::SIMD512<R>) {
-               if      constexpr (CT::Float<T>)    return R {simde_mm512_ceil_ps(value)};
-               else if constexpr (CT::Double<T>)   return R {simde_mm512_ceil_pd(value)};
-               else static_assert(false, "Unsupported type for 64-byte package");
-            }
-            else static_assert(false, "Unsupported type");
+            #if LANGULUS_SIMD(128BIT)
+               if constexpr (CT::SIMD128<R>) {
+                  if      constexpr (CT::Float<T>)    return R {simde_mm_ceil_ps   (value)};
+                  else if constexpr (CT::Double<T>)   return R {simde_mm_ceil_pd   (value)};
+                  else static_assert(false, "Unsupported type for 16-byte package");
+               }
+               else
+            #endif
+            #if LANGULUS_SIMD(256BIT)
+               if constexpr (CT::SIMD256<R>) {
+                  if      constexpr (CT::Float<T>)    return R {simde_mm256_ceil_ps(value)};
+                  else if constexpr (CT::Double<T>)   return R {simde_mm256_ceil_pd(value)};
+                  else static_assert(false, "Unsupported type for 32-byte package");
+               }
+               else
+            #endif
+            #if LANGULUS_SIMD(512BIT)
+               if constexpr (CT::SIMD512<R>) {
+                  if      constexpr (CT::Float<T>)    return R {simde_mm512_ceil_ps(value)};
+                  else if constexpr (CT::Double<T>)   return R {simde_mm512_ceil_pd(value)};
+                  else static_assert(false, "Unsupported type for 64-byte package");
+               }
+               else
+            #endif
+            static_assert(false, "Unsupported type");
          #endif
       }
       

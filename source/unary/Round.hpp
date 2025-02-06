@@ -37,23 +37,31 @@ namespace Langulus::SIMD
             return Unsupported {};
          #else
             constexpr auto STYLE = SIMDE_MM_FROUND_TO_NEAREST_INT | SIMDE_MM_FROUND_NO_EXC;
-
-            if constexpr (CT::SIMD128<R>) {
-               if      constexpr (CT::Float<T>)    return R {simde_mm_round_ps(value, STYLE)};
-               else if constexpr (CT::Double<T>)   return R {simde_mm_round_pd(value, STYLE)};
-               else static_assert(false, "Unsupported type for 16-byte package");
-            }
-            else if constexpr (CT::SIMD256<R>) {
-               if      constexpr (CT::Float<T>)    return R {simde_mm256_round_ps(value, STYLE)};
-               else if constexpr (CT::Double<T>)   return R {simde_mm256_round_pd(value, STYLE)};
-               else static_assert(false, "Unsupported type for 32-byte package");
-            }
-            else if constexpr (CT::SIMD512<R>) {
-               if      constexpr (CT::Float<T>)    return R {simde_mm512_roundscale_ps(value, STYLE)};
-               else if constexpr (CT::Double<T>)   return R {simde_mm512_roundscale_pd(value, STYLE)};
-               else static_assert(false, "Unsupported type for 64-byte package");
-            }
-            else static_assert(false, "Unsupported type");
+            #if LANGULUS_SIMD(128BIT)
+               if constexpr (CT::SIMD128<R>) {
+                  if      constexpr (CT::Float<T>)    return R {simde_mm_round_ps(value, STYLE)};
+                  else if constexpr (CT::Double<T>)   return R {simde_mm_round_pd(value, STYLE)};
+                  else static_assert(false, "Unsupported type for 16-byte package");
+               }
+               else
+            #endif
+            #if LANGULUS_SIMD(256BIT)
+               if constexpr (CT::SIMD256<R>) {
+                  if      constexpr (CT::Float<T>)    return R {simde_mm256_round_ps(value, STYLE)};
+                  else if constexpr (CT::Double<T>)   return R {simde_mm256_round_pd(value, STYLE)};
+                  else static_assert(false, "Unsupported type for 32-byte package");
+               }
+               else
+            #endif
+            #if LANGULUS_SIMD(512BIT)
+               if constexpr (CT::SIMD512<R>) {
+                  if      constexpr (CT::Float<T>)    return R {simde_mm512_roundscale_ps(value, STYLE)};
+                  else if constexpr (CT::Double<T>)   return R {simde_mm512_roundscale_pd(value, STYLE)};
+                  else static_assert(false, "Unsupported type for 64-byte package");
+               }
+               else
+            #endif
+            static_assert(false, "Unsupported type");
          #endif
       }
       

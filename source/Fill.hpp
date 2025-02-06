@@ -33,7 +33,6 @@ namespace Langulus::SIMD
          }
          else
       #endif
-
       #if LANGULUS_SIMD(256BIT)
          if constexpr (R <= 32) {
             using T = Decvq<TypeOf<decltype(s)>>;
@@ -47,7 +46,6 @@ namespace Langulus::SIMD
          }
          else
       #endif
-
       #if LANGULUS_SIMD(512BIT)
          if constexpr (R <= 64) {
             using T = Decvq<TypeOf<decltype(s)>>;
@@ -61,8 +59,7 @@ namespace Langulus::SIMD
          }
          else
       #endif
-      
-      return Unsupported {};
+         return Unsupported {};
    }
 
 } // namespace Langulus::SIMD
