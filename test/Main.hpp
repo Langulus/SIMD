@@ -74,11 +74,11 @@ using namespace Langulus;
    (Vector<::std::uint16_t, S>),\
    (Vector<::std::uint32_t, S>),\
    (Vector<::std::uint64_t, S>),\
-   (Vector<Byte, S>),           \
-   (Vector<char8_t, S>),        \
+   (Vector<Byte, S>)           
+   /*(Vector<char8_t, S>),        \
    (Vector<char16_t, S>),       \
    (Vector<char32_t, S>),       \
-   (Vector<wchar_t, S>)
+   (Vector<wchar_t, S>)*/
 
 #define VECTORS_INT(S) \
    (Vector<::std::int8_t, S>),  \
