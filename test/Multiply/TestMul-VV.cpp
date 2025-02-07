@@ -141,7 +141,7 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          #endif
       }
 
-      /*WHEN("Multiplied in reverse (with saturation)") {
+      WHEN("Multiplied in reverse (with saturation)") {
          ControlMul<true>(y, x, rCheck);
          SIMD::Multiply<true>(y, x, r);
 
@@ -153,6 +153,6 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          SIMD::Multiply<false>(y, x, r);
 
          REQUIRE(r == rCheck);
-      }*/
+      }
    }
 }
