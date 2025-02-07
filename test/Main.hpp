@@ -69,18 +69,18 @@ using namespace Langulus;
    (Vector<::std::int64_t, S>), \
    VECTORS_REAL(S)
 
-#define VECTORS_UNSIGNED(S) (Vector<::std::uint8_t, S>)
-   /*(Vector<::std::uint8_t, S>), \
-   (Vector<::std::uint16_t, S>)
+#define VECTORS_UNSIGNED(S)     \
+   (Vector<::std::uint8_t,  S>),\
+   (Vector<::std::uint16_t, S>),\
    (Vector<::std::uint32_t, S>),\
    (Vector<::std::uint64_t, S>),\
-   (Vector<Byte, S>)           
+   (Vector<Byte, S>),           \
    (Vector<char8_t, S>),        \
    (Vector<char16_t, S>),       \
    (Vector<char32_t, S>),       \
-   (Vector<wchar_t, S>)*/
+   (Vector<wchar_t, S>)
 
-#define VECTORS_INT(S) \
+#define VECTORS_INT(S)          \
    (Vector<::std::int8_t, S>),  \
    (Vector<::std::int16_t, S>), \
    (Vector<::std::int32_t, S>), \
@@ -95,9 +95,9 @@ using namespace Langulus;
    (Vector<char32_t, S>),       \
    (Vector<wchar_t, S>)
 
-#define VECTORS_ALL(S) \
-   VECTORS_UNSIGNED(S)
-   //VECTORS_SIGNED(S),
+#define VECTORS_ALL(S)  \
+   VECTORS_UNSIGNED(S), \
+   VECTORS_SIGNED(S)
 
 using uint = unsigned int;
 template<class T>
