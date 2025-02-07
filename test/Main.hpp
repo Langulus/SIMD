@@ -69,8 +69,7 @@ using namespace Langulus;
    (Vector<::std::int64_t, S>), \
    VECTORS_REAL(S)
 
-#define VECTORS_UNSIGNED(S)     \
-   (Vector<::std::uint16_t, S>)
+#define VECTORS_UNSIGNED(S) (Vector<::std::uint8_t, S>)
    /*(Vector<::std::uint8_t, S>), \
    (Vector<::std::uint16_t, S>)
    (Vector<::std::uint32_t, S>),\
