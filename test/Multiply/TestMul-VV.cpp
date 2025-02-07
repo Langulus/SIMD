@@ -33,13 +33,13 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          InitOne(y, -5);
       }
 
-      WHEN("Multiplied as constexpr (with saturation)") {
+      //WHEN("Multiplied as constexpr (with saturation)") {
          static_assert(SIMD::Multiply<true>(T {0}, T {5}) == T {0});
-      }
+      //}
 
-      WHEN("Multiplied as constexpr (without saturation)") {
+      //WHEN("Multiplied as constexpr (without saturation)") {
          static_assert(SIMD::Multiply<false>(T {0}, T {5}) == T {0});
-      }
+      //}
 
       WHEN("Multiplied (with saturation)") {
          ControlMul<true>(x, y, rCheck);
