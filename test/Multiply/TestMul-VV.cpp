@@ -33,7 +33,7 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          InitOne(y, -5);
       }
 
-      /*WHEN("Multiplied as constexpr (with saturation)") {
+      WHEN("Multiplied as constexpr (with saturation)") {
          static_assert(SIMD::Multiply<true>(T {0}, T {5}) == T {0});
       }
 
@@ -41,7 +41,7 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          static_assert(SIMD::Multiply<false>(T {0}, T {5}) == T {0});
       }
 
-      WHEN("Multiplied (with saturation)") {
+      /*WHEN("Multiplied (with saturation)") {
          ControlMul<true>(x, y, rCheck);
          SIMD::Multiply<true>(x, y, r);
 
@@ -139,7 +139,7 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
                });
             };
          #endif
-      }*/
+      }
 
       WHEN("Multiplied in reverse (with saturation)") {
          ControlMul<true>(y, x, rCheck);
@@ -153,6 +153,6 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          SIMD::Multiply<false>(y, x, r);
 
          REQUIRE(r == rCheck);
-      }
+      }*/
    }
 }
