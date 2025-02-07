@@ -96,8 +96,8 @@ using namespace Langulus;
    (Vector<wchar_t, S>)
 
 #define VECTORS_ALL(S) \
-   VECTORS_SIGNED(S)
-   //, VECTORS_UNSIGNED(S)
+   //VECTORS_SIGNED(S),
+   VECTORS_UNSIGNED(S)
 
 using uint = unsigned int;
 template<class T>
