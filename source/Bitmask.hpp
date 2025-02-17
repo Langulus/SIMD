@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Common.hpp"
+#include <Langulus/Core/Assume.hpp>
 
 
 namespace Langulus::SIMD
