@@ -36,7 +36,7 @@ namespace Langulus::SIMD
             //TODO hopefully it is fixed in the future                  
             return Unsupported {};
          #else
-            constexpr auto STYLE = SIMDE_MM_FROUND_TO_NEAREST_INT | SIMDE_MM_FROUND_NO_EXC;
+            [[maybe_unused]] constexpr auto STYLE = SIMDE_MM_FROUND_TO_NEAREST_INT | SIMDE_MM_FROUND_NO_EXC;
             #if LANGULUS_SIMD(128BIT)
                if constexpr (CT::SIMD128<R>) {
                   if      constexpr (CT::Float<T>)    return R {simde_mm_round_ps(value, STYLE)};
