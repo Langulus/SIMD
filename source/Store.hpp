@@ -67,7 +67,7 @@ namespace Langulus::SIMD
          }
          else
       #endif
-         static_assert(false, "Unsupported register");
+         static_assert(CT::False<T>, "Unsupported register");
       }
 
       /// Save a register to a vector in memory                               

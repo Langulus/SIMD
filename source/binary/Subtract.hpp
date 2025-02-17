@@ -135,7 +135,7 @@ namespace Langulus::SIMD
             }
             else
          #endif
-            static_assert(false, "Unsupported type");
+            static_assert(CT::False<T>, "Unsupported type");
          }
          else {
          #if LANGULUS_SIMD(128BIT)
@@ -174,7 +174,7 @@ namespace Langulus::SIMD
             }
             else
          #endif
-            static_assert(false, "Unsupported type");
+            static_assert(CT::False<T>, "Unsupported type");
          }
       }
 
