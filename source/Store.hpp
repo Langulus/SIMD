@@ -22,6 +22,7 @@ namespace Langulus::SIMD
       void StoreSIMD(const CT::SIMD auto& from, CT::Bitmask auto& to) noexcept {
          using R  = Deref<decltype(from)>;
          using T  = TypeOf<R>;
+         (void)to;
 
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<R>) {
