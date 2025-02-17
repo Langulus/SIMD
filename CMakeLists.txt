@@ -6,16 +6,11 @@ project(LangulusSIMD
 )
 
 # Check if this project is built as standalone, or a part of something else 
-if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
+if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-
     include(LangulusUtilities.cmake)
-
-    # Add Langulus::Core/Logger/RTTI libraries                              
-    fetch_langulus_module(Core   GIT_TAG 23772d5c061535530c6efb815a638b271967cdd0)
     fetch_langulus_module(Logger GIT_TAG 3ac6b2baf2d4294c5553f000b441c9ac80c79208)
-    fetch_langulus_module(RTTI   GIT_TAG 2a34540a1f96fde24ab9f37f4895f28d3c726c1a)
 endif()
 
 # Configure SIMDe library                                                   
@@ -26,10 +21,7 @@ fetch_external_module(
 )
 
 # Build and install SIMD library                                            
-add_langulus_library(LangulusSIMD
-    $<TARGET_OBJECTS:LangulusLogger>
-    $<TARGET_OBJECTS:LangulusRTTI>
-)
+add_langulus_library(LangulusSIMD $<TARGET_OBJECTS:LangulusLogger>)
 
 if(MSVC)
 	# Some SVML functions seem to be broken on x86 MSVC builds				
@@ -38,10 +30,9 @@ if(MSVC)
 endif()
 
 target_include_directories(LangulusSIMD
-	PUBLIC      include
-                $<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>
-                $<TARGET_PROPERTY:LangulusRTTI,INTERFACE_INCLUDE_DIRECTORIES>
+	PUBLIC      $<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>
                 ${SIMDe_SOURCE_DIR}
+				include
 )
 
 target_link_libraries(LangulusSIMD
@@ -54,6 +45,6 @@ target_compile_definitions(LangulusSIMD
 )
 
 if(LANGULUS_TESTING)
-    enable_testing()
+	enable_testing()
 	add_subdirectory(test)
 endif()

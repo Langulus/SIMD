@@ -37,15 +37,15 @@ namespace Langulus::SIMD
             // Check if anything in 'rhs' is zero                       
             if constexpr (CT::Integer<T>) {
                if (simde_mm_movemask_epi8(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
+                  LANGULUS_THROW(ZeroDivision, "Division by zero");
             }
             else if constexpr (CT::Float<T>) {
                if (simde_mm_movemask_ps(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
+                  LANGULUS_THROW(ZeroDivision, "Division by zero");
             }
             else if constexpr (CT::Double<T>) {
                if (simde_mm_movemask_pd(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
+                  LANGULUS_THROW(ZeroDivision, "Division by zero");
             }
             else static_assert(false, "Unsupported T");
 
@@ -69,15 +69,15 @@ namespace Langulus::SIMD
             // Check if anything in 'rhs' is zero                       
             if constexpr (CT::Integer<T>) {
                if (simde_mm256_movemask_epi8(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
+                  LANGULUS_THROW(ZeroDivision, "Division by zero");
             }
             else if constexpr (CT::Float<T>) {
                if (simde_mm256_movemask_ps(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
+                  LANGULUS_THROW(ZeroDivision, "Division by zero");
             }
             else if constexpr (CT::Double<T>) {
                if (simde_mm256_movemask_pd(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
+                  LANGULUS_THROW(ZeroDivision, "Division by zero");
             }
             else static_assert(false, "Unsupported T");
 
@@ -142,7 +142,7 @@ namespace Langulus::SIMD
          return AttemptBinary<1, FORCE_OUT>(lhs, rhs, nullptr,
             []<class E>(const E& l, const E& r) -> E {
                if (r == E {0})
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
+                  LANGULUS_THROW(ZeroDivision, "Division by zero");
                return l / r;
             }
          );
@@ -163,7 +163,7 @@ namespace Langulus::SIMD
             []<class E>(const E& l, const E& r) -> E {
                LANGULUS_SIMD_VERBOSE("Dividing (Fallback) ", l, " / ", r, " (", NameOf<E>(), ")");
                if (r == E {0})
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
+                  LANGULUS_THROW(ZeroDivision, "Division by zero");
                return l / r;
             }
          );

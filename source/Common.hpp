@@ -6,7 +6,9 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include <Langulus/RTTI/Meta.hpp>
+#include <Langulus/Core/Types.hpp>
+#include <Langulus/Core/Byte.hpp>
+#include <Langulus/Core/Lossless.hpp>
 #include <array>
 
 #ifdef __is_identifier
@@ -39,8 +41,6 @@
 #else
    #define LANGULUS_API_SIMD() LANGULUS_IMPORT()
 #endif
-
-LANGULUS_EXCEPTION(DivisionByZero);
 
 #define LANGULUS_SIMD(a) LANGULUS_SIMD_##a()
 
@@ -224,8 +224,6 @@ LANGULUS_EXCEPTION(DivisionByZero);
 ///                                                                           
 namespace Langulus::SIMD
 {
-
-   using ::Langulus::Inner::Unsupported;
 
    /// Single real element inside a register                                  
    template<class...T>

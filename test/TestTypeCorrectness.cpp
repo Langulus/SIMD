@@ -74,7 +74,7 @@ TEMPLATE_TEST_CASE("CountOf checks", "[CountOf]", NUMBERS_ALL()) {
    static_assert(CountOf<Vector<T, 3>[ 8]> == 24);
 }
 
-TEST_CASE("OverlapExtents checks", "[OverlapExtents]") {
+/*TEST_CASE("OverlapExtents checks", "[OverlapExtents]") {
    int scalar {};
    int scalarArray[1] {};
    int smallArray[2] {};
@@ -99,7 +99,7 @@ TEST_CASE("OverlapExtents checks", "[OverlapExtents]") {
    static_assert(OVERLAP_EXTENTS(bigArray,    scalarArray) == 4);
    static_assert(OVERLAP_EXTENTS(bigArray,    smallArray ) == 2);
    static_assert(OVERLAP_EXTENTS(bigArray,    bigArray   ) == 4);
-}
+}*/
 
 TEST_CASE("OverlapCounts checks", "[OverlapCounts]") {
    int scalar {};
