@@ -105,7 +105,7 @@ namespace Langulus::SIMD
          }
          else
       #endif
-         static_assert(false, "Unsupported type");
+         static_assert(CT::False<T>, "Unsupported type");
       }
       
       /// Raise values to a power as constexpr, if possible                   

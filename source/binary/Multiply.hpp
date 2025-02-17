@@ -27,11 +27,11 @@ namespace Langulus::SIMD
       ///   @return the resulting register                                    
       template<bool SATURATE, CT::SIMD R> LANGULUS(INLINED)
       auto MultiplySIMD(R lhs, R rhs) noexcept {
+         using T = TypeOf<R>;
          (void)lhs; (void)rhs;
 
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<R>) {
-            using T = TypeOf<R>;
             if constexpr (CT::Integer8<T>) {
                auto lhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(lhs) : simde_mm_cvtepu8_epi16(lhs);
                auto rhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(rhs) : simde_mm_cvtepu8_epi16(rhs);
@@ -131,7 +131,6 @@ namespace Langulus::SIMD
       #endif
       #if LANGULUS_SIMD(256BIT)
          if constexpr (CT::SIMD256<R>) {
-            using T = TypeOf<R>;
             if constexpr (CT::Integer8<T>) {
                auto lhsi16 = CT::Signed<T> ? simde_mm256_cvtepi8_epi16(_mm256_castsi256_si128(lhs)) : simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(lhs));
                auto rhsi16 = CT::Signed<T> ? simde_mm256_cvtepi8_epi16(_mm256_castsi256_si128(rhs)) : simde_mm256_cvtepu8_epi16(_mm256_castsi256_si128(rhs));
@@ -212,7 +211,6 @@ namespace Langulus::SIMD
       #endif
       #if LANGULUS_SIMD(512BIT)
          if constexpr (CT::SIMD512<R>) {
-            using T = TypeOf<R>;
             if constexpr (CT::Integer8<T>)
                return Unsupported {};
             else if constexpr (CT::Integer16<T>)
@@ -230,7 +228,7 @@ namespace Langulus::SIMD
          }
          else
       #endif
-         static_assert(false, "Unsupported type");
+         static_assert(CT::False<T>, "Unsupported type");
       }
       
       /// Fallback multiplication                                             

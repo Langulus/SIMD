@@ -65,7 +65,7 @@ namespace Langulus::SIMD
          }
          else
       #endif
-         static_assert(false, "Unsupported register");
+         static_assert(CT::False<T>, "Unsupported register");
       }
       
       /// Compare values as constexpr, if possible                            

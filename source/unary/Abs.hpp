@@ -27,8 +27,7 @@ namespace Langulus::SIMD
       auto AbsSIMD(CT::SIMD auto v) noexcept {
          using R = decltype(v);
          using T = TypeOf<R>;
-         static_assert(CT::Signed<T>,
-            "Suboptimal and pointless for unsigned values");
+         static_assert(CT::Signed<T>, "Suboptimal and pointless for unsigned values");
          (void)v;
 
       #if LANGULUS_SIMD(128BIT)

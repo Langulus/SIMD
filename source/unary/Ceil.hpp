@@ -27,8 +27,7 @@ namespace Langulus::SIMD
       auto CeilSIMD(CT::SIMD auto value) noexcept {
          using R = decltype(value);
          using T = TypeOf<R>;
-         static_assert(CT::Real<T>,
-            "Suboptimal and pointless for whole numbers");
+         static_assert(CT::Real<T>, "Suboptimal and pointless for whole numbers");
          (void)value;
 
          #if LANGULUS_COMPILER(CLANG) and LANGULUS(DEBUG)
