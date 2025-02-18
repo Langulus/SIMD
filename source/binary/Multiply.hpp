@@ -57,15 +57,15 @@ namespace Langulus::SIMD
                   auto dst_even = simde_mm_mullo_epi16(lhs, rhs);
                   auto dst_odd  = simde_mm_mullo_epi16(simde_mm_srli_epi16(lhs, 8), simde_mm_srli_epi16(rhs, 8));
                   #if LANGULUS_SIMD(AVX2)
-                     return simde_mm_or_si128(
+                     return R {simde_mm_or_si128(
                         simde_mm_slli_epi16(dst_odd, 8),
                         simde_mm_and_si128(dst_even, simde_mm_set1_epi16(0xFF))
-                     );
+                     )};
                   #else
-                     return simde_mm_or_si128(
+                     return R {simde_mm_or_si128(
                         simde_mm_slli_epi16(dst_odd, 8),
                         simde_mm_srli_epi16(simde_mm_slli_epi16(dst_even, 8), 8)
-                     );
+                     )};
                   #endif
                }
             }
