@@ -33,27 +33,39 @@ namespace Langulus::SIMD
       #if LANGULUS_SIMD(128BIT)
          if constexpr (CT::SIMD128<R>) {
             if constexpr (CT::Integer8<T>) {
-               auto lhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(lhs) : simde_mm_cvtepu8_epi16(lhs);
-               auto rhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(rhs) : simde_mm_cvtepu8_epi16(rhs);
-               const auto lo = simde_mm_mullo_epi16(lhsi16, rhsi16);
-               lhs = _mm_halfflip(lhs);
-               rhs = _mm_halfflip(rhs);
-                     lhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(lhs) : simde_mm_cvtepu8_epi16(lhs);
-                     rhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(rhs) : simde_mm_cvtepu8_epi16(rhs);
-               const auto hi = simde_mm_mullo_epi16(lhsi16, rhsi16);
-
                if constexpr (SATURATE) {
+                  auto lhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(lhs) : simde_mm_cvtepu8_epi16(lhs);
+                  auto rhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(rhs) : simde_mm_cvtepu8_epi16(rhs);
+                  const auto lo = simde_mm_mullo_epi16(lhsi16, rhsi16);
+                  lhs = _mm_halfflip(lhs);
+                  rhs = _mm_halfflip(rhs);
+                       lhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(lhs) : simde_mm_cvtepu8_epi16(lhs);
+                       rhsi16 = CT::Signed<T> ? simde_mm_cvtepi8_epi16(rhs) : simde_mm_cvtepu8_epi16(rhs);
+                  const auto hi = simde_mm_mullo_epi16(lhsi16, rhsi16);
+
                   // Saturation happens via packing                     
-                  if constexpr (CT::SignedInteger8<T>)
+                  if constexpr (CT::Signed<T>)
                      return R {simde_mm_packs_epi16(lo, hi)};
                   else
-                     return R {simde_mm_packus_epi16(lo, hi)};
+                     return R {simde_mm_packus_epi16(
+                        simde_mm_min_epu16(lo, simde_mm_set1_epi16(0xFF)),
+                        simde_mm_min_epu16(hi, simde_mm_set1_epi16(0xFF))
+                     )};
                }
                else {
-                  #if LANGULUS_SIMD(AVX512BW) and LANGULUS_SIMD(AVX512VL)
-                     return R {simde_mm_cvtepi16_epi8(lo), simde_mm_cvtepi16_epi8(hi)};
+                  // https://stackoverflow.com/questions/8193601        
+                  auto dst_even = simde_mm_mullo_epi16(lhs, rhs);
+                  auto dst_odd  = simde_mm_mullo_epi16(simde_mm_srli_epi16(lhs, 8), simde_mm_srli_epi16(rhs, 8));
+                  #if LANGULUS_SIMD(AVX2)
+                     return simde_mm_or_si128(
+                        simde_mm_slli_epi16(dst_odd, 8),
+                        simde_mm_and_si128(dst_even, simde_mm_set1_epi16(0xFF))
+                     );
                   #else
-                     return Unsupported {};
+                     return simde_mm_or_si128(
+                        simde_mm_slli_epi16(dst_odd, 8),
+                        simde_mm_srli_epi16(simde_mm_slli_epi16(dst_even, 8), 8)
+                     );
                   #endif
                }
             }
@@ -69,7 +81,7 @@ namespace Langulus::SIMD
                   const auto hi = simde_mm_mullo_epi32(lhsi32, rhsi32);
 
                   // Saturation happens via packing                     
-                  if constexpr (CT::SignedInteger16<T>)
+                  if constexpr (CT::Signed<T>)
                      return R {simde_mm_packs_epi32(lo, hi)};
                   else
                      return R {simde_mm_packus_epi32(lo, hi)};
