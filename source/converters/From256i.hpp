@@ -110,8 +110,8 @@ namespace Langulus::SIMD::Inner
                auto m1 = int64_to_double_full(simde_mm256_extracti128_si256(v, 0));
                auto m2 = int64_to_double_full(simde_mm256_extracti128_si256(v, 1));
                return V256<TO> {simde_mm256_set_m128(
-                  simde_mm_movelh_ps(simde_mm_cvtpd_ps(m1), simde_mm_cvtpd_ps(m2)),
-                  simde_mm_setzero_ps()
+                  simde_mm_setzero_ps(),
+                  simde_mm_movelh_ps(simde_mm_cvtpd_ps(m1), simde_mm_cvtpd_ps(m2))
                )};
             #endif
          }
@@ -124,8 +124,8 @@ namespace Langulus::SIMD::Inner
                auto m1 = uint64_to_double_full(simde_mm256_extracti128_si256(v, 0));
                auto m2 = uint64_to_double_full(simde_mm256_extracti128_si256(v, 1));
                return V256<TO> {simde_mm256_set_m128(
-                  simde_mm_movelh_ps(simde_mm_cvtpd_ps(m1), simde_mm_cvtpd_ps(m2)),
-                  simde_mm_setzero_ps()
+                  simde_mm_setzero_ps(),
+                  simde_mm_movelh_ps(simde_mm_cvtpd_ps(m1), simde_mm_cvtpd_ps(m2))
                )};
             #endif
          }
