@@ -174,17 +174,35 @@ namespace Langulus::SIMD
             constexpr auto CI = CountOf<CONVERTED_TYPE>;
             constexpr auto CO = CountOf<OUTPUT>;
 
-            if constexpr (not supported) {
+            if constexpr (not supported or CI == 1 or CO == 1) {
                // Will always utilize the fallback converter            
                Store(Inner::ConvertConstexpr<TO>(DeintCast(val)), out);
             }
-            else if constexpr (CI >= CO or CI == 1) {
+            else if constexpr (CI >= CountOf<INPUT>) {
                // We're able to do the conversion with a single register
                // (or SIMD is not required at all)                      
                if constexpr (CT::SIMD<OUTPUT>)
                   out = Inner::Convert<DEF, TO>(DeintCast(val));
-               else
-                  Store(Inner::Convert<DEF, TO>(DeintCast(val)), out);
+               else {
+                  constexpr Count left = std::min(CI, CO);
+                  using LEFTO = TO(&)[left];
+                  constexpr Count tail = CO - left;
+
+                  auto output = reinterpret_cast<TO*>(SparseCast(out));
+                  Store(
+                     Inner::Convert<DEF, TO>(DeintCast(val)),
+                     reinterpret_cast<LEFTO>(output[0])
+                  );
+
+                  if constexpr (tail) {
+                     // Zero out the rest. This exception here is needed
+                     // because if we route the tail it might get       
+                     // handled as a scalar and get multicasted         
+                     constexpr TO def = static_cast<TO>(DEF);
+                     for (Offset i = left; i < CO; ++i)
+                        output[i] = def;
+                  }
+               }
             }
             else {
                // We have to divide the conversion into multiple regs   
@@ -193,24 +211,26 @@ namespace Langulus::SIMD
                constexpr Count left = Roof2(CountOf<INPUT>/2);
                static_assert(left < CountOf<INPUT>,
                   "Can't properly split the input vector");
-               static_assert(left < CountOf<OUTPUT>,
+               static_assert(left < CO,
                   "Can't properly split the output vector");
+               constexpr Count right = std::min(CountOf<INPUT> - left, CO - left);
+               constexpr Count tail  = CO - left - right;
 
                using LEFTI  = const FROM(&)[left];
-               using RIGHTI = const FROM(&)[CountOf<INPUT>  - left];
+               using RIGHTI = const FROM(&)[right];
                using LEFTO  = TO(&)[left];
-               using RIGHTO = TO(&)[CountOf<OUTPUT> - left];
+               using RIGHTO = TO(&)[right];
 
                // Nest the two parts so that splitting can occur        
                // statically multiple times if it has to                
                auto input = reinterpret_cast<FROM const*>(SparseCast(DeintCast(val)));
 
                if constexpr (CT::SIMD<OUTPUT>) {
-                  LosslessRegister<LEFTO> out1;
+                  LosslessRegister<LEFTO>  out1;
                   LosslessRegister<RIGHTO> out2;
-                  Convert<DEF>(reinterpret_cast<LEFTI> (input[0]), out1);
+                  Convert<DEF>(reinterpret_cast<LEFTI> (input[0]),    out1);
                   Convert<DEF>(reinterpret_cast<RIGHTI>(input[left]), out2);
-                  ConcatSIMD(out1, out2, out);
+                  ConcatSIMD<DEF>(out1, out2, out);
                }
                else {
                   auto output = reinterpret_cast<TO*>(SparseCast(out));
@@ -222,6 +242,15 @@ namespace Langulus::SIMD
                      reinterpret_cast<RIGHTI>(input[left]),
                      reinterpret_cast<RIGHTO>(output[left])
                   );
+
+                  if constexpr (tail) {
+                     // Zero out the rest. This exception here is needed
+                     // because if we route the tail it might get       
+                     // handled as a scalar and get multicasted         
+                     constexpr TO def = static_cast<TO>(DEF);
+                     for (Offset i = left + right; i < CO; ++i)
+                        output[i] = def;
+                  }
                }
             }
          }
