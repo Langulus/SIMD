@@ -258,12 +258,12 @@ namespace Langulus::SIMD
    ///                                                                        
    LANGULUS(INLINED)
    V128f _mm_halfflip(const V128f what) noexcept {
-      return {simde_mm_permute_ps(what.m, Shuffle2(2, 3, 0, 1))};
+      return simde_mm_permute_ps(what.m, Shuffle2(2, 3, 0, 1));
    }
 
    LANGULUS(INLINED)
    V128d _mm_halfflip(const V128d what) noexcept {
-      return {simde_mm_permute_pd(what.m, Shuffle1(1, 0))};
+      return simde_mm_permute_pd(what.m, Shuffle1(1, 0));
    }
 
    template<CT::Integer T> LANGULUS(INLINED)

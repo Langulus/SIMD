@@ -24,6 +24,9 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
 ) {
    using T = TestType;
 
+   static_assert(SIMD::Multiply<true >(T (0), T (5)) == T (0));
+   static_assert(SIMD::Multiply<false>(T (0), T (5)) == T (0));
+
    GIVEN("x * y = r") {
       T x, y;
       T r, rCheck;
@@ -32,9 +35,6 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
          InitOne(x, 1);
          InitOne(y, -5);
       }
-      
-      static_assert(SIMD::Multiply<true>(T {0}, T {5}) == T {0});
-      static_assert(SIMD::Multiply<false>(T {0}, T {5}) == T {0});
 
       WHEN("Multiplied (with saturation)") {
          ControlMul<true>(x, y, rCheck);
