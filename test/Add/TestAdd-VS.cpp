@@ -37,13 +37,8 @@ TEMPLATE_TEST_CASE("Vector + Scalar", "[add]"
       }
       else InitOne(y, -5);
 
-      WHEN("Added as constexpr (with saturation)") {
-         static_assert(SIMD::Add<true>(T {0}, E {5}) == T {CT::Real<TypeOf<T>> ? 1 : 5});
-      }
-
-      WHEN("Added as constexpr (without saturation)") {
-         static_assert(SIMD::Add<false>(T {0}, E {5}) == static_cast<T>(5));
-      }
+      static_assert(SIMD::Add<true>(T {0}, E {5}) == T {CT::Real<TypeOf<T>> ? 1 : 5});
+      static_assert(SIMD::Add<false>(T {0}, E {5}) == static_cast<T>(5));
 
       WHEN("Added (with saturation)") {
          ControlAdd<true>(x, y, rCheck);
