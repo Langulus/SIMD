@@ -45,15 +45,13 @@ TEMPLATE_TEST_CASE("Floor", "[floor]"
       if constexpr (not CT::Vector<T>)
          InitOne(x, 1.2);
 
-      WHEN("Floored as constexpr") {
-         static_assert(SIMD::Floor(T {-1})   == T {-1});
-         static_assert(SIMD::Floor(T {-0.5f})== T {-1});
-         static_assert(SIMD::Floor(T {0})    == T { 0});
-         static_assert(SIMD::Floor(T {1})    == T { 1});
-         static_assert(SIMD::Floor(T {1.2f}) == T { 1});
-         static_assert(SIMD::Floor(T {1.5f}) == T { 1});
-         static_assert(SIMD::Floor(T {2})    == T { 2});
-      }
+      static_assert(SIMD::Floor(T {-1})   == T {-1});
+      static_assert(SIMD::Floor(T {-0.5f})== T {-1});
+      static_assert(SIMD::Floor(T {0})    == T { 0});
+      static_assert(SIMD::Floor(T {1})    == T { 1});
+      static_assert(SIMD::Floor(T {1.2f}) == T { 1});
+      static_assert(SIMD::Floor(T {1.5f}) == T { 1});
+      static_assert(SIMD::Floor(T {2})    == T { 2});
 
       WHEN("Floored") {
          ControlFloor(x, rCheck);

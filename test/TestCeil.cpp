@@ -45,15 +45,13 @@ TEMPLATE_TEST_CASE("Ceil", "[ceil]"
       if constexpr (not CT::Vector<T>)
          InitOne(x, 1.2);
 
-      WHEN("Ceiled as constexpr") {
-         static_assert(SIMD::Ceil(T {-1})  == T {-1});
-         static_assert(SIMD::Ceil(T {-0.5f})== T {0});
-         static_assert(SIMD::Ceil(T {0})   == T {0});
-         static_assert(SIMD::Ceil(T {1})   == T {1});
-         static_assert(SIMD::Ceil(T {1.2f}) == T {2});
-         static_assert(SIMD::Ceil(T {1.5f}) == T {2});
-         static_assert(SIMD::Ceil(T {2})   == T {2});
-      }
+      static_assert(SIMD::Ceil(T {-1})   == T {-1});
+      static_assert(SIMD::Ceil(T {-0.5f})== T {0});
+      static_assert(SIMD::Ceil(T {0})    == T {0});
+      static_assert(SIMD::Ceil(T {1})    == T {1});
+      static_assert(SIMD::Ceil(T {1.2f}) == T {2});
+      static_assert(SIMD::Ceil(T {1.5f}) == T {2});
+      static_assert(SIMD::Ceil(T {2})    == T {2});
 
       WHEN("Ceiled") {
          ControlCeil(x, rCheck);
