@@ -14,14 +14,14 @@ jobs:
         arch: [x86, x64]
         cxx: [g++-14, clang++-19, ClangCl, v143]
         feature: [
-          [NoSIMD, 16, ' ', '/arch:IA32'],
-          [SSE2, 16, '-msse2', '/arch:SSE2'],
-          [SSE3, 16, '-msse3', '<not available on msvc>'],
-          [SSSE3, 16, '-mssse3', '<not available on msvc>'],
-          [SSE4.1, 16, '-msse4.1', '<not available on msvc>'],
-          [SSE4.2, 16, '-msse4.2', '<not available on msvc>'],
-          [AVX, 32, '-mavx', '/arch:AVX'],
-          [AVX2, 32, '-mavx2', '/arch:AVX2'],
+          [NoSIMD, 16, ' ',         '/arch:IA32'],
+          [SSE2,   16, '-msse2',    '/arch:SSE2'],
+          [SSE3,   16, '-msse3',    '<not available on msvc>'],
+          [SSSE3,  16, '-mssse3',   '<not available on msvc>'],
+          [SSE4.1, 16, '-msse4.1',  '<not available on msvc>'],
+          [SSE4.2, 16, '-msse4.2',  '<not available on msvc>'],
+          [AVX,    32, '-mavx',     '/arch:AVX'],
+          [AVX2,   32, '-mavx2',    '/arch:AVX2'],
           [AVX512, 64, '-mavx512f', '/arch:AVX512']
         ]
 
@@ -80,6 +80,12 @@ jobs:
             cxx: v143
             feature: [SSE4.2, 16, '-msse4.2', '<not available on msvc>']
 
+          - arch: x86
+            cxx: v143
+            # I can't even begin to describe how much grief has this particular configuration given me!
+            # 32bit v143 compiler SSE2 support is very neglected and produces a lot of constexpr related ICE
+            # I've been suffering for years before I finally gave up and excluded it. Sorry.
+            feature: [SSE2, 16, '-msse2', '/arch:SSE2']
           - arch: x86
             cxx: v143
             feature: [SSE3, 16, '-msse3', '<not available on msvc>']
