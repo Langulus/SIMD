@@ -85,6 +85,7 @@ jobs:
             # I can't even begin to describe how much grief has this particular configuration given me!
             # 32bit v143 compiler SSE2 support is very neglected and produces a lot of constexpr related ICE
             # I've been suffering for years before I finally gave up and excluded it. Sorry.
+            # see https://github.com/Langulus/SIMD/issues/22 for more info and updates on the situation
             feature: [SSE2, 16, '-msse2', '/arch:SSE2']
           - arch: x86
             cxx: v143
