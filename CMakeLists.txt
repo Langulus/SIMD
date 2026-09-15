@@ -18,7 +18,7 @@ endif()
 fetch_external_module(
    SIMDe
    GIT_REPOSITORY  https://github.com/simd-everywhere/simde.git
-   GIT_TAG         f47e3c5c9ecbea85b4f802e07feebab113c837cd #master
+   GIT_TAG         v0.8.4-rc3
 )
 
 # Build and install SIMD library                                            
@@ -26,11 +26,11 @@ add_langulus_library(LangulusSIMD
    SOURCES  $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:$<TARGET_OBJECTS:LangulusLogger>>
 )
 
-if(MSVC)
+#if(MSVC)
    # Some SVML functions seem to be broken on x86 MSVC builds				
    # See https://github.com/simd-everywhere/simde/issues/1111				
-   target_compile_options(LangulusSIMD INTERFACE -DSIMDE_X86_SVML_NO_NATIVE)
-endif()
+#   target_compile_options(LangulusSIMD INTERFACE -DSIMDE_X86_SVML_NO_NATIVE)
+#endif()
 
 target_include_directories(LangulusSIMD
    PUBLIC   $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:$<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>>
@@ -47,7 +47,7 @@ target_compile_definitions(LangulusSIMD
    PRIVATE  LANGULUS_EXPORT_ALL
 )
 
-if(LANGULUS_TESTING)
+if(LANGULUS_OPTION_TESTING)
    enable_testing()
    add_subdirectory(test)
 endif()
