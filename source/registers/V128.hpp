@@ -1,5 +1,5 @@
 #pragma once
-#include "../Common.hpp"
+#include "../Export.hpp"
 
 
 namespace Langulus::SIMD

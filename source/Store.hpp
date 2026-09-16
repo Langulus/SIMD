@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include "Common.hpp"
+#include "Export.hpp"
 #include "Bitmask.hpp"
 
 

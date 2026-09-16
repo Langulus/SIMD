@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include "../../../source/Common.hpp"
+#include "../../../source/Export.hpp"
 
 #include "../../../source/SetGet.hpp"
 #include "../../../source/Fill.hpp"

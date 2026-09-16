@@ -40,6 +40,7 @@ target_include_directories(LangulusSIMD
 
 target_link_libraries(LangulusSIMD
    PUBLIC   LangulusCore
+            LangulusCT
             $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:fmt>
 )
 

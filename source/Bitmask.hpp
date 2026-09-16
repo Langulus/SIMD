@@ -6,8 +6,8 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include "Common.hpp"
-#include <Langulus/Core/Assume.hpp>
+#include <Langulus/Assume.hpp>
+#include "Export.hpp"
 
 
 namespace Langulus::SIMD

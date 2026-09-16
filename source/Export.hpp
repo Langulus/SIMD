@@ -6,9 +6,9 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include <Langulus/Core/Types.hpp>
-#include <Langulus/Core/Byte.hpp>
-#include <Langulus/Core/Lossless.hpp>
+#include <Langulus/Types.hpp>
+#include <Langulus/Byte.hpp>
+#include <Langulus/Lossless.hpp>
 #include <array>
 
 #ifdef __is_identifier
