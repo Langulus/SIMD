@@ -132,7 +132,7 @@ namespace Langulus::SIMD
       }
 
       constexpr bool operator [] (const Offset& idx) const noexcept {
-         LANGULUS_ASSUME(UserAssumes, idx < C, "Index out of limits");
+         LglsAssumeUser(idx < C, "Index out of limits");
          return 0 != (mValue & (Type {1} << idx));
       }
 
@@ -150,7 +150,7 @@ namespace Langulus::SIMD
       };
 
       constexpr BitSwitcher operator [] (const Offset& idx) noexcept {
-         LANGULUS_ASSUME(UserAssumes, idx < C, "Index out of limits");
+         LglsAssumeUser(idx < C, "Index out of limits");
          return BitSwitcher {*this, Type {1} << idx};
       }
 
