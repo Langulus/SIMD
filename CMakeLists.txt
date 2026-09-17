@@ -23,7 +23,7 @@ fetch_external_module(
 
 # Build and install SIMD library                                            
 add_langulus_library(LangulusSIMD 
-   SOURCES  $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:$<TARGET_OBJECTS:LangulusLogger>>
+   SOURCES  $<TARGET_OBJECTS:LangulusLogger>
 )
 
 #if(MSVC)
@@ -33,7 +33,7 @@ add_langulus_library(LangulusSIMD
 #endif()
 
 target_include_directories(LangulusSIMD
-   PUBLIC   $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:$<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>>
+   PUBLIC   $<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>
             ${SIMDe_SOURCE_DIR}
             include
 )
