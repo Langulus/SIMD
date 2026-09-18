@@ -15,7 +15,7 @@ namespace Langulus::SIMD
    namespace Inner
    {
       template<class R, class FORCE_OUT>
-      consteval Count DecideCount() {
+      consteval size_t DecideCount() {
          using T = Decvq<TypeOf<R>>;
          if constexpr (CT::Void<FORCE_OUT>)
             return CountOf<R>;

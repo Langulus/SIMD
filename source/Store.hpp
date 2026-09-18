@@ -304,7 +304,7 @@ namespace Langulus::SIMD
                // Store each bit into an array of different type        
                if constexpr (CT::Bool<E>) {
                   // Convert each bit to a boolean inside an array      
-                  for (Offset i = 0; i < S; ++i)
+                  for (size_t i = 0; i < S; ++i)
                      to[i] = from[i];
                }
                else static_assert(false, "Bad output to store a bitmask");
@@ -322,12 +322,12 @@ namespace Langulus::SIMD
             // Extract from any range                                   
             if constexpr (CT::Bitmask<TO>) {
                // Store as bits inside a bitmask                        
-               for (Offset i = 0; i < S; ++i)
+               for (size_t i = 0; i < S; ++i)
                   to[i] = static_cast<bool>(from[i]);
             }
             else if constexpr (CT::Vector<TO>) {
                // Fill a vector, element by element                     
-               for (Offset i = 0; i < S; ++i)
+               for (size_t i = 0; i < S; ++i)
                   to[i] = from[i];
             }
             else if constexpr (CT::Scalar<TO>) {
@@ -351,7 +351,7 @@ namespace Langulus::SIMD
             // Extract from a scalar                                    
             if constexpr (CT::Vector<TO>) {
                // Multicast to a vector output                          
-               for (Offset i = 0; i < S; ++i)
+               for (size_t i = 0; i < S; ++i)
                   to[i] = from;
             }
             else GetFirst(to) = from;

@@ -32,7 +32,7 @@ namespace Langulus::SIMD::Inner
          if constexpr (CT::Vector<VAL>) {
             // Vector OP                                                
             RETURN output;
-            for (Count i = 0; i < S; ++i) {
+            for (size_t i = 0; i < S; ++i) {
                output[i] = static_cast<LOSSLESS>(op(
                   static_cast<LOSSLESS>(val[i])
                ));
@@ -72,7 +72,7 @@ namespace Langulus::SIMD::Inner
          if constexpr (CT::Vector<LHS, RHS>) {
             // Vector OP Vector                                         
             RETURN output;
-            for (Count i = 0; i < S; ++i) {
+            for (size_t i = 0; i < S; ++i) {
                output[i] = static_cast<LOSSLESS>(op(
                   static_cast<LOSSLESS>(lhs[i]),
                   static_cast<LOSSLESS>(rhs[i])
@@ -85,7 +85,7 @@ namespace Langulus::SIMD::Inner
             // Vector OP Scalar                                         
             RETURN output;
             const auto same_rhs = static_cast<LOSSLESS>(GetFirst(rhs));
-            for (Count i = 0; i < S; ++i) {
+            for (size_t i = 0; i < S; ++i) {
                output[i] = static_cast<LOSSLESS>(op(
                   static_cast<LOSSLESS>(lhs[i]),
                   same_rhs
@@ -98,7 +98,7 @@ namespace Langulus::SIMD::Inner
             // Scalar OP Vector                                         
             RETURN output;
             const auto same_lhs = static_cast<LOSSLESS>(GetFirst(lhs));
-            for (Count i = 0; i < S; ++i) {
+            for (size_t i = 0; i < S; ++i) {
                output[i] = static_cast<LOSSLESS>(op(
                   same_lhs,
                   static_cast<LOSSLESS>(rhs[i])

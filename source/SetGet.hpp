@@ -20,7 +20,7 @@ namespace Langulus::SIMD::Inner
    ///   @tparam FROM - the scalar/array/vector to use for setting            
    ///   @param values - the array to access                                  
    ///   @return a reference to the element, or DEF if out of range           
-   template<class R, auto DEF, Offset IDX, Count MAXS, bool REVERSE = false, class FROM>
+   template<class R, auto DEF, size_t IDX, size_t MAXS, bool REVERSE = false, class FROM>
    LANGULUS(INLINED)
    constexpr decltype(auto) Get(const FROM& values) {
       constexpr auto S = CountOf<FROM>;
@@ -56,7 +56,7 @@ namespace Langulus::SIMD::Inner
    ///   @tparam INDICES - the indices to use                                 
    ///   @param values - the array to access                                  
    ///   @return the register                                                 
-   template<auto DEF, Offset CHUNK, CT::Vector FROM, Offset...INDICES>
+   template<auto DEF, size_t CHUNK, CT::Vector FROM, size_t...INDICES>
    LANGULUS(INLINED)
    auto Set(ExpandedSequence<INDICES...>, const FROM& values) {
       (void)values;
@@ -139,7 +139,7 @@ namespace Langulus::SIMD
    ///   @tparam FROM - the scalar/array/vector to use for setting            
    ///   @param values - the array to wrap                                    
    ///   @return the register                                                 
-   template<auto DEF = 0, Offset CHUNK = Alignment, CT::Vector FROM>
+   template<auto DEF = 0, size_t CHUNK = Alignment, CT::Vector FROM>
    LANGULUS(INLINED)
    auto Set(const FROM& values) noexcept {
       using T = TypeOf<FROM>;

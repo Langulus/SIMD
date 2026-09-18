@@ -21,11 +21,11 @@ namespace Langulus::SIMD
    /// any implicit promotions or truncations                                 
    ///   @tparam C - number of bits in the bitmask                            
    ///                                                                        
-   template<Count C>
+   template<size_t C>
    struct Bitmask {
       static_assert(C <= 64 and C > 0, "C must be in the range [1:64]");
 
-      static constexpr Count MemberCount = C;
+      static constexpr size_t MemberCount = C;
       static constexpr bool IsBitmask = true;
       using Type = Conditional<C <= 32, ::std::int32_t, ::std::int64_t>;
 
@@ -49,11 +49,11 @@ namespace Langulus::SIMD
          : mValue {v & Mask} {}
 
       struct iterator {
-         Offset marker;
+         size_t marker;
          const Type& bitset;
 
          iterator() = delete;
-         iterator(const Offset a, const Type& set)
+         iterator(const size_t a, const Type& set)
             : marker {a}
             , bitset {set} {}
 
@@ -131,7 +131,7 @@ namespace Langulus::SIMD
          return *this;
       }
 
-      constexpr bool operator [] (const Offset& idx) const noexcept {
+      constexpr bool operator [] (const size_t& idx) const noexcept {
          LglsAssumeUser(idx < C, "Index out of limits");
          return 0 != (mValue & (Type {1} << idx));
       }
@@ -149,7 +149,7 @@ namespace Langulus::SIMD
          }
       };
 
-      constexpr BitSwitcher operator [] (const Offset& idx) noexcept {
+      constexpr BitSwitcher operator [] (const size_t& idx) noexcept {
          LglsAssumeUser(idx < C, "Index out of limits");
          return BitSwitcher {*this, Type {1} << idx};
       }

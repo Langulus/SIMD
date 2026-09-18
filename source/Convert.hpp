@@ -92,7 +92,7 @@ namespace Langulus::SIMD
          if constexpr (CT::Vector<FROM>) {
             // Convert from vectors                                     
             ::std::array<TO, CountOf<FROM>> result;
-            for (Count i = 0; i < CountOf<FROM>; ++i)
+            for (size_t i = 0; i < CountOf<FROM>; ++i)
                result[i] = static_cast<TO>(in[i]);
             return result;
          }
@@ -184,9 +184,9 @@ namespace Langulus::SIMD
                if constexpr (CT::SIMD<OUTPUT>)
                   out = Inner::Convert<DEF, TO>(DeintCast(val));
                else {
-                  constexpr Count left = std::min(CI, CO);
+                  constexpr size_t left = std::min(CI, CO);
                   using LEFTO = TO(&)[left];
-                  constexpr Count tail = CO - left;
+                  constexpr size_t tail = CO - left;
 
                   auto output = reinterpret_cast<TO*>(SparseCast(out));
                   Store(
@@ -199,7 +199,7 @@ namespace Langulus::SIMD
                      // because if we route the tail it might get       
                      // handled as a scalar and get multicasted         
                      constexpr TO def = static_cast<TO>(DEF);
-                     for (Offset i = left; i < CO; ++i)
+                     for (size_t i = left; i < CO; ++i)
                         output[i] = def;
                   }
                }
@@ -208,13 +208,13 @@ namespace Langulus::SIMD
                // We have to divide the conversion into multiple regs   
                // This happens when we convert float[4] to double[4]    
                // without AVX support for example                       
-               constexpr Count left = Roof2(CountOf<INPUT>/2);
+               constexpr size_t left = Roof2(CountOf<INPUT>/2);
                static_assert(left < CountOf<INPUT>,
                   "Can't properly split the input vector");
                static_assert(left < CO,
                   "Can't properly split the output vector");
-               constexpr Count right = std::min(CountOf<INPUT> - left, CO - left);
-               constexpr Count tail  = CO - left - right;
+               constexpr size_t right = std::min(CountOf<INPUT> - left, CO - left);
+               constexpr size_t tail  = CO - left - right;
 
                using LEFTI  = const FROM(&)[left];
                using RIGHTI = const FROM(&)[right];
@@ -248,7 +248,7 @@ namespace Langulus::SIMD
                      // because if we route the tail it might get       
                      // handled as a scalar and get multicasted         
                      constexpr TO def = static_cast<TO>(DEF);
-                     for (Offset i = left + right; i < CO; ++i)
+                     for (size_t i = left + right; i < CO; ++i)
                         output[i] = def;
                   }
                }

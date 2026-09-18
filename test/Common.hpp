@@ -117,10 +117,10 @@ void InitOne(T& a, A&& b) noexcept {
 /// Satisfied the CT::Scalar concept when C == 1                              
 ///                                                                           
 #pragma pack(push, 1)
-template<CT::Dense T, Count C>
+template<CT::Dense T, size_t C>
 struct Vector {
    using CTTI_InnerType = T;
-   static constexpr Count MemberCount = C;
+   static constexpr size_t MemberCount = C;
 
    T mArray[C];
 
@@ -173,42 +173,42 @@ struct Vector {
    
    template<class ALT>
    constexpr Vector(const std::array<ALT, C>& v) {
-      for (Count i = 0; i < C; ++i)
+      for (size_t i = 0; i < C; ++i)
          mArray[i] = static_cast<T>(v[i]);
    }
 
    constexpr Vector(const Vector& v) {
-      for (Count i = 0; i < C; ++i)
+      for (size_t i = 0; i < C; ++i)
          mArray[i] = v.mArray[i];
    }
 
    constexpr Vector(const Decay<T>& s) {
-      for (Count i = 0; i < C; ++i)
+      for (size_t i = 0; i < C; ++i)
          mArray[i] = s;
    }
 
    constexpr bool operator == (const Vector& e) const noexcept {
-      for (Count i = 0; i < C; ++i)
+      for (size_t i = 0; i < C; ++i)
          if (DenseCast(mArray[i]) != DenseCast(e.mArray[i]))
             return false;
       return true;
    }
 
    constexpr bool operator == (const T& e) const noexcept {
-      for (Count i = 0; i < C; ++i)
+      for (size_t i = 0; i < C; ++i)
          if (DenseCast(mArray[i]) != e)
             return false;
       return true;
    }
 
    constexpr Vector& operator = (const Vector& b) noexcept {
-      for (Count i = 0; i < C; ++i)
+      for (size_t i = 0; i < C; ++i)
          DenseCast(mArray[i]) = DenseCast(b.mArray[i]);
       return *this;
    }
 
    constexpr Vector& operator = (const Decay<T>& b) noexcept {
-      for (Count i = 0; i < C; ++i)
+      for (size_t i = 0; i < C; ++i)
          DenseCast(mArray[i]) = b;
       return *this;
    }

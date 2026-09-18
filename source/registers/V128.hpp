@@ -12,7 +12,7 @@ namespace Langulus::SIMD
    struct V128<simde_float32> {
       using CTTI_InnerType = simde_float32;
       static constexpr int CTTI_SIMD_Trait = 128;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float32);
+      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float32);
 
       simde__m128 m;
 
@@ -75,7 +75,7 @@ namespace Langulus::SIMD
    struct V128<simde_float64> {
       using CTTI_InnerType = simde_float64;
       static constexpr int CTTI_SIMD_Trait = 128;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float64);
+      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float64);
 
       simde__m128d m;
 
@@ -138,7 +138,7 @@ namespace Langulus::SIMD
    struct V128<T> {
       using CTTI_InnerType = T;
       static constexpr int CTTI_SIMD_Trait = 128;
-      static constexpr Count MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
+      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
 
       simde__m128i m;
 
