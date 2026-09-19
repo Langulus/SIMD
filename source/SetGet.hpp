@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Export.hpp"
-#include <Langulus/Utils/Sequences.hpp>
+#include <Langulus/Utils/Sequence.hpp>
 
 
 namespace Langulus::SIMD::Inner
