@@ -225,7 +225,6 @@
 ///                                                                           
 namespace Langulus::SIMD
 {
-
    /// Single real element inside a register                                  
    template<class...T>
    concept RealElement = ((ExactAsOneOf<T,
@@ -244,7 +243,6 @@ namespace Langulus::SIMD
    /// Single element inside a register                                       
    template<class...T>
    concept Element = RealElement<T...> or IntElement<T...>;
-
 
 #if LANGULUS_SIMD(512BIT)
    /// 512bit register                                                        
@@ -351,8 +349,7 @@ namespace Langulus::SIMD
    consteval int Shuffle1(int a0, int a1) {
       return (a1 << 1) | a0;
    }
-
-} // namespace Langulus::SIMD
+}
 
 
 /// Include the register types, which are designed to be seamlessly           
@@ -373,7 +370,6 @@ namespace Langulus::SIMD
 /// Add some SIMD related concepts to the CT library                          
 namespace Langulus::CT
 {
-
 #if not LANGULUS_SIMD(128BIT)
    template<class...T> concept SIMD128f = false;
    template<class...T> concept SIMD128d = false;
@@ -402,13 +398,10 @@ namespace Langulus::CT
    /// Anything but SIMD registers                                            
    template<class...T>
    concept NotSIMD = ((not SIMD<T>) and ...);
-
-} // namespace Langulus::CT
-
+}
 
 namespace Langulus::SIMD
 {
-
    /// Get the first element of an array or vector, or just the scalar        
    LANGULUS(INLINED)
    constexpr decltype(auto) GetFirst(const CT::NotSIMD auto& a) noexcept {
@@ -429,7 +422,6 @@ namespace Langulus::SIMD
 
    namespace Inner
    {
-
       template<class T>
       consteval auto LosslessRegister() {
          #if LANGULUS_SIMD(128BIT)
@@ -458,7 +450,7 @@ namespace Langulus::SIMD
 
          if constexpr (CT::Void<LHS, RHS>) {
             // Both sides are void                                      
-            return Unsupported {};
+            return No {};
          }
          else if constexpr (CT::Void<LHS>) {
             // LHS is void, we rely only on RHS, which can be either    
@@ -521,8 +513,7 @@ namespace Langulus::SIMD
          else
             return (::std::invoke_result_t<F, T, T>*) nullptr;
       }
-
-   } // namespace Langulus::SIMD::Inner
+   }
 
    template<class T>
    using LosslessRegister = Deptr<decltype(Inner::LosslessRegister<T>())>;
@@ -558,8 +549,7 @@ namespace Langulus::SIMD
       }
       else return static_cast<AS>(v);
    }
-
-} // namespace Langulus::SIMD
+}
 
 namespace Langulus::CT
 {
