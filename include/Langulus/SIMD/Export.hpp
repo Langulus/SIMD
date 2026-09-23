@@ -10,7 +10,9 @@
 #include <Langulus/Utils/Byte.hpp>
 #include <Langulus/CT/Akin.hpp>
 #include <Langulus/CT/Lossless.hpp>
+#include <Langulus/IntentOf.hpp>
 #include <array>
+#include <type_traits>
 
 #ifdef __is_identifier
   #if !__is_identifier(_Float16)
@@ -426,12 +428,12 @@ namespace Langulus::SIMD
       consteval auto LosslessRegister() {
          #if LANGULUS_SIMD(128BIT)
             if constexpr (sizeof(Deint<T>) <= 16)
-               return (V128<TypeOf<Deint<T>>>*) nullptr;
+               return (V128<TypeOf<T>>*) nullptr;
             else
          #endif
          #if LANGULUS_SIMD(256BIT)
             if constexpr (sizeof(Deint<T>) <= 32)
-               return (V256<TypeOf<Deint<T>>>*) nullptr;
+               return (V256<TypeOf<T>>*) nullptr;
             else
          #endif
          #if LANGULUS_SIMD(512BIT)
@@ -444,8 +446,8 @@ namespace Langulus::SIMD
 
       template<class LHS, class RHS>
       consteval auto LosslessArray() {
-         using LT = TypeOf<Deint<LHS>>;
-         using RT = TypeOf<Deint<RHS>>;
+         using LT = TypeOf<LHS>;
+         using RT = TypeOf<RHS>;
          constexpr auto C = OverlapCounts<LHS, RHS>();
 
          if constexpr (CT::Void<LHS, RHS>) {
@@ -475,18 +477,18 @@ namespace Langulus::SIMD
          else if constexpr (CT::SIMD<LHS> and not CT::SIMD<RHS>) {
             // Both sides are known, LHS is a register, so we rely only 
             // on RHS, which can be either scalar, or an array          
-            if constexpr (CountOf<RHS> == 1)
+            if constexpr (ExtentOf<RHS> == 1)
                return RT {};
             else
-               return std::array<RT, CountOf<RHS>> {};
+               return std::array<RT, ExtentOf<RHS>> {};
          }
          else if constexpr (not CT::SIMD<LHS> and CT::SIMD<RHS>) {
             // Both sides are known, RHS is a register, so we rely only 
             // on LHS, which can be either scalar, or an array          
-            if constexpr (CountOf<LHS> == 1)
+            if constexpr (ExtentOf<LHS> == 1)
                return LT {};
             else
-               return std::array<LT, CountOf<LHS>> {};
+               return std::array<LT, ExtentOf<LHS>> {};
          }
          else {
             // Both sides are known, and none are registers, so pick    
@@ -500,16 +502,16 @@ namespace Langulus::SIMD
 
       template<class F, class T>
       consteval auto InvocableResultInner1() noexcept {
-         if constexpr (CT::Nullptr<Decay<F>>)
-            return (Unsupported*) nullptr;
+         if constexpr (::std::is_null_pointer_v<Decay<F>>)
+            return (No*) nullptr;
          else
             return (::std::invoke_result_t<F, T>*) nullptr;
       }
 
       template<class F, class T>
       consteval auto InvocableResultInner2() noexcept {
-         if constexpr (CT::Nullptr<Decay<F>>)
-            return (Unsupported*) nullptr;
+         if constexpr (::std::is_null_pointer_v<Decay<F>>)
+            return (No*) nullptr;
          else
             return (::std::invoke_result_t<F, T, T>*) nullptr;
       }
