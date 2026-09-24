@@ -12,22 +12,20 @@
 
 namespace Langulus::SIMD
 {
-
    ///                                                                        
-   /// Bitmask type, used as result from comparison SIMD operations           
+   ///   Bitmask type, used as result from comparison SIMD operations         
    /// Each comparison operation maps exactly to one bit in this mask         
    /// Internal type representation is designed to be directly mappable to    
    /// _mm_movemask_epi8/_mm512_cmpeq_epi8_mask instrinsic results, without   
-   /// any implicit promotions or truncations                                 
+   /// any implicit promotions or truncations.                                
    ///   @tparam C - number of bits in the bitmask                            
-   ///                                                                        
    template<size_t C>
    struct Bitmask {
       static_assert(C <= 64 and C > 0, "C must be in the range [1:64]");
 
       static constexpr size_t MemberCount = C;
       static constexpr bool IsBitmask = true;
-      using Type = Conditional<C <= 32, ::std::int32_t, ::std::int64_t>;
+      using Type = ::std::conditional_t<C <= 32, ::std::int32_t, ::std::int64_t>;
 
       static constexpr Type GetMask() noexcept {
          if constexpr (C == 32)
@@ -131,7 +129,7 @@ namespace Langulus::SIMD
          return *this;
       }
 
-      constexpr bool operator [] (const size_t& idx) const noexcept {
+      constexpr bool operator [] (const size_t& idx) const assumptious {
          LglsAssumeUser(idx < C, "Index out of limits");
          return 0 != (mValue & (Type {1} << idx));
       }
@@ -149,24 +147,21 @@ namespace Langulus::SIMD
          }
       };
 
-      constexpr BitSwitcher operator [] (const size_t& idx) noexcept {
+      constexpr BitSwitcher operator [] (const size_t& idx) assumptious {
          LglsAssumeUser(idx < C, "Index out of limits");
          return BitSwitcher {*this, Type {1} << idx};
       }
 
       constexpr void AsVector (CT::Vector auto& result) const noexcept {
-         static_assert(C == CountOf<decltype(result)>);
+         static_assert(C == ExtentOf<decltype(result)>);
          for (Type i = 0; i < Type {C}; ++i)
             result[i] = (*this)[i];
       }
    };
-
-} // namespace Langulus::SIMD
+}
 
 namespace Langulus::CT
 {
-
    template<class...T>
    concept Bitmask = (Deref<T>::IsBitmask and ...);
-
-} // namespace Langulus::CT
+}

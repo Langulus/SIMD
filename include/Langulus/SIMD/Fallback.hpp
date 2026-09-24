@@ -11,7 +11,6 @@
 
 namespace Langulus::SIMD::Inner
 {
-
    /// Fallback OP with one argument                                          
    ///   @tparam OUT - the desired output array/vector/scalar                 
    ///   @param val - argument                                                
@@ -22,12 +21,12 @@ namespace Langulus::SIMD::Inner
       if constexpr (CT::SIMD<VAL>) {
          // Fallback routine can't handle registers, but the function   
          // instantiation is still needed in the Evaluate function      
-         return Unsupported {};
+         return No {};
       }
       else {
          using RETURN = SIMD::LosslessArray<VAL, VAL>;
          using LOSSLESS = TypeOf<RETURN>;
-         constexpr auto S = CountOf<RETURN>;
+         constexpr auto S = ExtentOf<RETURN>;
 
          if constexpr (CT::Vector<VAL>) {
             // Vector OP                                                
@@ -62,12 +61,12 @@ namespace Langulus::SIMD::Inner
       if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>) {
          // Fallback routine can't handle registers, but the function   
          // instantiation is still needed in the Evaluate function      
-         return Unsupported {};
+         return No {};
       }
       else {
          using RETURN = SIMD::LosslessArray<LHS, RHS>;
          using LOSSLESS = TypeOf<RETURN>;
-         constexpr auto S = CountOf<RETURN>;
+         constexpr auto S = ExtentOf<RETURN>;
 
          if constexpr (CT::Vector<LHS, RHS>) {
             // Vector OP Vector                                         
@@ -117,5 +116,4 @@ namespace Langulus::SIMD::Inner
          }
       }
    }
-
-} // namespace Langulus::SIMD::Inner
+}

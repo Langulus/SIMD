@@ -18,7 +18,7 @@ namespace Langulus::SIMD
       consteval size_t DecideCount() {
          using T = Decvq<TypeOf<R>>;
          if constexpr (CT::Void<FORCE_OUT>)
-            return CountOf<R>;
+            return ExtentOf<R>;
          else 
             return sizeof(FORCE_OUT) / sizeof(T);
       }
@@ -35,7 +35,7 @@ namespace Langulus::SIMD
       using R = Deref<decltype(v)>;
       constexpr auto S = Inner::DecideCount<R, FORCE_OUT>();
 
-      if constexpr (S == CountOf<R>) {
+      if constexpr (S == ExtentOf<R>) {
          // Just forward the original register                          
          return v;
       }
@@ -58,10 +58,10 @@ namespace Langulus::SIMD
       using T = Decvq<TypeOf<R>>;
 
       if constexpr (CT::Scalar<R>) {
-         if constexpr (CT::Void<FORCE_OUT> or CountOf<FORCE_OUT> == 1) {
+         if constexpr (CT::Void<FORCE_OUT> or ExtentOf<FORCE_OUT> == 1) {
             // We either can't decide in what register to insert the    
             // scalar, or the destination is just a scalar - fallback   
-            return Unsupported {};
+            return No {};
          }
          else {
             // Load a scalar, by duplicating the value for each element 
@@ -84,8 +84,8 @@ namespace Langulus::SIMD
 
                // Load as a single 128bit register                      
                if constexpr (sizeof(R) >= 16) {
-                  if      constexpr (CT::Float<T>)    return V128<T> {simde_mm_loadu_ps   (&GetFirst(v))};
-                  else if constexpr (CT::Double<T>)   return V128<T> {simde_mm_loadu_pd   (&GetFirst(v))};
+                  if      constexpr (CT::Real32<T>)   return V128<T> {simde_mm_loadu_ps   (&GetFirst(v))};
+                  else if constexpr (CT::Real64<T>)   return V128<T> {simde_mm_loadu_pd   (&GetFirst(v))};
                   else if constexpr (CT::Integer<T>)  return V128<T> {simde_mm_loadu_si128(&GetFirst(v))};
                   else static_assert(false, "Unsupported element");
                }
@@ -100,8 +100,8 @@ namespace Langulus::SIMD
 
                // Load as a single 256bit register                      
                if constexpr (sizeof(R) >= 32) {
-                  if      constexpr (CT::Float<T>)    return V256<T> {simde_mm256_loadu_ps   (&GetFirst(v))};
-                  else if constexpr (CT::Double<T>)   return V256<T> {simde_mm256_loadu_pd   (&GetFirst(v))};
+                  if      constexpr (CT::Real32<T>)   return V256<T> {simde_mm256_loadu_ps   (&GetFirst(v))};
+                  else if constexpr (CT::Real64<T>)   return V256<T> {simde_mm256_loadu_pd   (&GetFirst(v))};
                   else if constexpr (CT::Integer<T>)  return V256<T> {simde_mm256_loadu_si256(&GetFirst(v))};
                   else static_assert(false, "Unsupported element");
                }
@@ -116,8 +116,8 @@ namespace Langulus::SIMD
 
                // Load as a single 512bit register                      
                if constexpr (sizeof(R) >= 64) {
-                  if      constexpr (CT::Float<T>)    return V512<T> {simde_mm512_loadu_ps   (&GetFirst(v))};
-                  else if constexpr (CT::Double<T>)   return V512<T> {simde_mm512_loadu_pd   (&GetFirst(v))};
+                  if      constexpr (CT::Real32<T>)   return V512<T> {simde_mm512_loadu_ps   (&GetFirst(v))};
+                  else if constexpr (CT::Real64<T>)   return V512<T> {simde_mm512_loadu_pd   (&GetFirst(v))};
                   else if constexpr (CT::Integer<T>)  return V512<T> {simde_mm512_loadu_si512(&GetFirst(v))};
                   else static_assert(false, "Unsupported element");
                }
@@ -125,8 +125,7 @@ namespace Langulus::SIMD
             }
             else
          #endif
-         return Unsupported {};
+         return No {};
       }
    }
-
-} // namespace Langulus::SIMD
+}

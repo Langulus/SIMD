@@ -12,7 +12,6 @@
 
 namespace Langulus::SIMD::Inner
 {
-
    /// https://stackoverflow.com/questions/41144668                           
    /// Converts the lower two floats into uint64                              
    ///   @attention only works for inputs in the range: [0, 2^52)             
@@ -28,14 +27,13 @@ namespace Langulus::SIMD::Inner
       return double_to_int64(simde_mm_cvtps_pd(x));
    }
 
-
    /// Convert V128f to any other register                                    
    ///   @tparam TO - the desired element type                                
    ///   @param v - the input register                                        
    ///   @return the converted register                                       
    template<Element TO> LANGULUS(INLINED)
    auto ConvertFrom128f(CT::SIMD128f auto v) noexcept {
-      if constexpr (CT::Double<TO>) {
+      if constexpr (CT::Real64<TO>) {
          LANGULUS_SIMD_VERBOSE("Converting 32bit floats -> 64bit floats");
          #if LANGULUS_SIMD(AVX)
             return V256<TO> {simde_mm256_cvtps_pd(v)};
@@ -43,7 +41,7 @@ namespace Langulus::SIMD::Inner
             return V128<TO> {simde_mm_cvtps_pd(v)};
          #endif
       }
-      else if constexpr (CT::Float<TO>) {
+      else if constexpr (CT::Real32<TO>) {
          LANGULUS_SIMD_VERBOSE("No conversion required");
          return v;
       }
@@ -111,5 +109,4 @@ namespace Langulus::SIMD::Inner
       }
       else static_assert(false, "Unsupported register");
    }
-
-} // namespace Langulus::SIMD
+}
