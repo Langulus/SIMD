@@ -8,11 +8,11 @@
 #pragma once
 #include "Fallback.hpp"
 #include "Convert.hpp"
+#include <type_traits>
 
 
 namespace Langulus::SIMD::Inner
 {
-
    /// Attempt register encapsulation of argument                             
    /// Check if result of opSIMD is supported and return it, otherwise        
    /// fallback to opFALL and calculate conventionally (can be constexpr)     
@@ -31,7 +31,7 @@ namespace Langulus::SIMD::Inner
       const auto& opFALL
    ) {
       using VAL = Deref<decltype(val)>;
-      using OUT = Conditional<CT::Void<FORCE_OUT>,
+      using OUT = ::std::conditional_t<CT::Void<FORCE_OUT>,
          SIMD::LosslessArray<VAL>,
          SIMD::LosslessArray<FORCE_OUT>
       >;
@@ -90,7 +90,7 @@ namespace Langulus::SIMD::Inner
       using LHS = Deref<decltype(lhs)>;
       using RHS = Deref<decltype(rhs)>;
       using LOSSLESS = SIMD::LosslessArray<LHS, RHS>;
-      using OUT = Conditional<CT::Void<FORCE_OUT>,
+      using OUT = ::std::conditional_t<CT::Void<FORCE_OUT>,
          LOSSLESS, SIMD::LosslessArray<FORCE_OUT>>;
       using E = TypeOf<OUT>;
       using R = decltype(Load<DEF>(Fake<const LOSSLESS&>()));
@@ -154,5 +154,4 @@ namespace Langulus::SIMD::Inner
          }
       }
    }
-
-} // namespace Langulus::SIMD::Inner
+}

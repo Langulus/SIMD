@@ -26,132 +26,130 @@
 #endif
 
 
-namespace Langulus::SIMD
+namespace Langulus::SIMD::Inner
 {
-   namespace Inner
-   {
+   /// Used to detect missing SIMD routine                                 
+   template<Element> LANGULUS(INLINED)
+   constexpr No ConvertSIMD(CT::NotSIMD auto) noexcept {
+      return {};
+   }
 
-      /// Used to detect missing SIMD routine                                 
-      template<Element> LANGULUS(INLINED)
-      constexpr Unsupported ConvertSIMD(CT::NotSIMD auto) noexcept {
-         return {};
+   /// Convert from one register to another                                
+   ///   @tparam TO - type of element to convert to                        
+   ///   @param in - register to convert from                              
+   ///   @return the resulting register, or Unsupported if not possible    
+   ///   @attention this function doesn't guarantee that all elements in   
+   ///      'in' will be converted - only the amount that fits in the      
+   ///      biggest available hardware register                            
+   template<Element TO> LANGULUS(INLINED)
+   auto ConvertSIMD(CT::SIMD auto in) noexcept {
+      using R = decltype(in);
+      using T = TypeOf<R>;
+
+      if constexpr (Same<T, TO>) {
+         LANGULUS_SIMD_VERBOSE("No conversion required");
+         return in;
       }
-
-      /// Convert from one register to another                                
-      ///   @tparam TO - type of element to convert to                        
-      ///   @param in - register to convert from                              
-      ///   @return the resulting register, or Unsupported if not possible    
-      ///   @attention this function doesn't guarantee that all elements in   
-      ///      'in' will be converted - only the amount that fits in the      
-      ///      biggest available hardware register                            
-      template<Element TO> LANGULUS(INLINED)
-      auto ConvertSIMD(CT::SIMD auto in) noexcept {
-         using R = decltype(in);
-         using T = TypeOf<R>;
-
-         if constexpr (CT::Similar<T, TO>) {
-            LANGULUS_SIMD_VERBOSE("No conversion required");
-            return in;
-         }
-         else
-         #if LANGULUS_SIMD(128BIT)
-         if constexpr (CT::SIMD128<R>) {
-            if      constexpr (CT::Float<T>)    return ConvertFrom128f<TO>(in);
-            else if constexpr (CT::Double<T>)   return ConvertFrom128d<TO>(in);
-            else if constexpr (CT::Integer<T>)  return ConvertFrom128i<TO>(in);
-         }
-         else
-         #endif
-         #if LANGULUS_SIMD(256BIT)
-         if constexpr (CT::SIMD256<R>) {
-            if      constexpr (CT::Float<T>)    return ConvertFrom256f<TO>(in);
-            else if constexpr (CT::Double<T>)   return ConvertFrom256d<TO>(in);
-            else if constexpr (CT::Integer<T>)  return ConvertFrom256i<TO>(in);
-         }
-         else
-         #endif
-         #if LANGULUS_SIMD(512BIT)
-         if constexpr (CT::SIMD512<R>) {
-            if      constexpr (CT::Float<T>)    return ConvertFrom512f<TO>(in);
-            else if constexpr (CT::Double<T>)   return ConvertFrom512d<TO>(in);
-            else if constexpr (CT::Integer<T>)  return ConvertFrom512i<TO>(in);
-         }
-         else
-         #endif
-         static_assert(false, "Can't convert from unsupported");
+      else
+      #if LANGULUS_SIMD(128BIT)
+      if constexpr (CT::SIMD128<R>) {
+         if      constexpr (CT::Real32<T>)   return ConvertFrom128f<TO>(in);
+         else if constexpr (CT::Real64<T>)   return ConvertFrom128d<TO>(in);
+         else if constexpr (CT::Integer<T>)  return ConvertFrom128i<TO>(in);
       }
+      else
+      #endif
+      #if LANGULUS_SIMD(256BIT)
+      if constexpr (CT::SIMD256<R>) {
+         if      constexpr (CT::Real32<T>)   return ConvertFrom256f<TO>(in);
+         else if constexpr (CT::Real64<T>)   return ConvertFrom256d<TO>(in);
+         else if constexpr (CT::Integer<T>)  return ConvertFrom256i<TO>(in);
+      }
+      else
+      #endif
+      #if LANGULUS_SIMD(512BIT)
+      if constexpr (CT::SIMD512<R>) {
+         if      constexpr (CT::Real32<T>)   return ConvertFrom512f<TO>(in);
+         else if constexpr (CT::Real64<T>)   return ConvertFrom512d<TO>(in);
+         else if constexpr (CT::Integer<T>)  return ConvertFrom512i<TO>(in);
+      }
+      else
+      #endif
+      static_assert(false, "Can't convert from unsupported");
+   }
 
-      /// Convert scalars/arrays at compile-time, if possible                 
-      ///   @tparam TO - the desired element type                             
-      ///   @param in - scalar/vector to convert from                         
-      ///   @return std::array or scalar, depending on the input              
-      template<Element TO> LANGULUS(INLINED)
-      constexpr auto ConvertConstexpr(const CT::NotSIMD auto& in) noexcept {
-         using FROM = Deref<decltype(in)>;
+   /// Convert scalars/arrays at compile-time, if possible                 
+   ///   @tparam TO - the desired element type                             
+   ///   @param in - scalar/vector to convert from                         
+   ///   @return std::array or scalar, depending on the input              
+   template<Element TO> LANGULUS(INLINED)
+   constexpr auto ConvertConstexpr(const CT::NotSIMD auto& in) noexcept {
+      using FROM = Deref<decltype(in)>;
 
-         if constexpr (CT::Vector<FROM>) {
-            // Convert from vectors                                     
-            ::std::array<TO, CountOf<FROM>> result;
-            for (size_t i = 0; i < CountOf<FROM>; ++i)
-               result[i] = static_cast<TO>(in[i]);
-            return result;
+      if constexpr (CT::Vector<FROM>) {
+         // Convert from vectors                                     
+         ::std::array<TO, ExtentOf<FROM>> result;
+         for (size_t i = 0; i < ExtentOf<FROM>; ++i)
+            result[i] = static_cast<TO>(in[i]);
+         return result;
+      }
+      else {
+         // Convert from scalar                                      
+         return static_cast<TO>(DenseCast(in));
+      }
+   }
+
+   /// Convert scalars/arrays/registers and return a register, if possible 
+   ///   @tparam DEF - default value for setting elements outside array,   
+   ///      used only if input array is smaller than chosen register       
+   ///   @tparam TO - the desired element type                             
+   ///   @param in - scalar/vector/register to convert from                
+   ///   @return scalar/vector/register/unsupported                        
+   ///   @attention this function doesn't guarantee that all elements in   
+   ///      'in' will be converted when ConvertSIMD is used - only the     
+   ///      amount that fits in the biggest available hardware register    
+   template<auto DEF, Element TO> LANGULUS(INLINED)
+   auto Convert(const auto& in) noexcept {
+      using FROM = Deref<decltype(in)>;
+
+      if constexpr (CT::SIMD<FROM>) {
+         // Input is already a register, skip loading                
+         return ConvertSIMD<TO>(in);
+      }
+      else if constexpr (CT::Vector<FROM>) {
+         // Convert from vectors                                     
+         // Attempt loading input array into a register              
+         const auto v = Load<DEF>(in);
+
+         if constexpr (CT::Unsupported<decltype(v)>) {
+            // Load to register fails, fallback                      
+            return ConvertConstexpr<TO>(in);
          }
          else {
-            // Convert from scalar                                      
-            return static_cast<TO>(DenseCast(in));
-         }
-      }
-
-      /// Convert scalars/arrays/registers and return a register, if possible 
-      ///   @tparam DEF - default value for setting elements outside array,   
-      ///      used only if input array is smaller than chosen register       
-      ///   @tparam TO - the desired element type                             
-      ///   @param in - scalar/vector/register to convert from                
-      ///   @return scalar/vector/register/unsupported                        
-      ///   @attention this function doesn't guarantee that all elements in   
-      ///      'in' will be converted when ConvertSIMD is used - only the     
-      ///      amount that fits in the biggest available hardware register    
-      template<auto DEF, Element TO> LANGULUS(INLINED)
-      auto Convert(const auto& in) noexcept {
-         using FROM = Deref<decltype(in)>;
-
-         if constexpr (CT::SIMD<FROM>) {
-            // Input is already a register, skip loading                
-            return ConvertSIMD<TO>(in);
-         }
-         else if constexpr (CT::Vector<FROM>) {
-            // Convert from vectors                                     
-            // Attempt loading input array into a register              
-            const auto v = Load<DEF>(in);
-
-            if constexpr (CT::Unsupported<decltype(v)>) {
-               // Load to register fails, fallback                      
+            // Load was a success, now test if SIMD conversion is    
+            // supported                                             
+            const auto converted = ConvertSIMD<TO>(v);
+            if constexpr (CT::Unsupported<decltype(converted)>) {
+               // SIMD conversion fails, fallback                    
                return ConvertConstexpr<TO>(in);
             }
             else {
-               // Load was a success, now test if SIMD conversion is    
-               // supported                                             
-               const auto converted = ConvertSIMD<TO>(v);
-               if constexpr (CT::Unsupported<decltype(converted)>) {
-                  // SIMD conversion fails, fallback                    
-                  return ConvertConstexpr<TO>(in);
-               }
-               else {
-                  static_assert(CT::SIMD<decltype(converted)>,
-                     "Conversion result isn't a V type, "
-                     "did you forget return R {...}?");
-                  return converted;
-               }
+               static_assert(CT::SIMD<decltype(converted)>,
+                  "Conversion result isn't a V type, "
+                  "did you forget return R {...}?");
+               return converted;
             }
          }
-         else {
-            // Convert from scalar                                      
-            return static_cast<TO>(DenseCast(in));
-         }
       }
+      else {
+         // Convert from scalar                                      
+         return static_cast<TO>(DenseCast(in));
+      }
+   }
+}
 
-   } // namespace Langulus::SIMD::Inner
-
+namespace Langulus::SIMD
+{
    /// Convert scalar/array/register, and force output to desired place       
    ///   @tparam DEF - default value for setting elements outside array,      
    ///      used only if input extent is smaller than output extent           
@@ -171,14 +169,14 @@ namespace Langulus::SIMD
             // Converting using SIMD, hopefully                         
             using CONVERTED_TYPE = decltype(Inner::Convert<DEF, TO>(DeintCast(val)));
             constexpr bool supported = CT::SIMD<CONVERTED_TYPE>;
-            constexpr auto CI = CountOf<CONVERTED_TYPE>;
-            constexpr auto CO = CountOf<OUTPUT>;
+            constexpr auto CI = ExtentOf<CONVERTED_TYPE>;
+            constexpr auto CO = ExtentOf<OUTPUT>;
 
             if constexpr (not supported or CI == 1 or CO == 1) {
                // Will always utilize the fallback converter            
                Store(Inner::ConvertConstexpr<TO>(DeintCast(val)), out);
             }
-            else if constexpr (CI >= CountOf<INPUT>) {
+            else if constexpr (CI >= ExtentOf<INPUT>) {
                // We're able to do the conversion with a single register
                // (or SIMD is not required at all)                      
                if constexpr (CT::SIMD<OUTPUT>)
@@ -208,12 +206,12 @@ namespace Langulus::SIMD
                // We have to divide the conversion into multiple regs   
                // This happens when we convert float[4] to double[4]    
                // without AVX support for example                       
-               constexpr size_t left = Roof2(CountOf<INPUT>/2);
-               static_assert(left < CountOf<INPUT>,
+               constexpr size_t left = Roof2(ExtentOf<INPUT>/2);
+               static_assert(left < ExtentOf<INPUT>,
                   "Can't properly split the input vector");
                static_assert(left < CO,
                   "Can't properly split the output vector");
-               constexpr size_t right = std::min(CountOf<INPUT> - left, CO - left);
+               constexpr size_t right = std::min(ExtentOf<INPUT> - left, CO - left);
                constexpr size_t tail  = CO - left - right;
 
                using LEFTI  = const FROM(&)[left];
@@ -267,5 +265,4 @@ namespace Langulus::SIMD
       Convert(DeintCast(val), out);
       return out;
    }
-
-} // namespace Langulus::SIMD
+}

@@ -11,16 +11,15 @@
 
 namespace Langulus::SIMD::Inner
 {
-
    /// Convert V256f to any other register                                    
    ///   @tparam TO - the desired element type                                
    ///   @param v - the input register                                        
    ///   @return the converted register                                       
    template<Element TO> LANGULUS(INLINED)
    auto ConvertFrom256f(CT::SIMD256f auto v) noexcept {
-      if constexpr (CT::Double<TO>)
+      if constexpr (CT::Real64<TO>)
          return V256<TO> {simde_mm256_cvtps_pd(simde_mm256_castps256_ps128(v))};
-      else if constexpr (CT::Float<TO>)
+      else if constexpr (CT::Real32<TO>)
          return v;
       else if constexpr (CT::SignedInteger8<TO>) {
          const V256i32 t32 {simde_mm256_cvtps_epi32(v)};
@@ -73,5 +72,4 @@ namespace Langulus::SIMD::Inner
       }
       else static_assert(false, "Unsupported register");
    }
-
-} // namespace Langulus::SIMD
+}

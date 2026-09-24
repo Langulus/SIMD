@@ -11,167 +11,162 @@
 #include "Equals.hpp"
 
 
+namespace Langulus::SIMD::Inner
+{
+   /// Used to detect missing SIMD routine                                    
+   LANGULUS(INLINED)
+   constexpr No DivideSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept { return {}; }
+
+   /// Divide two registers                                                   
+   ///   @attention will throw if any element on right side is zero           
+   ///   @param lhs - left register                                           
+   ///   @param rhs - right register                                          
+   ///   @return the resulting register                                       
+   template<CT::SIMD R> LANGULUS(INLINED)
+   R DivideSIMD(R lhs, R rhs) {
+      using T = TypeOf<R>;
+      (void)lhs; (void)rhs;
+
+   #if LANGULUS_SIMD(128BIT)
+      if constexpr (CT::SIMD128<R>) {
+         // Check if anything in 'rhs' is zero                          
+         if constexpr (CT::Integer<T>) {
+            if (simde_mm_movemask_epi8(EqualsSIMD(rhs, rhs.Zero())))
+               throw Exception {"Division by zero"};
+         }
+         else if constexpr (CT::Real32<T>) {
+            if (simde_mm_movemask_ps(EqualsSIMD(rhs, rhs.Zero())))
+               throw Exception {"Division by zero"};
+         }
+         else if constexpr (CT::Real64<T>) {
+            if (simde_mm_movemask_pd(EqualsSIMD(rhs, rhs.Zero())))
+               throw Exception {"Division by zero"};
+         }
+         else static_assert(false, "Unsupported T");
+
+         // Divide                                                      
+         if      constexpr (CT::UnsignedInteger8<T>)  return simde_mm_div_epu8   (lhs, rhs);
+         else if constexpr (CT::SignedInteger8<T>)    return simde_mm_div_epi8   (lhs, rhs);
+         else if constexpr (CT::UnsignedInteger16<T>) return simde_mm_div_epu16  (lhs, rhs);
+         else if constexpr (CT::SignedInteger16<T>)   return simde_mm_div_epi16  (lhs, rhs);
+         else if constexpr (CT::UnsignedInteger32<T>) return simde_mm_div_epu32  (lhs, rhs);
+         else if constexpr (CT::SignedInteger32<T>)   return simde_mm_div_epi32  (lhs, rhs);
+         else if constexpr (CT::UnsignedInteger64<T>) return simde_mm_div_epu64  (lhs, rhs);
+         else if constexpr (CT::SignedInteger64<T>)   return simde_mm_div_epi64  (lhs, rhs);
+         else if constexpr (CT::Real32<T>)            return simde_mm_div_ps     (lhs, rhs);
+         else if constexpr (CT::Real64<T>)            return simde_mm_div_pd     (lhs, rhs);
+         else static_assert(false, "Unsupported type for 16-byte package");
+      }
+      else
+   #endif
+   #if LANGULUS_SIMD(256BIT)
+      if constexpr (CT::SIMD256<R>) {
+         // Check if anything in 'rhs' is zero                          
+         if constexpr (CT::Integer<T>) {
+            if (simde_mm256_movemask_epi8(EqualsSIMD(rhs, rhs.Zero())))
+               throw Exception {"Division by zero"};
+         }
+         else if constexpr (CT::Real32<T>) {
+            if (simde_mm256_movemask_ps(EqualsSIMD(rhs, rhs.Zero())))
+               throw Exception {"Division by zero"};
+         }
+         else if constexpr (CT::Real64<T>) {
+            if (simde_mm256_movemask_pd(EqualsSIMD(rhs, rhs.Zero())))
+               throw Exception {"Division by zero"};
+         }
+         else static_assert(false, "Unsupported T");
+
+         // Divide                                                      
+         if      constexpr (CT::UnsignedInteger8<T>)  return simde_mm256_div_epu8   (lhs, rhs);
+         else if constexpr (CT::SignedInteger8<T>)    return simde_mm256_div_epi8   (lhs, rhs);
+         else if constexpr (CT::UnsignedInteger16<T>) return simde_mm256_div_epu16  (lhs, rhs);
+         else if constexpr (CT::SignedInteger16<T>)   return simde_mm256_div_epi16  (lhs, rhs);
+         else if constexpr (CT::UnsignedInteger32<T>) return simde_mm256_div_epu32  (lhs, rhs);
+         else if constexpr (CT::SignedInteger32<T>)   return simde_mm256_div_epi32  (lhs, rhs);
+         else if constexpr (CT::UnsignedInteger64<T>) return simde_mm256_div_epu64  (lhs, rhs);
+         else if constexpr (CT::SignedInteger64<T>)   return simde_mm256_div_epi64  (lhs, rhs);
+         else if constexpr (CT::Real32<T>)            return simde_mm256_div_ps     (lhs, rhs);
+         else if constexpr (CT::Real64<T>)            return simde_mm256_div_pd     (lhs, rhs);
+         else static_assert(false, "Unsupported type for 32-byte package");
+      }
+      else
+   #endif
+   #if LANGULUS_SIMD(512BIT)
+      if constexpr (CT::SIMD512<R>) {
+         // Check if anything in 'rhs' is zero                          
+         if constexpr (CT::Integer<T>) {
+            if (EqualsSIMD(rhs, rhs.Zero()))
+               throw Exception {"Division by zero"};
+         }
+         else if constexpr (CT::Real32<T>) {
+            if (EqualsSIMD(rhs, rhs.Zero()))
+               throw Exception {"Division by zero"};
+         }
+         else if constexpr (CT::Real64<T>) {
+            if (EqualsSIMD(rhs, rhs.Zero()))
+               throw Exception {"Division by zero"};
+         }
+         else static_assert(false, "Unsupported T");
+
+         // Divide                                                      
+         if      constexpr (CT::UnsignedInteger8<T>)  return simde_mm512_div_epu8   (lhs, rhs);
+         else if constexpr (CT::SignedInteger8<T>)    return simde_mm512_div_epi8   (lhs, rhs);
+         else if constexpr (CT::UnsignedInteger16<T>) return simde_mm512_div_epu16  (lhs, rhs);
+         else if constexpr (CT::SignedInteger16<T>)   return simde_mm512_div_epi16  (lhs, rhs);
+         else if constexpr (CT::UnsignedInteger32<T>) return simde_mm512_div_epu32  (lhs, rhs);
+         else if constexpr (CT::SignedInteger32<T>)   return simde_mm512_div_epi32  (lhs, rhs);
+         else if constexpr (CT::UnsignedInteger64<T>) return simde_mm512_div_epu64  (lhs, rhs);
+         else if constexpr (CT::SignedInteger64<T>)   return simde_mm512_div_epi64  (lhs, rhs);
+         else if constexpr (CT::Real32<T>)            return simde_mm512_div_ps     (lhs, rhs);
+         else if constexpr (CT::Real64<T>)            return simde_mm512_div_pd     (lhs, rhs);
+         else static_assert(false, "Unsupported type for 64-byte package");
+      }
+      else
+   #endif
+      static_assert(false, "Unsupported type");
+   }
+
+   
+   /// Get divided values as constexpr, if possible                           
+   ///   @attention will throw on division by zero                            
+   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
+   ///   @patam value - scalar/vector to operate on                           
+   ///   @return the divided scalar/vector                                    
+   template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
+   constexpr auto DivideConstexpr(const auto& lhs, const auto& rhs) {
+      return AttemptBinary<1, FORCE_OUT>(lhs, rhs, nullptr,
+         []<class E>(const E& l, const E& r) -> E {
+            if (r == E {0})
+               throw Exception {"Division by zero"};
+            return l / r;
+         }
+      );
+   }
+
+   /// Get divided values as a register, if possible                          
+   ///   @attention will throw on division by zero                            
+   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
+   ///   @patam value - scalar/vector/register to operate on                  
+   ///   @return the divided scalar/vector/register                           
+   template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
+   auto Divide(const auto& lhs, const auto& rhs) {
+      return AttemptBinary<1, FORCE_OUT>(lhs, rhs,
+         []<class R>(const R& l, const R& r) {
+            LANGULUS_SIMD_VERBOSE("Dividing (SIMD) as ", NameOf<R>());
+            return DivideSIMD(l, r);
+         },
+         []<class E>(const E& l, const E& r) -> E {
+            LANGULUS_SIMD_VERBOSE("Dividing (Fallback) ", l, " / ", r, " (", NameOf<E>(), ")");
+            if (r == E {0})
+               throw Exception {"Division by zero"};
+            return l / r;
+         }
+      );
+   }
+}
+
 namespace Langulus::SIMD
 {
-   namespace Inner
-   {
-
-      /// Used to detect missing SIMD routine                                 
-      LANGULUS(INLINED)
-      constexpr Unsupported DivideSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept {
-         return {};
-      }
-
-      /// Divide two registers                                                
-      ///   @attention will throw if any element on right side is zero        
-      ///   @param lhs - left register                                        
-      ///   @param rhs - right register                                       
-      ///   @return the resulting register                                    
-      template<CT::SIMD R> LANGULUS(INLINED)
-      R DivideSIMD(R lhs, R rhs) {
-         using T = TypeOf<R>;
-         (void)lhs; (void)rhs;
-
-      #if LANGULUS_SIMD(128BIT)
-         if constexpr (CT::SIMD128<R>) {
-            // Check if anything in 'rhs' is zero                       
-            if constexpr (CT::Integer<T>) {
-               if (simde_mm_movemask_epi8(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(ZeroDivision, "Division by zero");
-            }
-            else if constexpr (CT::Float<T>) {
-               if (simde_mm_movemask_ps(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(ZeroDivision, "Division by zero");
-            }
-            else if constexpr (CT::Double<T>) {
-               if (simde_mm_movemask_pd(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(ZeroDivision, "Division by zero");
-            }
-            else static_assert(false, "Unsupported T");
-
-            // Divide                                                   
-            if      constexpr (CT::UnsignedInteger8<T>)  return simde_mm_div_epu8   (lhs, rhs);
-            else if constexpr (CT::SignedInteger8<T>)    return simde_mm_div_epi8   (lhs, rhs);
-            else if constexpr (CT::UnsignedInteger16<T>) return simde_mm_div_epu16  (lhs, rhs);
-            else if constexpr (CT::SignedInteger16<T>)   return simde_mm_div_epi16  (lhs, rhs);
-            else if constexpr (CT::UnsignedInteger32<T>) return simde_mm_div_epu32  (lhs, rhs);
-            else if constexpr (CT::SignedInteger32<T>)   return simde_mm_div_epi32  (lhs, rhs);
-            else if constexpr (CT::UnsignedInteger64<T>) return simde_mm_div_epu64  (lhs, rhs);
-            else if constexpr (CT::SignedInteger64<T>)   return simde_mm_div_epi64  (lhs, rhs);
-            else if constexpr (CT::Float<T>)             return simde_mm_div_ps     (lhs, rhs);
-            else if constexpr (CT::Double<T>)            return simde_mm_div_pd     (lhs, rhs);
-            else static_assert(false, "Unsupported type for 16-byte package");
-         }
-         else
-      #endif
-      #if LANGULUS_SIMD(256BIT)
-         if constexpr (CT::SIMD256<R>) {
-            // Check if anything in 'rhs' is zero                       
-            if constexpr (CT::Integer<T>) {
-               if (simde_mm256_movemask_epi8(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(ZeroDivision, "Division by zero");
-            }
-            else if constexpr (CT::Float<T>) {
-               if (simde_mm256_movemask_ps(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(ZeroDivision, "Division by zero");
-            }
-            else if constexpr (CT::Double<T>) {
-               if (simde_mm256_movemask_pd(EqualsSIMD(rhs, rhs.Zero())))
-                  LANGULUS_THROW(ZeroDivision, "Division by zero");
-            }
-            else static_assert(false, "Unsupported T");
-
-            // Divide                                                   
-            if      constexpr (CT::UnsignedInteger8<T>)  return simde_mm256_div_epu8   (lhs, rhs);
-            else if constexpr (CT::SignedInteger8<T>)    return simde_mm256_div_epi8   (lhs, rhs);
-            else if constexpr (CT::UnsignedInteger16<T>) return simde_mm256_div_epu16  (lhs, rhs);
-            else if constexpr (CT::SignedInteger16<T>)   return simde_mm256_div_epi16  (lhs, rhs);
-            else if constexpr (CT::UnsignedInteger32<T>) return simde_mm256_div_epu32  (lhs, rhs);
-            else if constexpr (CT::SignedInteger32<T>)   return simde_mm256_div_epi32  (lhs, rhs);
-            else if constexpr (CT::UnsignedInteger64<T>) return simde_mm256_div_epu64  (lhs, rhs);
-            else if constexpr (CT::SignedInteger64<T>)   return simde_mm256_div_epi64  (lhs, rhs);
-            else if constexpr (CT::Float<T>)             return simde_mm256_div_ps     (lhs, rhs);
-            else if constexpr (CT::Double<T>)            return simde_mm256_div_pd     (lhs, rhs);
-            else static_assert(false, "Unsupported type for 32-byte package");
-         }
-         else
-      #endif
-      #if LANGULUS_SIMD(512BIT)
-         if constexpr (CT::SIMD512<R>) {
-            // Check if anything in 'rhs' is zero                       
-            if constexpr (CT::Integer<T>) {
-               if (EqualsSIMD(rhs, rhs.Zero()))
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
-            }
-            else if constexpr (CT::Float<T>) {
-               if (EqualsSIMD(rhs, rhs.Zero()))
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
-            }
-            else if constexpr (CT::Double<T>) {
-               if (EqualsSIMD(rhs, rhs.Zero()))
-                  LANGULUS_THROW(DivisionByZero, "Division by zero");
-            }
-            else static_assert(false, "Unsupported T");
-
-            // Divide                                                   
-            if      constexpr (CT::UnsignedInteger8<T>)  return simde_mm512_div_epu8   (lhs, rhs);
-            else if constexpr (CT::SignedInteger8<T>)    return simde_mm512_div_epi8   (lhs, rhs);
-            else if constexpr (CT::UnsignedInteger16<T>) return simde_mm512_div_epu16  (lhs, rhs);
-            else if constexpr (CT::SignedInteger16<T>)   return simde_mm512_div_epi16  (lhs, rhs);
-            else if constexpr (CT::UnsignedInteger32<T>) return simde_mm512_div_epu32  (lhs, rhs);
-            else if constexpr (CT::SignedInteger32<T>)   return simde_mm512_div_epi32  (lhs, rhs);
-            else if constexpr (CT::UnsignedInteger64<T>) return simde_mm512_div_epu64  (lhs, rhs);
-            else if constexpr (CT::SignedInteger64<T>)   return simde_mm512_div_epi64  (lhs, rhs);
-            else if constexpr (CT::Float<T>)             return simde_mm512_div_ps     (lhs, rhs);
-            else if constexpr (CT::Double<T>)            return simde_mm512_div_pd     (lhs, rhs);
-            else static_assert(false, "Unsupported type for 64-byte package");
-         }
-         else
-      #endif
-         static_assert(CT::False<T>, "Unsupported type");
-      }
-
-      
-      /// Get divided values as constexpr, if possible                        
-      ///   @attention will throw on division by zero                         
-      ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
-      ///   @patam value - scalar/vector to operate on                        
-      ///   @return the divided scalar/vector                                 
-      template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-      constexpr auto DivideConstexpr(const auto& lhs, const auto& rhs) {
-         return AttemptBinary<1, FORCE_OUT>(lhs, rhs, nullptr,
-            []<class E>(const E& l, const E& r) -> E {
-               if (r == E {0})
-                  LANGULUS_THROW(ZeroDivision, "Division by zero");
-               return l / r;
-            }
-         );
-      }
-   
-      /// Get divided values as a register, if possible                       
-      ///   @attention will throw on division by zero                         
-      ///   @tparam FORCE_OUT - the desired element type (lossless if void)   
-      ///   @patam value - scalar/vector/register to operate on               
-      ///   @return the divided scalar/vector/register                        
-      template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-      auto Divide(const auto& lhs, const auto& rhs) {
-         return AttemptBinary<1, FORCE_OUT>(lhs, rhs,
-            []<class R>(const R& l, const R& r) {
-               LANGULUS_SIMD_VERBOSE("Dividing (SIMD) as ", NameOf<R>());
-               return DivideSIMD(l, r);
-            },
-            []<class E>(const E& l, const E& r) -> E {
-               LANGULUS_SIMD_VERBOSE("Dividing (Fallback) ", l, " / ", r, " (", NameOf<E>(), ")");
-               if (r == E {0})
-                  LANGULUS_THROW(ZeroDivision, "Division by zero");
-               return l / r;
-            }
-         );
-      }
-
-   } // namespace Langulus::SIMD::Inner
-
-
    /// Divide numbers, and force output to desired place                      
    ///   @tparam LHS - left array, scalar, or register (deducible)            
    ///   @tparam RHS - right array, scalar, or register (deducible)           
@@ -186,7 +181,7 @@ namespace Langulus::SIMD
       else if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>)
          Store(Inner::Divide<OUT>(lhs, rhs), out);
       else {
-         IF_CONSTEXPR() {
+         if consteval {
             Store(Inner::DivideConstexpr<OUT>(DeintCast(lhs), DeintCast(rhs)), out);
          }
          else {
@@ -208,12 +203,11 @@ namespace Langulus::SIMD
       OUT out;
       Divide(DeintCast(lhs), DeintCast(rhs), out);
 
-      if constexpr (CT::Similar<LHS, RHS> or CT::DerivedFrom<LHS, RHS>)
+      if constexpr (Same<LHS, RHS> or CT::DerivedFrom<LHS, RHS>)
          return LHS {out};
       else if constexpr (CT::DerivedFrom<RHS, LHS>)
          return RHS {out};
       else
          return out;
    }
-
-} // namespace Langulus::SIMD
+}

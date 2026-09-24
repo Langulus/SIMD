@@ -68,9 +68,9 @@ namespace Langulus::SIMD::Inner
       static_assert(false, "Unsupported register");
    }
 
-   /// Save a register to a vector in memory                               
-   ///   @param from - the source register                                 
-   ///   @param to - the destination vector                                
+   /// Save a register to a vector in memory                                  
+   ///   @param from - the source register                                    
+   ///   @param to - the destination vector                                   
    LANGULUS(INLINED)
    void StoreSIMD(const CT::SIMD auto& from, CT::Vector auto& to) noexcept {
       using TO   = Deref<decltype(to)>;
@@ -87,7 +87,7 @@ namespace Langulus::SIMD::Inner
          "of similar type as the register");
 
       if constexpr (CT::Bool<TO_T>) {
-         // register -> bool array                                   
+         // register -> bool array                                      
          Bitmask<ExtentOf<TO>> mask;
          StoreSIMD(from, mask);
          mask.AsVector(to);
@@ -96,7 +96,7 @@ namespace Langulus::SIMD::Inner
    #if LANGULUS_SIMD(128BIT)
       if constexpr (CT::SIMD128<R>) {
          if constexpr (CT::Real32<T>) {
-            // To float array                                        
+            // To float array                                           
             if constexpr (sizeof(to) == sizeof(from)) {
                if constexpr (alignof(TO) % 16 == 0) {
                   LANGULUS_SIMD_VERBOSE("Storing 128f to aligned");
@@ -115,7 +115,7 @@ namespace Langulus::SIMD::Inner
             }
          }
          else if constexpr (CT::Real64<T>) {
-            // To double array                                       
+            // To double array                                          
             if constexpr (sizeof(to) == sizeof(from)) {
                if constexpr (alignof(TO) % 16 == 0) {
                   LANGULUS_SIMD_VERBOSE("Storing 128d to aligned");
@@ -129,7 +129,7 @@ namespace Langulus::SIMD::Inner
             else static_assert(false, "Shouldn't be reached (storing one double)");
          }
          else if constexpr (CT::Integer<T>) {
-            // To integer array                                      
+            // To integer array                                         
             if constexpr (sizeof(to) == sizeof(from)) {
                if constexpr (alignof(TO) % 16 == 0) {
                   LANGULUS_SIMD_VERBOSE("Storing 128i to aligned");
@@ -154,7 +154,7 @@ namespace Langulus::SIMD::Inner
    #if LANGULUS_SIMD(256BIT)
       if constexpr (CT::SIMD256<R>) {
          if constexpr (CT::Real32<T>) {
-            // To float array                                        
+            // To float array                                           
             if constexpr (sizeof(to) == sizeof(from)) {
                if constexpr (alignof(TO) % 32 == 0) {
                   LANGULUS_SIMD_VERBOSE("Storing 256f to aligned");
@@ -173,7 +173,7 @@ namespace Langulus::SIMD::Inner
             }
          }
          else if constexpr (CT::Real64<T>) {
-            // To double array                                       
+            // To double array                                          
             if constexpr (sizeof(to) == sizeof(from)) {
                if constexpr (alignof(TO) % 32 == 0) {
                   LANGULUS_SIMD_VERBOSE("Storing 256d to aligned");
@@ -192,7 +192,7 @@ namespace Langulus::SIMD::Inner
             }
          }
          else if constexpr (CT::Integer<T>) {
-            // To integer array                                      
+            // To integer array                                         
             if constexpr (sizeof(to) == sizeof(from)) {
                if constexpr (alignof(TO) % 32 == 0) {
                   LANGULUS_SIMD_VERBOSE("Storing 256i to aligned");
@@ -217,7 +217,7 @@ namespace Langulus::SIMD::Inner
    #if LANGULUS_SIMD(512BIT)
       if constexpr (CT::SIMD512<R>) {
          if constexpr (CT::Real32<T>) {
-            // To float array                                        
+            // To float array                                           
             if constexpr (sizeof(to) == sizeof(from)) {
                if constexpr (alignof(TO) % 64 == 0) {
                   LANGULUS_SIMD_VERBOSE("Storing 512f to aligned");
@@ -236,7 +236,7 @@ namespace Langulus::SIMD::Inner
             }
          }
          else if constexpr (CT::Real64<T>) {
-            // To double array                                       
+            // To double array                                          
             if constexpr (sizeof(to) == sizeof(from)) {
                if constexpr (alignof(TO) % 64 == 0) {
                   LANGULUS_SIMD_VERBOSE("Storing 512d to aligned");
@@ -255,7 +255,7 @@ namespace Langulus::SIMD::Inner
             }
          }
          else if constexpr (CT::Integer<T>) {
-            // To integer array                                      
+            // To integer array                                         
             if constexpr (sizeof(to) == sizeof(from)) {
                if constexpr (alignof(TO) % 64 == 0) {
                   LANGULUS_SIMD_VERBOSE("Storing 512i to aligned");
@@ -280,9 +280,9 @@ namespace Langulus::SIMD::Inner
       static_assert(false, "Unsupported register");
    }
 
-   /// Fallback store routine, doesn't use SIMD, hopefully constexpr       
-   ///   @param from - scalar/vector/bitmask to store                      
-   ///   @param to - scalar/vector/bitmask to write                        
+   /// Fallback store routine, doesn't use SIMD, hopefully constexpr          
+   ///   @param from - scalar/vector/bitmask to store                         
+   ///   @param to - scalar/vector/bitmask to write                           
    LANGULUS(INLINED)
    constexpr void StoreConstexpr(const CT::NotSIMD auto& from, CT::NotSIMD auto& to) noexcept {
       using FROM = Deref<decltype(from)>;
@@ -292,15 +292,15 @@ namespace Langulus::SIMD::Inner
       static_assert(S > 0);
 
       if constexpr (CT::Bitmask<FROM>) {
-         // Extract from bitmask                                     
+         // Extract from bitmask                                        
          if constexpr (CT::Bitmask<TO>) {
-            // Store in another bitmask                              
+            // Store in another bitmask                                 
             to = from;
          }
          else if constexpr (CT::Vector<TO>) {
-            // Store each bit into an array of different type        
+            // Store each bit into an array of different type           
             if constexpr (CT::Bool<E>) {
-               // Convert each bit to a boolean inside an array      
+               // Convert each bit to a boolean inside an array         
                for (size_t i = 0; i < S; ++i)
                   to[i] = from[i];
             }
@@ -308,7 +308,7 @@ namespace Langulus::SIMD::Inner
          }
          else if constexpr (CT::Scalar<TO>) {
             if constexpr (CT::Bool<E>) {
-               // Collapse the entire bitmask to a single boolean    
+               // Collapse the entire bitmask to a single boolean       
                GetFirst(to) = from;
             }
             else static_assert(false, "Bad output to store a bitmask");
@@ -316,22 +316,22 @@ namespace Langulus::SIMD::Inner
          else static_assert(false, "Unsupported destination");
       }
       else if constexpr (CT::Vector<FROM>) {
-         // Extract from any range                                   
+         // Extract from any range                                      
          if constexpr (CT::Bitmask<TO>) {
-            // Store as bits inside a bitmask                        
+            // Store as bits inside a bitmask                           
             for (size_t i = 0; i < S; ++i)
                to[i] = static_cast<bool>(from[i]);
          }
          else if constexpr (CT::Vector<TO>) {
-            // Fill a vector, element by element                     
+            // Fill a vector, element by element                        
             for (size_t i = 0; i < S; ++i)
                to[i] = from[i];
          }
          else if constexpr (CT::Scalar<TO>) {
-            // Store as a scalar                                     
+            // Store as a scalar                                        
             if constexpr (CT::Bool<E>) {
-               // Collect all booleans, so that we don't lose the    
-               // information. Short-circuit on the first falsum     
+               // Collect all booleans, so that we don't lose the       
+               // information. Short-circuit on the first falsum        
                for (auto& it : from) {
                   if (not it) {
                      GetFirst(to) = false;
@@ -345,9 +345,9 @@ namespace Langulus::SIMD::Inner
          else static_assert(false, "Unsupported destination");
       }
       else if constexpr (CT::Scalar<FROM>) {
-         // Extract from a scalar                                    
+         // Extract from a scalar                                       
          if constexpr (CT::Vector<TO>) {
-            // Multicast to a vector output                          
+            // Multicast to a vector output                             
             for (size_t i = 0; i < S; ++i)
                to[i] = from;
          }
@@ -374,18 +374,18 @@ namespace Langulus::SIMD
    }
 }
 
-
 ///                                                                           
 #define LANGULUS_SIMD_ARITHMETHIC_API(OP) \
    template<class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED) \
    constexpr void OP(const LHS& lhs, const RHS& rhs, OUT& out) noexcept { \
-      IF_CONSTEXPR() { \
+      if consteval { \
          Store(Inner::OP##Constexpr<OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
+      } else { \
+         if constexpr (CT::SIMD<OUT>) \
+            out = Inner::OP<OUT>(lhs, rhs); \
+         else \
+            Store(Inner::OP<OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
       } \
-      else if constexpr (CT::SIMD<OUT>) \
-         out = Inner::OP<OUT>(lhs, rhs); \
-      else \
-         Store(Inner::OP<OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
    } \
    template<class LHS, class RHS, CT::NoIntent OUT = LosslessArray<LHS, RHS>> \
    LANGULUS(INLINED) \
@@ -406,13 +406,14 @@ namespace Langulus::SIMD
    template<bool SATURATE = false, class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED) \
    constexpr void OP(const LHS& lhs, const RHS& rhs, OUT& out) noexcept { \
       constexpr bool saturated = SATURATE or CT::Saturated<LHS, RHS>; \
-      IF_CONSTEXPR() { \
+      if consteval { \
          Store(Inner::OP##Constexpr<saturated, OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
+      } else { \
+         if constexpr (CT::SIMD<OUT>) \
+            out = Inner::OP<saturated, OUT>(lhs, rhs); \
+         else \
+            Store(Inner::OP<saturated, OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
       } \
-      else if constexpr (CT::SIMD<OUT>) \
-         out = Inner::OP<saturated, OUT>(lhs, rhs); \
-      else \
-         Store(Inner::OP<saturated, OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
    } \
    template<bool SATURATE = false, class LHS, class RHS, CT::NoIntent OUT = LosslessArray<LHS, RHS>> \
    LANGULUS(INLINED) \
@@ -433,16 +434,16 @@ namespace Langulus::SIMD
 #define LANGULUS_SIMD_ARITHMETHIC_UNARY_API(OP) \
    template<class VAL, CT::NoIntent OUT> LANGULUS(INLINED) \
    constexpr void OP(const VAL& val, OUT& out) noexcept { \
-      IF_CONSTEXPR() { \
+      if consteval { \
          Store(Inner::OP##Constexpr<OUT>(DeintCast(val)), out); \
+      } else { \
+         if constexpr (CT::SIMD<OUT>) \
+            out = Inner::OP<OUT>(val); \
+         else \
+            Store(Inner::OP<OUT>(DeintCast(val)), out); \
       } \
-      else if constexpr (CT::SIMD<OUT>) \
-         out = Inner::OP<OUT>(val); \
-      else \
-         Store(Inner::OP<OUT>(DeintCast(val)), out); \
    } \
-   template<class VAL, CT::NoIntent OUT = LosslessArray<VAL>> \
-   LANGULUS(INLINED) \
+   template<class VAL, CT::NoIntent OUT = LosslessArray<VAL>> LANGULUS(INLINED) \
    constexpr auto OP(const VAL& val) noexcept { \
       OUT out; \
       OP(DeintCast(val), out); \

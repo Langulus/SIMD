@@ -11,7 +11,6 @@
 
 namespace Langulus::SIMD::Inner
 {
-
    /// Convert V256i to any other register                                    
    ///   @tparam TO - the desired element type                                
    ///   @param v - the input register                                        
@@ -21,7 +20,7 @@ namespace Langulus::SIMD::Inner
       using R = decltype(v);
       using T = TypeOf<R>;
 
-      if constexpr (CT::Double<TO>) {
+      if constexpr (CT::Real64<TO>) {
          //                                                             
          // Converting as many doubles as possible                      
          //                                                             
@@ -73,7 +72,7 @@ namespace Langulus::SIMD::Inner
          }
          else static_assert(false, "Unsupported conversion");
       }
-      else if constexpr (CT::Float<TO>) {
+      else if constexpr (CT::Real32<TO>) {
          //                                                             
          // Converting to floats                                        
          //                                                             
@@ -193,5 +192,4 @@ namespace Langulus::SIMD::Inner
       }
       else static_assert(false, "Unsupported register");
    }
-
-} // namespace Langulus::SIMD
+}
