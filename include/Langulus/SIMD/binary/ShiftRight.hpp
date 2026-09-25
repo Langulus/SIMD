@@ -29,7 +29,7 @@ namespace Langulus::SIMD::Inner
    template<CT::SIMD R> LANGULUS(INLINED)
    auto ShiftRightSIMD(R lhs, R rhs) noexcept {
       using T = TypeOf<R>;
-      static_assert(CT::IntegerX<T>, "Can only shift integers");
+      static_assert(CT::Integer<T>, "Can only shift integers");
       (void)lhs; (void)rhs;
 
    #if LANGULUS_SIMD(128BIT)
@@ -128,7 +128,7 @@ namespace Langulus::SIMD::Inner
          []<class E>(const E& l, const E& r) noexcept -> E {
             // Well defined condition in SIMD calls, that is            
             // otherwise undefined behavior by C++ standard             
-            static_assert(CT::IntegerX<E>, "Can only shift integers");
+            static_assert(CT::Integer<E>, "Can only shift integers");
             return r < E {sizeof(E) * 8} and r >= 0
                ? l >> r : 0;
          }
@@ -155,7 +155,7 @@ namespace Langulus::SIMD::Inner
          []<class E>(const E& l, const E& r) noexcept -> E {
             // Well defined condition in SIMD calls, that is            
             // otherwise undefined behavior by C++ standard             
-            static_assert(CT::IntegerX<E>, "Can only shift integers");
+            static_assert(CT::Integer<E>, "Can only shift integers");
             return r < E {sizeof(E) * 8} and r >= 0
                ? l >> r : 0;
          }

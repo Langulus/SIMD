@@ -51,7 +51,7 @@ namespace Langulus::SIMD::Inner
             #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
                return simde_mm_cmpge_epi64(lhs, rhs);
             #else
-               return Unsupported {};
+               return No {};
             #endif
          }
          else if constexpr (CT::Real32<T>)      return simde_mm_cmpge_ps(lhs, rhs);
@@ -87,7 +87,7 @@ namespace Langulus::SIMD::Inner
             #if LANGULUS_SIMD(AVX512F) and LANGULUS_SIMD(AVX512VL)
                return simde_mm256_cmpge_epi64(lhs, rhs);
             #else
-               return Unsupported {};
+               return No {};
             #endif
          }
          else if constexpr (CT::Real32<T>)      return simde_mm256_cmp_ps(lhs, rhs, SIMDE_CMP_GE_OQ);

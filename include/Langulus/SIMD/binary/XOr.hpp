@@ -51,7 +51,7 @@ namespace Langulus::SIMD::Inner
       }
       else
    #endif
-      static_assert(CT::False<T>, "Unsupported type");
+      static_assert(false, "Unsupported type");
    }
    
    /// Xor values as constexpr, if possible                                   

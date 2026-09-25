@@ -181,7 +181,7 @@ namespace Langulus::SIMD::Inner
                      simde_mm256_cvtsepi64_epi32(hi)
                   };
                #else
-                  return Unsupported {};
+                  return No {};
                #endif
             }
             else return R {simde_mm256_mullo_epi32(lhs, rhs)};
@@ -191,9 +191,9 @@ namespace Langulus::SIMD::Inner
                if constexpr (not SATURATE)
                   return R {simde_mm256_mullo_epi64(lhs, rhs)};
                else
-                  return Unsupported {};
+                  return No {};
             #else
-               return Unsupported{};
+               return No {};
             #endif
          }
          else if constexpr (CT::Real32<T>) {
@@ -219,13 +219,13 @@ namespace Langulus::SIMD::Inner
    #if LANGULUS_SIMD(512BIT)
       if constexpr (CT::SIMD512<R>) {
          if constexpr (CT::Integer8<T>)
-            return Unsupported {};
+            return No {};
          else if constexpr (CT::Integer16<T>)
             return R {simde_mm512_mullo_epi16(lhs, rhs)};
          else if constexpr (CT::Integer32<T>)
             return R {simde_mm512_mullo_epi32(lhs, rhs)};
          else if constexpr (CT::Integer64<T>)
-            return Unsupported{};
+            return No {};
          else if constexpr (CT::Real32<T>)
             return R {simde_mm512_mul_ps(lhs, rhs)};
          else if constexpr (CT::Real64<T>)

@@ -36,14 +36,14 @@ namespace Langulus::SIMD::Inner
             #if LANGULUS_SIMD(AVX512)
                return R {_mm_max_epi64(lhs, rhs)};
             #else
-               return Unsupported{};
+               return No {};
             #endif
          }
          else if constexpr (CT::UnsignedInteger64<T>) {
             #if LANGULUS_SIMD(AVX512)
                return R {simde_mm_max_epu64(lhs, rhs)};
             #else
-               return Unsupported{};
+               return No {};
             #endif
          }
          else if constexpr (CT::Real32<T>)            return R {simde_mm_max_ps      (lhs, rhs)};
@@ -64,14 +64,14 @@ namespace Langulus::SIMD::Inner
             #if LANGULUS_SIMD(AVX512)
                return R {_mm_max_epi64(lhs, rhs)};
             #else
-               return Unsupported{};
+               return No {};
             #endif
          }
          else if constexpr (CT::UnsignedInteger64<T>) {
             #if LANGULUS_SIMD(AVX512)
                return R {_mm_max_epu64(lhs, rhs)};
             #else
-               return Unsupported{};
+               return No {};
             #endif
          }
          else if constexpr (CT::Real32<T>)            return R {simde_mm256_max_ps   (lhs, rhs)};

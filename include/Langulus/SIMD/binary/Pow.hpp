@@ -51,7 +51,7 @@ namespace Langulus::SIMD::Inner
 
             return result;
          }
-         else if constexpr (CT::IntegerX<T>)    return Unsupported {};
+         else if constexpr (CT::Integer<T>)    return No {};
          else static_assert(false, "Unsupported type for 16-byte package");
       }
       else
@@ -82,7 +82,7 @@ namespace Langulus::SIMD::Inner
             }
             return result;
          }
-         else if constexpr (CT::IntegerX<T>)    return Unsupported {};
+         else if constexpr (CT::Integer<T>)    return No {};
          else static_assert(false, "Unsupported type for 32-byte package");
       }
       else
@@ -95,7 +95,7 @@ namespace Langulus::SIMD::Inner
             TODO();
             //https://stackoverflow.com/questions/42964882/test-if-a-big-integer-is-a-power-of-two
          }
-         else if constexpr (CT::IntegerX<T>)          return Unsupported {};
+         else if constexpr (CT::Integer<T>)          return No {};
          else static_assert(false, "Unsupported type for 64-byte package");
       }
       else
@@ -114,7 +114,7 @@ namespace Langulus::SIMD::Inner
             if (l == E {1})
                return E {1};
 
-            if constexpr (CT::IntegerX<E>) {
+            if constexpr (CT::Integer<E>) {
                if constexpr (CT::Unsigned<E>) {
                   E result {1};
                   while (r != E {0}) {
@@ -159,7 +159,7 @@ namespace Langulus::SIMD::Inner
             if (l == E {1})
                return E {1};
 
-            if constexpr (CT::IntegerX<E>) {
+            if constexpr (CT::Integer<E>) {
                if constexpr (CT::Unsigned<E>) {
                   E result {1};
                   while (r != E {0}) {
