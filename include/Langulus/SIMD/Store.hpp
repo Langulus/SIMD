@@ -8,6 +8,7 @@
 #pragma once
 #include "Export.hpp"
 #include "Bitmask.hpp"
+#include <Langulus/CT/Saturated.hpp>
 
 
 namespace Langulus::SIMD::Inner
@@ -405,7 +406,7 @@ namespace Langulus::SIMD
 #define LANGULUS_SIMD_ARITHMETHIC_WITH_SATURATION_API(OP) \
    template<bool SATURATE = false, class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED) \
    constexpr void OP(const LHS& lhs, const RHS& rhs, OUT& out) noexcept { \
-      constexpr bool saturated = SATURATE or CT::Saturated<LHS, RHS>; \
+      constexpr bool saturated = SATURATE or CT::Saturated<LHS> or CT::Saturated<RHS>; \
       if consteval { \
          Store(Inner::OP##Constexpr<saturated, OUT>(DeintCast(lhs), DeintCast(rhs)), out); \
       } else { \
@@ -418,7 +419,7 @@ namespace Langulus::SIMD
    template<bool SATURATE = false, class LHS, class RHS, CT::NoIntent OUT = LosslessArray<LHS, RHS>> \
    LANGULUS(INLINED) \
    constexpr auto OP(const LHS& lhs, const RHS& rhs) noexcept { \
-      constexpr bool saturated = SATURATE or CT::Saturated<LHS, RHS>; \
+      constexpr bool saturated = SATURATE or CT::Saturated<LHS> or CT::Saturated<RHS>; \
       OUT out; \
       OP<SATURATE or saturated>(DeintCast(lhs), DeintCast(rhs), out); \
       if constexpr (::std::derived_from<Decay<LHS>, Decay<RHS>>) \

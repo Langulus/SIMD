@@ -552,14 +552,3 @@ namespace Langulus::SIMD
       else return static_cast<AS>(v);
    }
 }
-
-namespace Langulus::CT
-{
-   /// Anything that is saturated                                             
-   /// Notice that only one of the types has to be saturated                  
-   template<class...T>
-   concept Saturated = ((Decay<Deint<T>>::CTTI_SaturatedTrait) or ...);
-
-   template<class...T>
-   concept Unsaturated = ((not Saturated<T>) and ...);
-}
