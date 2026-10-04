@@ -28,19 +28,17 @@
 
 namespace Langulus::SIMD::Inner
 {
-   /// Used to detect missing SIMD routine                                 
-   template<Element> LANGULUS(INLINED)
-   constexpr No ConvertSIMD(CT::NotSIMD auto) noexcept {
-      return {};
-   }
+   /// Used to detect missing SIMD routine                                    
+   template<Element>
+   constexpr No ConvertSIMD(CT::NotSIMD auto) noexcept { return {}; }
 
-   /// Convert from one register to another                                
-   ///   @tparam TO - type of element to convert to                        
-   ///   @param in - register to convert from                              
-   ///   @return the resulting register, or Unsupported if not possible    
-   ///   @attention this function doesn't guarantee that all elements in   
-   ///      'in' will be converted - only the amount that fits in the      
-   ///      biggest available hardware register                            
+   /// Convert from one register to another                                   
+   ///   @tparam TO - type of element to convert to                           
+   ///   @param in - register to convert from                                 
+   ///   @return the resulting register, or Unsupported if not possible       
+   ///   @attention this function doesn't guarantee that all elements in      
+   ///      'in' will be converted - only the amount that fits in the         
+   ///      biggest available hardware register                               
    template<Element TO> LANGULUS(INLINED)
    auto ConvertSIMD(CT::SIMD auto in) noexcept {
       using R = decltype(in);
@@ -78,36 +76,36 @@ namespace Langulus::SIMD::Inner
       static_assert(false, "Can't convert from unsupported");
    }
 
-   /// Convert scalars/arrays at compile-time, if possible                 
-   ///   @tparam TO - the desired element type                             
-   ///   @param in - scalar/vector to convert from                         
-   ///   @return std::array or scalar, depending on the input              
+   /// Convert scalars/arrays at compile-time, if possible                    
+   ///   @tparam TO - the desired element type                                
+   ///   @param in - scalar/vector to convert from                            
+   ///   @return std::array or scalar, depending on the input                 
    template<Element TO> LANGULUS(INLINED)
    constexpr auto ConvertConstexpr(const CT::NotSIMD auto& in) noexcept {
       using FROM = Deref<decltype(in)>;
 
       if constexpr (CT::Vector<FROM>) {
-         // Convert from vectors                                     
+         // Convert from vectors                                        
          ::std::array<TO, ExtentOf<FROM>> result;
          for (size_t i = 0; i < ExtentOf<FROM>; ++i)
             result[i] = static_cast<TO>(in[i]);
          return result;
       }
       else {
-         // Convert from scalar                                      
+         // Convert from scalar                                         
          return static_cast<TO>(DenseCast(in));
       }
    }
 
-   /// Convert scalars/arrays/registers and return a register, if possible 
-   ///   @tparam DEF - default value for setting elements outside array,   
-   ///      used only if input array is smaller than chosen register       
-   ///   @tparam TO - the desired element type                             
-   ///   @param in - scalar/vector/register to convert from                
-   ///   @return scalar/vector/register/unsupported                        
-   ///   @attention this function doesn't guarantee that all elements in   
-   ///      'in' will be converted when ConvertSIMD is used - only the     
-   ///      amount that fits in the biggest available hardware register    
+   /// Convert scalars/arrays/registers and return a register, if possible    
+   ///   @tparam DEF - default value for setting elements outside array,      
+   ///      used only if input array is smaller than chosen register          
+   ///   @tparam TO - the desired element type                                
+   ///   @param in - scalar/vector/register to convert from                   
+   ///   @return scalar/vector/register/unsupported                           
+   ///   @attention this function doesn't guarantee that all elements in      
+   ///      'in' will be converted when ConvertSIMD is used - only the        
+   ///      amount that fits in the biggest available hardware register       
    template<auto DEF, Element TO> LANGULUS(INLINED)
    auto Convert(const auto& in) noexcept {
       using FROM = Deref<decltype(in)>;
@@ -161,7 +159,7 @@ namespace Langulus::SIMD
       using TO   = TypeOf<OUTPUT>;
 
       if constexpr (CT::Vector<OUTPUT>) {
-         if (::std::is_constant_evaluated()) {
+         if consteval {
             // Converting in a contexpr context                         
             Store(Inner::ConvertConstexpr<TO>(DeintCast(val)), out);
          }
