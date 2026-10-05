@@ -14,8 +14,8 @@
 namespace Langulus::SIMD::Inner
 {
    /// Save a register to a bitmask in memory                                 
-   ///   @param from - the source register                                    
-   ///   @param to - the destination vector                                   
+   ///   @param from the source register                                      
+   ///   @param to [out] the destination vector                               
    LANGULUS(INLINED)
    void StoreSIMD(const CT::SIMD auto& from, CT::Bitmask auto& to) noexcept {
       using R = Deref<decltype(from)>;
@@ -70,8 +70,8 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Save a register to a vector in memory                                  
-   ///   @param from - the source register                                    
-   ///   @param to - the destination vector                                   
+   ///   @param from the source register                                      
+   ///   @param to [out] the destination vector                               
    LANGULUS(INLINED)
    void StoreSIMD(const CT::SIMD auto& from, CT::Vector auto& to) noexcept {
       using TO   = Deref<decltype(to)>;
@@ -282,14 +282,12 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Fallback store routine, doesn't use SIMD, hopefully constexpr          
-   ///   @param from - scalar/vector/bitmask to store                         
-   ///   @param to - scalar/vector/bitmask to write                           
-   LANGULUS(INLINED)
-   constexpr void StoreConstexpr(const CT::NotSIMD auto& from, CT::NotSIMD auto& to) noexcept {
-      using FROM = Deref<decltype(from)>;
-      using TO   = Deref<decltype(to)>;
-      using E    = TypeOf<TO>;
-      constexpr auto S = OverlapCounts<FROM, TO>();
+   ///   @param from scalar/vector/bitmask to store                           
+   ///   @param to [out] scalar/vector/bitmask to write                       
+   template<CT::NotSIMD FROM, CT::NotSIMD TO> LANGULUS(INLINED)
+   constexpr void StoreConstexpr(FROM const& from, TO& to) noexcept {
+      using E = TypeOf<TO>;
+      constexpr size_t S = Langulus::Inner::OverlapCounts<FROM, TO>();
       static_assert(S > 0);
 
       if constexpr (CT::Bitmask<FROM>) {
@@ -361,11 +359,10 @@ namespace Langulus::SIMD::Inner
 namespace Langulus::SIMD
 {
    /// Generalized store routine, will attempt constexpr and SIMD execution   
-   ///   @param from - what to store                                          
-   ///   @param to - where to store it                                        
-   LANGULUS(INLINED)
-   constexpr void Store(const CT::NoIntent auto& from, CT::NotSIMD auto& to) noexcept {
-      using FROM = Deref<decltype(from)>;
+   ///   @param from what to store                                            
+   ///   @param to [out] where to store it                                    
+   template<CT::NoIntent FROM> LANGULUS(INLINED)
+   constexpr void Store(FROM const& from, CT::NotSIMD auto& to) noexcept {
       if constexpr (CT::SIMD<FROM>)
          Inner::StoreSIMD(from, to);
       else if constexpr (CT::Supported<FROM>)

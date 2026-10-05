@@ -130,7 +130,7 @@ namespace Langulus::SIMD
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in an instance of 'OUT'. Use           
    ///      Inner::Lesser if you don't want this.                             
-   template<class LHS, class RHS, CT::NoIntent OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
+   template<class LHS, class RHS, CT::NoIntent OUT = Bitmask<Langulus::Inner::OverlapCounts<LHS, RHS>()>>
    LANGULUS(INLINED)
    constexpr OUT Lesser(const LHS& lhs, const RHS& rhs) noexcept {
       OUT out;
