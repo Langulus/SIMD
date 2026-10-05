@@ -16,9 +16,9 @@ namespace Langulus::SIMD::Inner
    constexpr No MultiplySIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept { return {}; }
 
    /// Multiply two registers                                                 
-   ///   @tparam SATURATE - whether to clamp integer vectors on overflow      
-   ///   @param lhs - left register                                           
-   ///   @param rhs - right register                                          
+   ///   @tparam SATURATE whether to clamp integer vectors on overflow        
+   ///   @param lhs left register                                             
+   ///   @param rhs right register                                            
    ///   @return the resulting register                                       
    template<bool SATURATE, CT::SIMD R> LANGULUS(INLINED)
    auto MultiplySIMD(R lhs, R rhs) noexcept {
