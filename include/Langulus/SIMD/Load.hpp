@@ -52,11 +52,8 @@ namespace Langulus::SIMD
    ///      void to pick a register that is capable of fitting 'v'            
    ///   @param v - the scalar/vector to load inside a register               
    ///   @return the register, or Unsupported if not possible                 
-   template<auto DEF, class FORCE_OUT = void> LANGULUS(INLINED)
-   auto Load(const CT::NotSIMD auto& v) noexcept {
-      using R = Deref<decltype(v)>;
-      using T = Decvq<TypeOf<R>>;
-
+   template<auto DEF, class FORCE_OUT = void, CT::NotSIMD R> LANGULUS(INLINED)
+   auto Load(R const& v) noexcept {
       if constexpr (CT::Scalar<R>) {
          if constexpr (CT::Void<FORCE_OUT> or ExtentOf<FORCE_OUT> == 1) {
             // We either can't decide in what register to insert the    
@@ -67,14 +64,15 @@ namespace Langulus::SIMD
             // Load a scalar, by duplicating the value for each element 
             // in the register. FORCE_OUT MUST BE SET!                  
             constexpr auto S = Inner::DecideCount<R, FORCE_OUT>();
-            return Fill<sizeof(T) * S>(v);
+            return Fill<sizeof(R) * S>(v);
          }
       }
       else {
          // Load a vector either partially, filling the blanks using    
          // DEF value, or directly if vector is of the proper size      
          // Should perform faster if 'v' is aligned properly            
-         constexpr auto S  = Inner::DecideCount<R, FORCE_OUT>();
+         using T = TypeOf<R>;
+         constexpr auto S = Inner::DecideCount<R, FORCE_OUT>();
          [[maybe_unused]] constexpr auto RS = sizeof(T) * S;
 
          #if LANGULUS_SIMD(128BIT)

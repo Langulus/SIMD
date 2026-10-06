@@ -15,10 +15,10 @@ namespace Langulus::SIMD::Inner
    ///   @tparam TO - the desired element type                                
    ///   @param v - the input register                                        
    ///   @return the converted register                                       
-   template<Element TO> LANGULUS(INLINED)
-   auto ConvertFrom256i(CT::SIMD256i auto v) noexcept {
-      using R = decltype(v);
+   template<Element TO, CT::SIMD256i R> LANGULUS(INLINED)
+   auto ConvertFrom256i(R v) noexcept {
       using T = TypeOf<R>;
+      static_assert(not ::std::is_void_v<T>);
 
       if constexpr (CT::Real64<TO>) {
          //                                                             

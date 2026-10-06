@@ -33,9 +33,9 @@ namespace Langulus::SIMD::Inner
    constexpr No ConvertSIMD(CT::NotSIMD auto) noexcept { return {}; }
 
    /// Convert from one register to another                                   
-   ///   @tparam TO - type of element to convert to                           
-   ///   @param in - register to convert from                                 
-   ///   @return the resulting register, or Unsupported if not possible       
+   ///   @tparam TO type of element to convert to                             
+   ///   @param in register to convert from                                   
+   ///   @return the resulting register, or No if that's not possible         
    ///   @attention this function doesn't guarantee that all elements in      
    ///      'in' will be converted - only the amount that fits in the         
    ///      biggest available hardware register                               
@@ -77,8 +77,8 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Convert scalars/arrays at compile-time, if possible                    
-   ///   @tparam TO - the desired element type                                
-   ///   @param in - scalar/vector to convert from                            
+   ///   @tparam TO the desired element type                                  
+   ///   @param in scalar/vector to convert from                              
    ///   @return std::array or scalar, depending on the input                 
    template<Element TO> LANGULUS(INLINED)
    constexpr auto ConvertConstexpr(const CT::NotSIMD auto& in) noexcept {
@@ -98,37 +98,36 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Convert scalars/arrays/registers and return a register, if possible    
-   ///   @tparam DEF - default value for setting elements outside array,      
+   ///   @tparam DEF default value for setting elements outside array,        
    ///      used only if input array is smaller than chosen register          
-   ///   @tparam TO - the desired element type                                
-   ///   @param in - scalar/vector/register to convert from                   
+   ///   @tparam TO the desired element type                                  
+   ///   @param in scalar/vector/register to convert from                     
    ///   @return scalar/vector/register/unsupported                           
    ///   @attention this function doesn't guarantee that all elements in      
    ///      'in' will be converted when ConvertSIMD is used - only the        
    ///      amount that fits in the biggest available hardware register       
-   template<auto DEF, Element TO> LANGULUS(INLINED)
-   auto Convert(const auto& in) noexcept {
-      using FROM = Deref<decltype(in)>;
-
+   template<auto DEF, Element TO, class FROM> LANGULUS(INLINED)
+   auto Convert(FROM const& in) noexcept {
       if constexpr (CT::SIMD<FROM>) {
-         // Input is already a register, skip loading                
+         // Input is already a register, skip loading                   
          return ConvertSIMD<TO>(in);
       }
       else if constexpr (CT::Vector<FROM>) {
-         // Convert from vectors                                     
-         // Attempt loading input array into a register              
+         // Convert from vectors                                        
+         // Attempt loading input array into a register                 
          const auto v = Load<DEF>(in);
+         static_assert(not ::std::is_void_v<decltype(v)>);
 
          if constexpr (CT::Unsupported<decltype(v)>) {
-            // Load to register fails, fallback                      
+            // Load to register fails, fallback                         
             return ConvertConstexpr<TO>(in);
          }
          else {
-            // Load was a success, now test if SIMD conversion is    
-            // supported                                             
+            // Load was a success, now test if SIMD conversion is       
+            // supported                                                
             const auto converted = ConvertSIMD<TO>(v);
             if constexpr (CT::Unsupported<decltype(converted)>) {
-               // SIMD conversion fails, fallback                    
+               // SIMD conversion fails, fallback                       
                return ConvertConstexpr<TO>(in);
             }
             else {
@@ -140,7 +139,7 @@ namespace Langulus::SIMD::Inner
          }
       }
       else {
-         // Convert from scalar                                      
+         // Convert from scalar                                         
          return static_cast<TO>(DenseCast(in));
       }
    }
@@ -149,36 +148,36 @@ namespace Langulus::SIMD::Inner
 namespace Langulus::SIMD
 {
    /// Convert scalar/array/register, and force output to desired place       
-   ///   @tparam DEF - default value for setting elements outside array,      
+   ///   @tparam DEF default value for setting elements outside array,        
    ///      used only if input extent is smaller than output extent           
-   ///   @param val - what scalar/array/register are we converting?           
-   ///   @param out - what scalar/array/register are we converting into?      
-   template<auto DEF, class INPUT, CT::NoIntent OUTPUT> LANGULUS(INLINED)
+   ///   @param val what scalar/array/register are we converting?             
+   ///   @param out what scalar/array/register are we converting into?        
+   template<auto DEF, class INPUT, class OUTPUT>
+   requires (CT::NoIntent<INPUT, OUTPUT>) LANGULUS(INLINED)
    constexpr void Convert(const INPUT& val, OUTPUT& out) noexcept {
-      using FROM = TypeOf<Deint<INPUT>>;
-      using TO   = TypeOf<OUTPUT>;
+      using TO = TypeOf<OUTPUT>;
 
       if constexpr (CT::Vector<OUTPUT>) {
          if consteval {
             // Converting in a contexpr context                         
-            Store(Inner::ConvertConstexpr<TO>(DeintCast(val)), out);
+            Store(Inner::ConvertConstexpr<TO>(val), out);
          }
          else {
             // Converting using SIMD, hopefully                         
-            using CONVERTED_TYPE = decltype(Inner::Convert<DEF, TO>(DeintCast(val)));
+            using CONVERTED_TYPE = decltype(Inner::Convert<DEF, TO>(val));
             constexpr bool supported = CT::SIMD<CONVERTED_TYPE>;
             constexpr auto CI = ExtentOf<CONVERTED_TYPE>;
             constexpr auto CO = ExtentOf<OUTPUT>;
 
             if constexpr (not supported or CI == 1 or CO == 1) {
                // Will always utilize the fallback converter            
-               Store(Inner::ConvertConstexpr<TO>(DeintCast(val)), out);
+               Store(Inner::ConvertConstexpr<TO>(val), out);
             }
             else if constexpr (CI >= ExtentOf<INPUT>) {
                // We're able to do the conversion with a single register
                // (or SIMD is not required at all)                      
                if constexpr (CT::SIMD<OUTPUT>)
-                  out = Inner::Convert<DEF, TO>(DeintCast(val));
+                  out = Inner::Convert<DEF, TO>(val);
                else {
                   constexpr size_t left = std::min(CI, CO);
                   using LEFTO = TO(&)[left];
@@ -186,7 +185,7 @@ namespace Langulus::SIMD
 
                   auto output = reinterpret_cast<TO*>(SparseCast(out));
                   Store(
-                     Inner::Convert<DEF, TO>(DeintCast(val)),
+                     Inner::Convert<DEF, TO>(val),
                      reinterpret_cast<LEFTO>(output[0])
                   );
 
@@ -201,9 +200,9 @@ namespace Langulus::SIMD
                }
             }
             else {
-               // We have to divide the conversion into multiple regs   
+               // We have to divide the conversion into multiple regs.  
                // This happens when we convert float[4] to double[4]    
-               // without AVX support for example                       
+               // without AVX support, for example.                     
                constexpr size_t left = Roof2(ExtentOf<INPUT>/2);
                static_assert(left < ExtentOf<INPUT>,
                   "Can't properly split the input vector");
@@ -212,6 +211,7 @@ namespace Langulus::SIMD
                constexpr size_t right = std::min(ExtentOf<INPUT> - left, CO - left);
                constexpr size_t tail  = CO - left - right;
 
+               using FROM   = TypeOf<INPUT>;
                using LEFTI  = const FROM(&)[left];
                using RIGHTI = const FROM(&)[right];
                using LEFTO  = TO(&)[left];
@@ -219,7 +219,7 @@ namespace Langulus::SIMD
 
                // Nest the two parts so that splitting can occur        
                // statically multiple times if it has to                
-               auto input = reinterpret_cast<FROM const*>(SparseCast(DeintCast(val)));
+               auto input = reinterpret_cast<FROM const*>(SparseCast(val));
 
                if constexpr (CT::SIMD<OUTPUT>) {
                   LosslessRegister<LEFTO>  out1;
@@ -251,16 +251,16 @@ namespace Langulus::SIMD
             }
          }
       }
-      else GetFirst(out) = static_cast<TO>(GetFirst(DeintCast(val)));
+      else GetFirst(out) = static_cast<TO>(GetFirst(val));
    }
 
    /// Convert scalar/array/register                                          
-   ///   @tparam OUT - the desired output type (lossless array by default)    
-   ///   @param val - what scalar/array/register are we converting?           
-   template<class VAL, CT::NoIntent OUT = LosslessArray<VAL, VAL>> LANGULUS(INLINED)
-   constexpr OUT Convert(const VAL& val) noexcept {
+   ///   @tparam OUT the desired output type (lossless array by default)      
+   ///   @param val what scalar/array/register are we converting?             
+   template<CT::NoIntent VAL, CT::NoIntent OUT = LosslessArray<VAL, VAL>> LANGULUS(INLINED)
+   constexpr OUT Convert(VAL const& val) noexcept {
       OUT out;
-      Convert(DeintCast(val), out);
+      Convert(val, out);
       return out;
    }
 }

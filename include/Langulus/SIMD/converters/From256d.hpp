@@ -12,8 +12,8 @@
 namespace Langulus::SIMD::Inner
 {
    /// Convert V256d to any other register                                    
-   ///   @tparam TO - the desired element type                                
-   ///   @param v - the input register                                        
+   ///   @tparam TO the desired element type                                  
+   ///   @param v the input register                                          
    ///   @return the converted register                                       
    template<Element TO> LANGULUS(INLINED)
    auto ConvertFrom256d(CT::SIMD256d auto v) noexcept {

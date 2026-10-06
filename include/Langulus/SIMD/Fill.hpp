@@ -16,7 +16,7 @@ namespace Langulus::SIMD
    ///   @param s -  the scalar value to use for filling                      
    ///   @return the filled register                                          
    template<int R> LANGULUS(INLINED)
-   auto Fill(const CT::Scalar auto& s) noexcept {
+   auto Fill(CT::Scalar auto const& s) noexcept {
       (void)s;
 
       #if LANGULUS_SIMD(128BIT)

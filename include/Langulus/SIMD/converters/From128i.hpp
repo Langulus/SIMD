@@ -47,13 +47,13 @@ namespace Langulus::SIMD::Inner
 
 
    /// Convert V128i to any other register                                    
-   ///   @tparam TO - the desired element type                                
-   ///   @param v - the input register                                        
+   ///   @tparam TO the desired element type                                  
+   ///   @param v the input register                                          
    ///   @return the converted register                                       
-   template<Element TO> LANGULUS(INLINED)
-   auto ConvertFrom128i(CT::SIMD128i auto v) noexcept {
-      using R = decltype(v);
+   template<Element TO, CT::SIMD128i R> LANGULUS(INLINED)
+   auto ConvertFrom128i(R v) noexcept {
       using T = TypeOf<R>;
+      static_assert(not ::std::is_void_v<T>);
 
       if constexpr (CT::Real64<TO>) {
          //                                                             

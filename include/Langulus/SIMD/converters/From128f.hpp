@@ -28,8 +28,8 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Convert V128f to any other register                                    
-   ///   @tparam TO - the desired element type                                
-   ///   @param v - the input register                                        
+   ///   @tparam TO the desired element type                                  
+   ///   @param v the input register                                          
    ///   @return the converted register                                       
    template<Element TO> LANGULUS(INLINED)
    auto ConvertFrom128f(CT::SIMD128f auto v) noexcept {
