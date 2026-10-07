@@ -9,10 +9,11 @@ namespace Langulus::SIMD
    ///                                                                        
    template<>
    struct V256<simde_float32> {
-      using CTTI_InnerType = simde_float32;
-      static constexpr int CTTI_SIMD_Trait = 256;
-      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float32);
-
+      using CTTI_Typed     = simde_float32;
+      using CTTI_SIMD      = Yup;
+      using CTTI_Array     = Yes<8>;
+      using CTTI_Nullable  = Yup;
+      
       simde__m256 m;
 
       V256() noexcept = default;
@@ -78,10 +79,11 @@ namespace Langulus::SIMD
    ///                                                                        
    template<>
    struct V256<simde_float64> {
-      using CTTI_InnerType = simde_float64;
-      static constexpr int CTTI_SIMD_Trait = 256;
-      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float64);
-
+      using CTTI_Typed     = simde_float64;
+      using CTTI_SIMD      = Yup;
+      using CTTI_Array     = Yes<4>;
+      using CTTI_Nullable  = Yup;
+      
       simde__m256d m;
 
       V256() noexcept = default;
@@ -147,9 +149,10 @@ namespace Langulus::SIMD
    ///                                                                        
    template<IntElement T>
    struct V256<T> {
-      using CTTI_InnerType = T;
-      static constexpr int CTTI_SIMD_Trait = 256;
-      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
+      using CTTI_Typed     = T;
+      using CTTI_SIMD      = Yup;
+      using CTTI_Array     = Yes<32 / sizeof(T)>;
+      using CTTI_Nullable  = Yup;
 
       simde__m256i m;
 
@@ -462,22 +465,19 @@ namespace Langulus::SIMD
 
 namespace Langulus::CT
 {
+   /// Concept for 256bit SIMD registers                                      
+   template<class...T>
+   concept SIMD256  = ((SIMD<T> and sizeof(T) == 32) and ...);
+
    /// Concept for 256bit SIMD float registers                                
    template<class...T>
-   concept SIMD256f = ((Deref<T>::CTTI_SIMD_Trait == 256
-       and CT::Real32<TypeOf<T>>) and ...);
+   concept SIMD256f = ((SIMD256<T> and CT::Real32<TypeOf<T>>) and ...);
 
    /// Concept for 256bit SIMD double registers                               
    template<class...T>
-   concept SIMD256d = ((Deref<T>::CTTI_SIMD_Trait == 256
-       and CT::Real64<TypeOf<T>>) and ...);
+   concept SIMD256d = ((SIMD256<T> and CT::Real64<TypeOf<T>>) and ...);
 
    /// Concept for 256bit SIMD integer/bool registers                         
    template<class...T>
-   concept SIMD256i = ((Deref<T>::CTTI_SIMD_Trait == 256
-       and CT::Integer<TypeOf<T>>) and ...);
-
-   /// Concept for 256bit SIMD registers                                      
-   template<class...T>
-   concept SIMD256  = ((Deref<T>::CTTI_SIMD_Trait == 256) and ...);
+   concept SIMD256i = ((SIMD256<T> and CT::Integer<TypeOf<T>>) and ...);
 }

@@ -194,7 +194,7 @@ struct Vector {
       return true;
    }
 
-   constexpr bool operator == (const T& e) const noexcept {
+   constexpr bool operator == (T const& e) const noexcept {
       for (size_t i = 0; i < C; ++i)
          if (DenseCast(mArray[i]) != e)
             return false;
@@ -217,7 +217,7 @@ struct Vector {
       return const_cast<T&>(mArray[0]);
    }
 
-   constexpr const T& operator [](auto i) const noexcept {
+   constexpr T const& operator [](auto i) const noexcept {
       return mArray[i];
    }
 

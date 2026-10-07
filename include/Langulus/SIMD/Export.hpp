@@ -10,6 +10,7 @@
 #include <Langulus/Utils/Byte.hpp>
 #include <Langulus/CT/Akin.hpp>
 #include <Langulus/CT/Lossless.hpp>
+#include <Langulus/CT/SIMD.hpp>
 #include <Langulus/IntentOf.hpp>
 #include <array>
 #include <type_traits>
@@ -369,39 +370,6 @@ namespace Langulus::SIMD
 #endif
 
 
-/// Add some SIMD related concepts to the CT library                          
-namespace Langulus::CT
-{
-#if not LANGULUS_SIMD(128BIT)
-   template<class...T> concept SIMD128f = false;
-   template<class...T> concept SIMD128d = false;
-   template<class...T> concept SIMD128i = false;
-   template<class...T> concept SIMD128  = false;
-#endif
-
-#if not LANGULUS_SIMD(256BIT)
-   template<class...T> concept SIMD256f = false;
-   template<class...T> concept SIMD256d = false;
-   template<class...T> concept SIMD256i = false;
-   template<class...T> concept SIMD256  = false;
-#endif
-
-#if not LANGULUS_SIMD(512BIT)
-   template<class...T> concept SIMD512f = false;
-   template<class...T> concept SIMD512d = false;
-   template<class...T> concept SIMD512i = false;
-   template<class...T> concept SIMD512  = false;
-#endif
-
-   /// Concept for SIMD registers                                             
-   template<class...T>
-   concept SIMD = ((SIMD128<T> or SIMD256<T> or SIMD512<T>) and ...);
-
-   /// Anything but SIMD registers                                            
-   template<class...T>
-   concept NotSIMD = ((not SIMD<T>) and ...);
-}
-
 namespace Langulus::SIMD
 {
    /// Get the first element of an array or vector, or just the scalar        
@@ -541,7 +509,7 @@ namespace Langulus::SIMD
    ///   @param v - saturate the value by converting T to a smaller type and  
    ///      clamping to the min/max if value exceeds the smaller range        
    template<class AS, class T> LANGULUS(INLINED)
-   constexpr AS Saturate(const T& v) noexcept {
+   constexpr AS Saturate(T const& v) noexcept {
       if constexpr (CT::Real<T>)
          return static_cast<AS>(v < T {0} ? T {0} : v > T {1} ? T {1} : v);
       else if constexpr (CT::Integer<T> and sizeof(AS) < sizeof(T)) {

@@ -4,13 +4,13 @@
 
 namespace Langulus::SIMD
 {
-
    template<>
    struct V512<simde_float32> {
-      using CTTI_InnerType = simde_float32;
-      static constexpr int CTTI_SIMD_Trait = 512;
-      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float32);
-
+      using CTTI_Typed     = simde_float32;
+      using CTTI_SIMD      = Yup;
+      using CTTI_Array     = Yes<16>;
+      using CTTI_Nullable  = Yup;
+      
       simde__m512 m;
 
       V512() noexcept = default;
@@ -35,10 +35,11 @@ namespace Langulus::SIMD
 
    template<>
    struct V512<simde_float64> {
-      using CTTI_InnerType = simde_float64;
-      static constexpr int CTTI_SIMD_Trait = 512;
-      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float64);
-
+      using CTTI_Typed     = simde_float64;
+      using CTTI_SIMD      = Yup;
+      using CTTI_Array     = Yes<8>;
+      using CTTI_Nullable  = Yup;
+      
       simde__m512d m;
 
       V512() noexcept = default;
@@ -63,9 +64,10 @@ namespace Langulus::SIMD
 
    template<IntElement T>
    struct V512<T> {
-      using CTTI_InnerType = T;
-      static constexpr int CTTI_SIMD_Trait = 512;
-      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
+      using CTTI_Typed     = T;
+      using CTTI_SIMD      = Yup;
+      using CTTI_Array     = Yes<64 / sizeof(T)>;
+      using CTTI_Nullable  = Yup;
 
       simde__m512i m;
 
@@ -154,29 +156,23 @@ namespace Langulus::SIMD
             static_assert(false, "Can't pack this type");
       }
    };
-
-} // namespace Langulus::SIMD
+}
 
 namespace Langulus::CT
 {
+   /// Concept for 512bit SIMD registers                                      
+   template<class...T>
+   concept SIMD512  = ((SIMD<T> and sizeof(T) == 64) and ...);
 
    /// Concept for 512bit SIMD float registers                                
    template<class...T>
-   concept SIMD512f = ((Deref<T>::CTTI_SIMD_Trait == 512
-       and CT::Float<TypeOf<T>>) and ...);
+   concept SIMD512f = ((SIMD512<T> and CT::Real32<TypeOf<T>>) and ...);
 
    /// Concept for 512bit SIMD double registers                               
    template<class...T>
-   concept SIMD512d = ((Deref<T>::CTTI_SIMD_Trait == 512
-       and CT::Double<TypeOf<T>>) and ...);
+   concept SIMD512d = ((SIMD512<T> and CT::Real64<TypeOf<T>>) and ...);
 
    /// Concept for 512bit SIMD integer/bool registers                         
    template<class...T>
-   concept SIMD512i = ((Deref<T>::CTTI_SIMD_Trait == 512
-       and CT::Integer<TypeOf<T>>) and ...);
-
-   /// Concept for 512bit SIMD registers                                      
-   template<class...T>
-   concept SIMD512  = ((Deref<T>::CTTI_SIMD_Trait == 512) and ...);
-
-} // namespace Langulus::CT
+   concept SIMD512i = ((SIMD512<T> and CT::Integer<TypeOf<T>>) and ...);
+}

@@ -1,5 +1,5 @@
 #pragma once
-#include <Langulus/SIMD/Export.hpp>
+#include "../Export.hpp"
 
 
 namespace Langulus::SIMD
@@ -9,9 +9,10 @@ namespace Langulus::SIMD
    ///                                                                        
    template<>
    struct V128<simde_float32> {
-      using CTTI_InnerType = simde_float32;
-      static constexpr int CTTI_SIMD_Trait = 128;
-      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float32);
+      using CTTI_Typed     = simde_float32;
+      using CTTI_SIMD      = Yup;
+      using CTTI_Array     = Yes<4>;
+      using CTTI_Nullable  = Yup;
 
       simde__m128 m;
 
@@ -72,9 +73,10 @@ namespace Langulus::SIMD
    ///                                                                        
    template<>
    struct V128<simde_float64> {
-      using CTTI_InnerType = simde_float64;
-      static constexpr int CTTI_SIMD_Trait = 128;
-      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(simde_float64);
+      using CTTI_Typed     = simde_float64;
+      using CTTI_SIMD      = Yup;
+      using CTTI_Array     = Yes<2>;
+      using CTTI_Nullable  = Yup;
 
       simde__m128d m;
 
@@ -135,10 +137,11 @@ namespace Langulus::SIMD
    ///                                                                        
    template<IntElement T>
    struct V128<T> {
-      using CTTI_InnerType = T;
-      static constexpr int CTTI_SIMD_Trait = 128;
-      static constexpr size_t MemberCount = (CTTI_SIMD_Trait / 8) / sizeof(T);
-
+      using CTTI_Typed     = T;
+      using CTTI_SIMD      = Yup;
+      using CTTI_Array     = Yes<16 / sizeof(T)>;
+      using CTTI_Nullable  = Yup;
+      
       simde__m128i m;
 
       V128() noexcept = default;
@@ -445,22 +448,19 @@ namespace Langulus::SIMD
 
 namespace Langulus::CT
 {
+   /// Concept for 128bit SIMD registers                                      
+   template<class...T>
+   concept SIMD128  = ((SIMD<T> and sizeof(T) == 16) and ...);
+
    /// Concept for 128bit SIMD float registers                                
    template<class...T>
-   concept SIMD128f = ((Deref<T>::CTTI_SIMD_Trait == 128
-       and CT::Real32<TypeOf<T>>) and ...);
+   concept SIMD128f = ((SIMD128<T> and CT::Real32<TypeOf<T>>) and ...);
 
    /// Concept for 128bit SIMD double registers                               
    template<class...T>
-   concept SIMD128d = ((Deref<T>::CTTI_SIMD_Trait == 128
-       and CT::Real64<TypeOf<T>>) and ...);
+   concept SIMD128d = ((SIMD128<T> and CT::Real64<TypeOf<T>>) and ...);
 
    /// Concept for 128bit SIMD integer/bool registers                         
    template<class...T>
-   concept SIMD128i = ((Deref<T>::CTTI_SIMD_Trait == 128
-       and CT::Integer<TypeOf<T>>) and ...);
-
-   /// Concept for 128bit SIMD registers                                      
-   template<class...T>
-   concept SIMD128  = ((Deref<T>::CTTI_SIMD_Trait == 128) and ...);
+   concept SIMD128i = ((SIMD128<T> and CT::Integer<TypeOf<T>>) and ...);
 }

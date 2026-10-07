@@ -39,9 +39,8 @@ namespace Langulus::SIMD::Inner
    ///   @attention this function doesn't guarantee that all elements in      
    ///      'in' will be converted - only the amount that fits in the         
    ///      biggest available hardware register                               
-   template<Element TO> LANGULUS(INLINED)
-   auto ConvertSIMD(CT::SIMD auto in) noexcept {
-      using R = decltype(in);
+   template<Element TO, CT::SIMD R> LANGULUS(INLINED)
+   auto ConvertSIMD(R in) noexcept {
       using T = TypeOf<R>;
 
       if constexpr (Same<T, TO>) {
@@ -54,6 +53,7 @@ namespace Langulus::SIMD::Inner
          if      constexpr (CT::Real32<T>)   return ConvertFrom128f<TO>(in);
          else if constexpr (CT::Real64<T>)   return ConvertFrom128d<TO>(in);
          else if constexpr (CT::Integer<T>)  return ConvertFrom128i<TO>(in);
+         else static_assert(false, "Unsupported SIMD128");
       }
       else
       #endif
@@ -62,6 +62,7 @@ namespace Langulus::SIMD::Inner
          if      constexpr (CT::Real32<T>)   return ConvertFrom256f<TO>(in);
          else if constexpr (CT::Real64<T>)   return ConvertFrom256d<TO>(in);
          else if constexpr (CT::Integer<T>)  return ConvertFrom256i<TO>(in);
+         else static_assert(false, "Unsupported SIMD256");
       }
       else
       #endif
@@ -70,6 +71,7 @@ namespace Langulus::SIMD::Inner
          if      constexpr (CT::Real32<T>)   return ConvertFrom512f<TO>(in);
          else if constexpr (CT::Real64<T>)   return ConvertFrom512d<TO>(in);
          else if constexpr (CT::Integer<T>)  return ConvertFrom512i<TO>(in);
+         else static_assert(false, "Unsupported SIMD512");
       }
       else
       #endif
