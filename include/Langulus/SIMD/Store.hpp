@@ -72,20 +72,18 @@ namespace Langulus::SIMD::Inner
    /// Save a register to a vector in memory                                  
    ///   @param from the source register                                      
    ///   @param to [out] the destination vector                               
-   LANGULUS(INLINED)
-   void StoreSIMD(const CT::SIMD auto& from, CT::Vector auto& to) noexcept {
-      using TO   = Deref<decltype(to)>;
+   template<CT::SIMD R, CT::Vector TO> LANGULUS(INLINED)
+   void StoreSIMD(R const& from, TO& to) noexcept {
       using TO_T = TypeOf<TO>;
-      using R    = Deref<decltype(from)>;
       using T    = TypeOf<R>;
 
       static_assert(ExtentOf<TO> <= ExtentOf<R>,
-         "Destination array must be smaller or equal of the register size");
+         "Destination array must be smaller or equal to the register size");
       static_assert(ExtentOf<TO> > 1,
          "Storing a single element is suboptimial - don't use SIMD in the first place");
-      static_assert(sizeof(T) == sizeof(TypeOf<TO_T>) or CT::Bool<TO_T>,
-         "Storing doesn't parform conversion, so destination must be "
-         "of similar type as the register");
+      static_assert(sizeof(T) == sizeof(TO_T) or CT::Bool<TO_T>,
+         "Storing doesn't parform conversion (unless it's conversion to bool), "
+         "so destination scalar size must match register scalar size");
 
       if constexpr (CT::Bool<TO_T>) {
          // register -> bool array                                      
