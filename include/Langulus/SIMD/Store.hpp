@@ -9,6 +9,7 @@
 #include "Export.hpp"
 #include "Bitmask.hpp"
 #include <Langulus/CT/Saturated.hpp>
+#include <Langulus/CT/Vector.hpp>
 
 
 namespace Langulus::SIMD::Inner

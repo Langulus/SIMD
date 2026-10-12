@@ -12,16 +12,16 @@
 namespace Langulus::SIMD
 {
    /// Fill a register with a single value                                    
-   ///   @tparam R - register size                                            
-   ///   @param s -  the scalar value to use for filling                      
+   ///   @tparam R register size                                              
+   ///   @param s the scalar value to use for filling                         
    ///   @return the filled register                                          
-   template<int R> LANGULUS(INLINED)
-   auto Fill(CT::Scalar auto const& s) noexcept {
+   template<int R, CT::Scalar S> LANGULUS(INLINED)
+   auto Fill(S const& s) noexcept {
+      using T = ::std::conditional_t<CT::Typed<S>, TypeOf<S>, S>;
       (void)s;
 
       #if LANGULUS_SIMD(128BIT)
          if constexpr (R <= 16) {
-            using T = Decvq<TypeOf<decltype(s)>>;
             if      constexpr (CT::Integer8<T>)    return V128<T> {simde_mm_set1_epi8        (static_cast<int8_t> (GetFirst(s)))};
             else if constexpr (CT::Integer16<T>)   return V128<T> {simde_mm_set1_epi16       (static_cast<int16_t>(GetFirst(s)))};
             else if constexpr (CT::Integer32<T>)   return V128<T> {simde_mm_set1_epi32       (static_cast<int32_t>(GetFirst(s)))};
@@ -34,7 +34,6 @@ namespace Langulus::SIMD
       #endif
       #if LANGULUS_SIMD(256BIT)
          if constexpr (R <= 32) {
-            using T = Decvq<TypeOf<decltype(s)>>;
             if      constexpr (CT::Integer8<T>)    return V256<T> {simde_mm256_set1_epi8     (static_cast<int8_t> (GetFirst(s)))};
             else if constexpr (CT::Integer16<T>)   return V256<T> {simde_mm256_set1_epi16    (static_cast<int16_t>(GetFirst(s)))};
             else if constexpr (CT::Integer32<T>)   return V256<T> {simde_mm256_set1_epi32    (static_cast<int32_t>(GetFirst(s)))};
@@ -47,7 +46,6 @@ namespace Langulus::SIMD
       #endif
       #if LANGULUS_SIMD(512BIT)
          if constexpr (R <= 64) {
-            using T = Decvq<TypeOf<decltype(s)>>;
             if      constexpr (CT::Integer8<T>)    return V512<T> {simde_mm512_set1_epi8     (static_cast<int8_t> (GetFirst(s)))};
             else if constexpr (CT::Integer16<T>)   return V512<T> {simde_mm512_set1_epi16    (static_cast<int16_t>(GetFirst(s)))};
             else if constexpr (CT::Integer32<T>)   return V512<T> {simde_mm512_set1_epi32    (static_cast<int32_t>(GetFirst(s)))};

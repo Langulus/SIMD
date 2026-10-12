@@ -82,12 +82,11 @@ namespace Langulus::SIMD::Inner
    ///   @tparam TO the desired element type                                  
    ///   @param in scalar/vector to convert from                              
    ///   @return std::array or scalar, depending on the input                 
-   template<Element TO> LANGULUS(INLINED)
-   constexpr auto ConvertConstexpr(const CT::NotSIMD auto& in) noexcept {
-      using FROM = Deref<decltype(in)>;
-
+   template<Element TO, CT::NotSIMD FROM> LANGULUS(INLINED)
+   constexpr auto ConvertConstexpr(FROM const& in) noexcept {
       if constexpr (CT::Vector<FROM>) {
          // Convert from vectors                                        
+         static_assert(ExtentOf<FROM> > 1);
          ::std::array<TO, ExtentOf<FROM>> result;
          for (size_t i = 0; i < ExtentOf<FROM>; ++i)
             result[i] = static_cast<TO>(in[i]);

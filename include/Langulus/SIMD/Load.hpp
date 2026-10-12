@@ -16,11 +16,10 @@ namespace Langulus::SIMD
    {
       template<class R, class FORCE_OUT>
       consteval size_t DecideCount() {
-         using T = Decvq<TypeOf<R>>;
          if constexpr (CT::Void<FORCE_OUT>)
             return ExtentOf<R>;
          else 
-            return sizeof(FORCE_OUT) / sizeof(T);
+            return sizeof(FORCE_OUT) / sizeof(::std::conditional_t<CT::Typed<R>, TypeOf<R>, R>);
       }
    }
 

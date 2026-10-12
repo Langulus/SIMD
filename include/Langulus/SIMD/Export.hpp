@@ -414,9 +414,9 @@ namespace Langulus::SIMD
 
       template<class LHS, class RHS>
       consteval auto LosslessArray() {
-         using LT = TypeOf<LHS>;
-         using RT = TypeOf<RHS>;
-         constexpr auto C = OverlapCounts<LHS, RHS>();
+         using LT = ::std::conditional_t<CT::Typed<LHS>, TypeOf<LHS>, LHS>;
+         using RT = ::std::conditional_t<CT::Typed<RHS>, TypeOf<RHS>, RHS>;
+         constexpr auto C = Langulus::Inner::OverlapCounts<Decvq<ShedDeref<LHS>>, Decvq<ShedDeref<RHS>>>();
 
          if constexpr (CT::Void<LHS, RHS>) {
             // Both sides are void                                      

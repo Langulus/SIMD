@@ -70,7 +70,7 @@ namespace Langulus::SIMD::Inner
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto LesserConstexpr(const auto& lhs, const auto& rhs) noexcept {
       // Will always return a std::array<bool>                          
-      constexpr auto S = OverlapCounts<decltype(lhs), decltype(rhs)>();
+      constexpr auto S = Langulus::Inner::OverlapCounts<decltype(lhs), decltype(rhs)>();
 
       return AttemptBinary<0, ::std::array<bool, S>>(
          lhs, rhs, nullptr,
