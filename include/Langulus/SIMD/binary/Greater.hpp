@@ -70,7 +70,7 @@ namespace Langulus::SIMD::Inner
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto GreaterConstexpr(const auto& lhs, const auto& rhs) noexcept {
       // Will always return a std::array<bool>                          
-      constexpr auto S = OverlapCounts<decltype(lhs), decltype(rhs)>();
+      constexpr size_t S = LglsOverlapExtents(lhs, rhs);
 
       return AttemptBinary<0, ::std::array<bool, S>>(
          lhs, rhs, nullptr,
@@ -88,7 +88,7 @@ namespace Langulus::SIMD::Inner
    auto Greater(const auto& lhs, const auto& rhs) noexcept {
       // Will return either a std::array<bool>, or a masked register,   
       // depending whether SIMD operation is supported or not           
-      constexpr auto S = OverlapCounts<decltype(lhs), decltype(rhs)>();
+      constexpr size_t S = LglsOverlapExtents(lhs, rhs);
       using OUT = ::std::conditional_t<CT::SIMD<FORCE_OUT>, FORCE_OUT, ::std::array<bool, S>>;
 
       return AttemptBinary<0, OUT>(lhs, rhs,
@@ -130,7 +130,7 @@ namespace Langulus::SIMD
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in an instance of 'OUT'. Use           
    ///      Inner::Greater if you don't want this.                            
-   template<class LHS, class RHS, CT::NoIntent OUT = Bitmask<OverlapCounts<LHS, RHS>()>>
+   template<class LHS, class RHS, CT::NoIntent OUT = BitmaskFromOverlap<LHS, RHS>>
    LANGULUS(INLINED)
    constexpr OUT Greater(const LHS& lhs, const RHS& rhs) noexcept {
       OUT out;

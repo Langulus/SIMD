@@ -161,7 +161,7 @@ namespace Langulus::SIMD
       if constexpr (CT::Vector<OUTPUT>) {
          if consteval {
             // Converting in a contexpr context                         
-            Store(Inner::ConvertConstexpr<TO>(val), out);
+            Inner::StoreConstexpr(Inner::ConvertConstexpr<TO>(val), out);
          }
          else {
             // Converting using SIMD, hopefully                         

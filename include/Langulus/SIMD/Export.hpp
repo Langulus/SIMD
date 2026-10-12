@@ -416,7 +416,7 @@ namespace Langulus::SIMD
       consteval auto LosslessArray() {
          using LT = ::std::conditional_t<CT::Typed<LHS>, TypeOf<LHS>, LHS>;
          using RT = ::std::conditional_t<CT::Typed<RHS>, TypeOf<RHS>, RHS>;
-         constexpr auto C = Langulus::Inner::OverlapCounts<Decvq<ShedDeref<LHS>>, Decvq<ShedDeref<RHS>>>();
+         constexpr size_t C = LglsOverlapExtents(LHS{}, RHS{});
 
          if constexpr (CT::Void<LHS, RHS>) {
             // Both sides are void                                      
@@ -471,22 +471,22 @@ namespace Langulus::SIMD
       template<class F, class T>
       consteval auto InvocableResultInner1() noexcept {
          if constexpr (::std::is_null_pointer_v<Decay<F>>)
-            return (No*) nullptr;
+            return ::std::type_identity<No> {};
          else
-            return (::std::invoke_result_t<F, T>*) nullptr;
+            return ::std::type_identity<::std::invoke_result_t<F, T>> {};
       }
 
       template<class F, class T>
       consteval auto InvocableResultInner2() noexcept {
          if constexpr (::std::is_null_pointer_v<Decay<F>>)
-            return (No*) nullptr;
+            return ::std::type_identity<No> {};
          else
-            return (::std::invoke_result_t<F, T, T>*) nullptr;
+            return ::std::type_identity<::std::invoke_result_t<F, T, T>> {};
       }
    }
 
    template<class T>
-   using LosslessRegister = Deptr<decltype(Inner::LosslessRegister<T>())>;
+   using LosslessRegister = typename decltype(Inner::LosslessRegister<T>())::type;
 
    /// Useful tool for auto-deducing operation return type based on arguments 
    ///   @tparam LHS - left operand                                           
@@ -496,13 +496,11 @@ namespace Langulus::SIMD
 
    /// Get the return type of F(T)                                            
    template<class F, class T>
-   using InvocableResult1 = Deptr<
-      decltype(Inner::InvocableResultInner1<F, T>())>;
+   using InvocableResult1 = typename decltype(Inner::InvocableResultInner1<F, T>())::type;
 
    /// Get the return type of F(T, T)                                         
    template<class F, class T>
-   using InvocableResult2 = Deptr<
-      decltype(Inner::InvocableResultInner2<F, T>())>;
+   using InvocableResult2 = typename decltype(Inner::InvocableResultInner2<F, T>())::type;
 
    /// Clamp a real value inside the interval [0:1]                           
    /// Clamp integers in the numerical limits of provided AS                  

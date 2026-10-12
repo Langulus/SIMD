@@ -13,16 +13,16 @@
 
 namespace Langulus::SIMD::Inner
 {
-   /// Attempt register encapsulation of argument                             
+   /// Attempt register encapsulation of argument.                            
    /// Check if result of opSIMD is supported and return it, otherwise        
    /// fallback to opFALL and calculate conventionally (can be constexpr)     
-   ///   @tparam DEF - default value to fill empty register regions           
-   ///      useful to avoid division-by-zero cases                            
-   ///   @tparam FORCE_OUT - the type of data we want as a result - use void  
+   ///   @tparam DEF default value to fill empty register regions.            
+   ///      useful to avoid division-by-zero cases.                           
+   ///   @tparam FORCE_OUT the type of data we want as a result - use void    
    ///      to pick a lossless type derived from 'lhs' and 'rhs'              
-   ///   @param val - argument                                                
-   ///   @param opSIMD - the SIMD function to invoke if supported             
-   ///   @param opFALL - the fallback (non-SIMD/constexpr) function           
+   ///   @param val argument                                                  
+   ///   @param opSIMD the SIMD function to invoke if supported               
+   ///   @param opFALL the fallback (non-SIMD/constexpr) function             
    ///   @return the result - either scalar, vector or register               
    template<auto DEF, class FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto AttemptUnary(
@@ -68,17 +68,17 @@ namespace Langulus::SIMD::Inner
       }
    }
 
-   /// Attempt register encapsulation of arguments                            
+   /// Attempt register encapsulation of arguments.                           
    /// Check if result of opSIMD is supported and return it, otherwise        
    /// fallback to opFALL and calculate conventionally (can be constexpr)     
-   ///   @tparam DEF - default value to fill empty register regions           
-   ///      useful to avoid division-by-zero cases                            
-   ///   @tparam FORCE_OUT - the type of data we want as a result - use void  
+   ///   @tparam DEF default value to fill empty register regions.            
+   ///      useful to avoid division-by-zero cases.                           
+   ///   @tparam FORCE_OUT the type of data we want as a result - use void    
    ///      to pick a lossless type derived from 'lhs' and 'rhs'              
-   ///   @param lhs - left argument                                           
-   ///   @param rhs - right argument                                          
-   ///   @param opSIMD - the SIMD function to invoke if supported             
-   ///   @param opFALL - the fallback (non-SIMD/constexpr) function           
+   ///   @param lhs left argument                                             
+   ///   @param rhs right argument                                            
+   ///   @param opSIMD the SIMD function to invoke if supported               
+   ///   @param opFALL the fallback (non-SIMD/constexpr) function             
    ///   @return the result - either scalar, vector or register               
    template<auto DEF, class FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto AttemptBinary(

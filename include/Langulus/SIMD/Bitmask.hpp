@@ -13,12 +13,12 @@
 namespace Langulus::SIMD
 {
    ///                                                                        
-   ///   Bitmask type, used as result from comparison SIMD operations         
-   /// Each comparison operation maps exactly to one bit in this mask         
+   ///   Bitmask type, used as result from comparison SIMD operations.        
+   /// Each comparison operation maps exactly to one bit in this mask.        
    /// Internal type representation is designed to be directly mappable to    
    /// _mm_movemask_epi8/_mm512_cmpeq_epi8_mask instrinsic results, without   
    /// any implicit promotions or truncations.                                
-   ///   @tparam C - number of bits in the bitmask                            
+   ///   @tparam C number of bits in the bitmask                              
    template<size_t C>
    struct Bitmask {
       static_assert(C <= 64 and C > 0, "C must be in the range [1:64]");
@@ -158,6 +158,9 @@ namespace Langulus::SIMD
             result[i] = (*this)[i];
       }
    };
+
+   template<class LHS, class RHS>
+   using BitmaskFromOverlap = Bitmask<Langulus::Inner::OverlapExtents<Decvq<ShedDeref<LHS>>, Decvq<ShedDeref<RHS>>>()>;
 }
 
 namespace Langulus::CT

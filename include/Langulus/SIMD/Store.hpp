@@ -286,7 +286,7 @@ namespace Langulus::SIMD::Inner
    template<CT::NotSIMD FROM, CT::NotSIMD TO> LANGULUS(INLINED)
    constexpr void StoreConstexpr(FROM const& from, TO& to) noexcept {
       using E = TypeOf<TO>;
-      constexpr size_t S = Langulus::Inner::OverlapCounts<FROM, TO>();
+      constexpr size_t S = LglsOverlapExtents(FROM{}, TO{});
       static_assert(S > 0);
 
       if constexpr (CT::Bitmask<FROM>) {
@@ -362,12 +362,17 @@ namespace Langulus::SIMD
    ///   @param to [out] where to store it                                    
    template<CT::NoIntent FROM> LANGULUS(INLINED)
    constexpr void Store(FROM const& from, CT::NotSIMD auto& to) noexcept {
-      if constexpr (CT::SIMD<FROM>)
-         Inner::StoreSIMD(from, to);
-      else if constexpr (CT::Supported<FROM>)
+      if consteval {
          Inner::StoreConstexpr(from, to);
-      //else
-      //   static_assert(false, "Source not supported");
+      }
+      else {
+         if constexpr (CT::SIMD<FROM>)
+            Inner::StoreSIMD(from, to);
+         else if constexpr (CT::Supported<FROM>)
+            Inner::StoreConstexpr(from, to);
+         //else
+         //   static_assert(false, "Source not supported");
+      }
    }
 }
 
