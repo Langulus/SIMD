@@ -12,6 +12,7 @@
 #include <Langulus/CT/Lossless.hpp>
 #include <Langulus/CT/SIMD.hpp>
 #include <Langulus/IntentOf.hpp>
+#include <Langulus/Lambda.hpp>
 #include <array>
 #include <type_traits>
 
@@ -219,9 +220,9 @@
 ///                                                                           
 ///   Register concepts and representations                                   
 ///                                                                           
-/// Notice how we don't use simde__m128i, simde__m256i and simde__m512i       
+/// Notice how we don't use simde__m128i, simde__m256i and simde__m512i.      
 /// These are forbidden in langulus, because they cause type-erasure.         
-/// Instead, thes are contained inside these aggregate types:                 
+/// Instead, they are contained inside these aggregate types:                 
 ///   V128i<integer or bool>                                                  
 ///   V256i<integer or bool>                                                  
 ///   V512i<integer or bool>                                                  
@@ -373,140 +374,123 @@ namespace Langulus::SIMD
 namespace Langulus::SIMD
 {
    /// Get the first element of an array or vector, or just the scalar        
-   LANGULUS(INLINED)
-   constexpr decltype(auto) GetFirst(const CT::NotSIMD auto& a) noexcept {
+   LANGULUS(ALWAYS_INLINED)
+   constexpr decltype(auto) GetFirst(CT::NotSIMD auto&& a) noexcept {
       if constexpr (requires { a[0]; })
          return (a[0]);
       else
-         return (a);
-   }
-
-   /// Get the first element of an array or vector, or just the scalar        
-   LANGULUS(INLINED)
-   constexpr decltype(auto) GetFirst(CT::NotSIMD auto& a) noexcept {
-      if constexpr (requires { a[0]; })
-         return (a[0]);
-      else
-         return (a);
+         return LglsFwd(a);
    }
 
    namespace Inner
    {
-      template<class T>
+      /// Pick a lossless register capable of representing T                  
+      template<CT::NoIntent T>
       consteval auto LosslessRegister() {
+         using InnerT = ::std::conditional_t<CT::Array<T>, TypeOf<T>, T>;
          #if LANGULUS_SIMD(128BIT)
-            if constexpr (sizeof(Deint<T>) <= 16)
-               return (V128<TypeOf<T>>*) nullptr;
+            if constexpr (sizeof(T) <= 16)
+               return ::std::type_identity<V128<InnerT>> {};
             else
          #endif
          #if LANGULUS_SIMD(256BIT)
-            if constexpr (sizeof(Deint<T>) <= 32)
-               return (V256<TypeOf<T>>*) nullptr;
+            if constexpr (sizeof(T) <= 32)
+               return ::std::type_identity<V256<InnerT>> {};
             else
          #endif
          #if LANGULUS_SIMD(512BIT)
-            if constexpr (sizeof(Deint<T>) <= 64)
-               return (V512<TypeOf<Deint<T>>>*) nullptr;
+            if constexpr (sizeof(T) <= 64)
+               return ::std::type_identity<V512<InnerT>> {};
             else
          #endif
-            static_assert(false, "Unsupported register");
+            return ::std::type_identity<No> {};
       }
 
-      template<class LHS, class RHS>
+      /// Pick a lossless register capable of representing an array           
+      template<CT::NoIntent LHS, CT::NoIntent RHS>
       consteval auto LosslessArray() {
-         using LT = ::std::conditional_t<CT::Typed<LHS>, TypeOf<LHS>, LHS>;
-         using RT = ::std::conditional_t<CT::Typed<RHS>, TypeOf<RHS>, RHS>;
+         using LT = ::std::conditional_t<CT::Array<LHS>, TypeOf<LHS>, LHS>;
+         using RT = ::std::conditional_t<CT::Array<RHS>, TypeOf<RHS>, RHS>;
          constexpr size_t C = LglsOverlapExtents(LHS{}, RHS{});
 
          if constexpr (CT::Void<LHS, RHS>) {
             // Both sides are void                                      
-            return No {};
+            return ::std::type_identity<No> {};
          }
          else if constexpr (CT::Void<LHS>) {
             // LHS is void, we rely only on RHS, which can be either    
             // a register, a scalar, or an array                        
             if constexpr (CT::SIMD<RHS>)
-               return RHS {};
+               return ::std::type_identity<RHS> {};
             else if constexpr (C == 1)
-               return RT {};
+               return ::std::type_identity<RT> {};
             else
-               return std::array<RT, C> {};
+               return ::std::type_identity<std::array<RT, C>> {};
          }
          else if constexpr (CT::Void<RHS>) {
             // RHS is void, we rely only on LHS, which can be either    
             // a register, a scalar, or an array                        
             if constexpr (CT::SIMD<LHS>)
-               return LHS {};
+               return ::std::type_identity<LHS> {};
             else if constexpr (C == 1)
-               return LT {};
+               return ::std::type_identity<LT> {};
             else
-               return std::array<LT, C> {};
+               return ::std::type_identity<std::array<LT, C>> {};
          }
          else if constexpr (CT::SIMD<LHS> and not CT::SIMD<RHS>) {
             // Both sides are known, LHS is a register, so we rely only 
             // on RHS, which can be either scalar, or an array          
             if constexpr (ExtentOf<RHS> == 1)
-               return RT {};
+               return ::std::type_identity<RT> {};
             else
-               return std::array<RT, ExtentOf<RHS>> {};
+               return ::std::type_identity<std::array<RT, ExtentOf<RHS>>> {};
          }
          else if constexpr (not CT::SIMD<LHS> and CT::SIMD<RHS>) {
             // Both sides are known, RHS is a register, so we rely only 
             // on LHS, which can be either scalar, or an array          
             if constexpr (ExtentOf<LHS> == 1)
-               return LT {};
+               return ::std::type_identity<LT> {};
             else
-               return std::array<LT, ExtentOf<LHS>> {};
+               return ::std::type_identity<std::array<LT, ExtentOf<LHS>>> {};
          }
          else {
             // Both sides are known, and none are registers, so pick    
             // the most lossless of the two                             
             if constexpr (C == 1)
-               return Lossless<LT, RT> {};
+               return ::std::type_identity<Lossless<LT, RT>> {};
             else
-               return std::array<Lossless<LT, RT>, C> {};
+               return ::std::type_identity<std::array<Lossless<LT, RT>, C>> {};
          }
       }
 
       template<class F, class T>
-      consteval auto InvocableResultInner1() noexcept {
-         if constexpr (::std::is_null_pointer_v<Decay<F>>)
+      consteval auto InvocableResultInner() noexcept {
+         if constexpr (::std::is_null_pointer_v<F>)
             return ::std::type_identity<No> {};
          else
-            return ::std::type_identity<::std::invoke_result_t<F, T>> {};
-      }
-
-      template<class F, class T>
-      consteval auto InvocableResultInner2() noexcept {
-         if constexpr (::std::is_null_pointer_v<Decay<F>>)
-            return ::std::type_identity<No> {};
-         else
-            return ::std::type_identity<::std::invoke_result_t<F, T, T>> {};
+            return ::std::type_identity<ReturnOf<decltype(&F::template operator()<T>)>> {};
       }
    }
 
+   /// Useful tool for auto-deducing operation return type based on arguments.
+   /// Ignores array sizes.                                                   
    template<class T>
    using LosslessRegister = typename decltype(Inner::LosslessRegister<T>())::type;
 
-   /// Useful tool for auto-deducing operation return type based on arguments 
-   ///   @tparam LHS - left operand                                           
-   ///   @tparam RHS - right operand                                          
+   /// Useful tool for auto-deducing operation return type based on arguments.
+   /// Overlaps array sizes, if such arguments exist.                         
    template<class LHS, class RHS = LHS>
-   using LosslessArray = decltype(Inner::LosslessArray<LHS, RHS>());
+   using LosslessArray = typename decltype(Inner::LosslessArray<LHS, RHS>())::type;
 
-   /// Get the return type of F(T)                                            
+   /// Get the return type of a SIMD/fallback operation                       
    template<class F, class T>
-   using InvocableResult1 = typename decltype(Inner::InvocableResultInner1<F, T>())::type;
-
-   /// Get the return type of F(T, T)                                         
-   template<class F, class T>
-   using InvocableResult2 = typename decltype(Inner::InvocableResultInner2<F, T>())::type;
+   using InvocableResult = typename decltype(Inner::InvocableResultInner<F, T>())::type;
 
    /// Clamp a real value inside the interval [0:1]                           
    /// Clamp integers in the numerical limits of provided AS                  
    ///   @param v - saturate the value by converting T to a smaller type and  
    ///      clamping to the min/max if value exceeds the smaller range        
-   template<class AS, class T> LANGULUS(INLINED)
+   template<CT::NoIntent AS, CT::NoIntent T> LANGULUS(INLINED)
    constexpr AS Saturate(T const& v) noexcept {
       if constexpr (CT::Real<T>)
          return static_cast<AS>(v < T {0} ? T {0} : v > T {1} ? T {1} : v);

@@ -16,9 +16,6 @@ namespace Langulus::SIMD::Inner
    constexpr No LesserSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept { return {}; }
    
    /// Compare two registers                                                  
-   ///   @param lhs - left register                                           
-   ///   @param rhs - right register                                          
-   ///   @return the resulting register                                       
    template<CT::SIMD R> LANGULUS(INLINED)
    R LesserSIMD(R lhs, R rhs) noexcept {
       using T = TypeOf<R>;
@@ -64,10 +61,10 @@ namespace Langulus::SIMD::Inner
    }
    
    /// Compare values as constexpr, if possible                               
-   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
-   ///   @patam value - scalar/vector to operate on                           
+   ///   @tparam FORCE_OUT the desired element type (lossless if void)        
+   ///   @param value scalar/vector to operate on                             
    ///   @return bool/bitmask                                                 
-   template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
+   template<class FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto LesserConstexpr(const auto& lhs, const auto& rhs) noexcept {
       // Will always return a std::array<bool>                          
       constexpr size_t S = LglsOverlapExtents(lhs, rhs);
@@ -81,10 +78,10 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Compare values as a register, if possible                              
-   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
-   ///   @patam value - scalar/vector/register to operate on                  
+   ///   @tparam FORCE_OUT the desired element type (lossless if void)        
+   ///   @param value scalar/vector/register to operate on                    
    ///   @return bool/bitmask/register                                        
-   template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
+   template<class FORCE_OUT = void> LANGULUS(INLINED)
    auto Lesser(const auto& lhs, const auto& rhs) noexcept {
       // Will return either a std::array<bool>, or a masked register,   
       // depending whether SIMD operation is supported or not           
@@ -107,34 +104,35 @@ namespace Langulus::SIMD::Inner
 namespace Langulus::SIMD
 {
    /// Compare numbers for less, force output to desired place                
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (deducible)                   
+   ///   @tparam LHS left array, scalar, or register (deducible)              
+   ///   @tparam RHS right array, scalar, or register (deducible)             
+   ///   @tparam OUT the desired element type (deducible)                     
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in 'out'. Use Inner::Lesser if you     
    ///      don't want this.                                                  
-   template<class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED)
+   template<class LHS, class RHS, class OUT> 
+   requires CT::NoIntent<LHS, RHS, OUT> LANGULUS(INLINED)
    constexpr void Lesser(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
       if consteval {
-         Store(Inner::LesserConstexpr<OUT>(DeintCast(lhs), DeintCast(rhs)), out);
+         Store(Inner::LesserConstexpr<OUT>(lhs, rhs), out);
       }
       else {
-         Store(Inner::Lesser<OUT>(DeintCast(lhs), DeintCast(rhs)), out);
+         Store(Inner::Lesser<OUT>(lhs, rhs), out);
       }
    }
 
    /// Compare numbers for less                                               
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired output type (lossless array by default)    
+   ///   @tparam LHS left array, scalar, or register (deducible)              
+   ///   @tparam RHS right array, scalar, or register (deducible)             
+   ///   @tparam OUT the desired output type (lossless array by default)      
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in an instance of 'OUT'. Use           
    ///      Inner::Lesser if you don't want this.                             
-   template<class LHS, class RHS, CT::NoIntent OUT = BitmaskFromOverlap<LHS, RHS>>
-   LANGULUS(INLINED)
+   template<class LHS, class RHS, class OUT = BitmaskFromOverlap<LHS, RHS>>
+   requires CT::NoIntent<LHS, RHS, OUT> LANGULUS(INLINED)
    constexpr OUT Lesser(const LHS& lhs, const RHS& rhs) noexcept {
       OUT out;
-      Lesser(DeintCast(lhs), DeintCast(rhs), out);
+      Lesser(lhs, rhs, out);
       return out;
    }
 }

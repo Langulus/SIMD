@@ -24,21 +24,24 @@ namespace Langulus::SIMD::Inner
    ///   @param opSIMD the SIMD function to invoke if supported               
    ///   @param opFALL the fallback (non-SIMD/constexpr) function             
    ///   @return the result - either scalar, vector or register               
-   template<auto DEF, class FORCE_OUT = void> LANGULUS(INLINED)
+   template<auto DEF, class FORCE_OUT = void, class VAL, class FSIMD, class FFALL>
+   requires CT::NoIntent<VAL> LANGULUS(INLINED)
    constexpr auto AttemptUnary(
-      const auto& val,
-      const auto& opSIMD,
-      const auto& opFALL
+      VAL   const& val,
+      FSIMD const& opSIMD,
+      FFALL const& opFALL
    ) {
-      using VAL = Deref<decltype(val)>;
       using OUT = ::std::conditional_t<CT::Void<FORCE_OUT>,
          SIMD::LosslessArray<VAL>,
          SIMD::LosslessArray<FORCE_OUT>
       >;
-      using E = TypeOf<OUT>;
+      using E = ::std::conditional_t<CT::Array<OUT>, TypeOf<OUT>, OUT>;
       using R = decltype(Load<DEF>(Fake<const SIMD::LosslessArray<VAL>&>()));
-      constexpr bool supported = CT::SIMD<InvocableResult1<decltype(opSIMD), R>>;
+      
+      static_assert(not ::std::is_null_pointer_v<FFALL>,
+         "Fallback must always be present");
 
+      constexpr bool supported = CT::SIMD<InvocableResult<FSIMD, R>>;
       if constexpr (not supported) {
          // Operating on scalars, or SIMD not supported, just fallback  
          return FallbackUnary<OUT>(val, opFALL);
@@ -77,25 +80,26 @@ namespace Langulus::SIMD::Inner
    ///      to pick a lossless type derived from 'lhs' and 'rhs'              
    ///   @param lhs left argument                                             
    ///   @param rhs right argument                                            
-   ///   @param opSIMD the SIMD function to invoke if supported               
-   ///   @param opFALL the fallback (non-SIMD/constexpr) function             
+   ///   @param opSIMD SIMD function to invoke if supported (can be null)     
+   ///   @param opFALL fallback (non-SIMD/constexpr) function (can't be null) 
    ///   @return the result - either scalar, vector or register               
-   template<auto DEF, class FORCE_OUT = void> LANGULUS(INLINED)
+   template<auto DEF, class FORCE_OUT = void, class LHS, class RHS, class FSIMD, class FFALL>
+   requires CT::NoIntent<LHS, RHS> LANGULUS(INLINED)
    constexpr auto AttemptBinary(
-      const CT::NoIntent auto& lhs,
-      const CT::NoIntent auto& rhs,
-      const auto& opSIMD,
-      const auto& opFALL
+      LHS const& lhs,
+      RHS const& rhs,
+      FSIMD const& opSIMD,
+      FFALL const& opFALL
    ) {
-      using LHS = Deref<decltype(lhs)>;
-      using RHS = Deref<decltype(rhs)>;
       using LOSSLESS = SIMD::LosslessArray<LHS, RHS>;
-      using OUT = ::std::conditional_t<CT::Void<FORCE_OUT>,
-         LOSSLESS, SIMD::LosslessArray<FORCE_OUT>>;
-      using E = TypeOf<OUT>;
-      using R = decltype(Load<DEF>(Fake<const LOSSLESS&>()));
-      constexpr bool supported = CT::SIMD<InvocableResult2<decltype(opSIMD), R>>;
+      using OUT = ::std::conditional_t<CT::Void<FORCE_OUT>, LOSSLESS, SIMD::LosslessArray<FORCE_OUT>>;
+      using E   = ::std::conditional_t<CT::Array<OUT>, TypeOf<OUT>, OUT>;
+      using R   = decltype(Load<DEF>(Fake<const LOSSLESS&>()));
 
+      static_assert(not ::std::is_null_pointer_v<FFALL>,
+         "Fallback must always be present");
+
+      constexpr bool supported = CT::SIMD<InvocableResult<FSIMD, R>>;
       if constexpr (not supported) {
          // Operating on scalars, or SIMD not supported, just fallback  
          return FallbackBinary<OUT>(lhs, rhs, opFALL);
