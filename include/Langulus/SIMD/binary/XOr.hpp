@@ -59,7 +59,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the scalar/vector                                            
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto XOrConstexpr(const auto& lhs, const auto& rhs) noexcept {
+   constexpr auto XOrConstexpr(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs, nullptr,
          []<class E>(const E& l, const E& r) noexcept -> E {
             return l ^ r;
@@ -72,7 +72,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the scalar/vector/register                                   
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto XOr(const auto& lhs, const auto& rhs) noexcept {
+   auto XOr(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
          []<class R>(const R& l, const R& r) noexcept {
             LANGULUS_SIMD_VERBOSE("Xoring (SIMD) as ", NameOf<R>());

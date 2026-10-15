@@ -65,7 +65,7 @@ namespace Langulus::SIMD::Inner
    ///   @param value scalar/vector to operate on                             
    ///   @return bool/bitmask                                                 
    template<class FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto LesserConstexpr(const auto& lhs, const auto& rhs) noexcept {
+   constexpr auto LesserConstexpr(auto const& lhs, auto const& rhs) noexcept {
       // Will always return a std::array<bool>                          
       constexpr size_t S = LglsOverlapExtents(lhs, rhs);
 
@@ -82,7 +82,7 @@ namespace Langulus::SIMD::Inner
    ///   @param value scalar/vector/register to operate on                    
    ///   @return bool/bitmask/register                                        
    template<class FORCE_OUT = void> LANGULUS(INLINED)
-   auto Lesser(const auto& lhs, const auto& rhs) noexcept {
+   auto Lesser(auto const& lhs, auto const& rhs) noexcept {
       // Will return either a std::array<bool>, or a masked register,   
       // depending whether SIMD operation is supported or not           
       constexpr size_t S = LglsOverlapExtents(lhs, rhs);

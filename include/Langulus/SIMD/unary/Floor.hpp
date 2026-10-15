@@ -63,7 +63,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the floored scalar/vector                                    
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto FloorConstexpr(const auto& value) noexcept {
+   constexpr auto FloorConstexpr(auto const& value) noexcept {
       return AttemptUnary<0, FORCE_OUT>(value, nullptr,
          []<class E>(const E& f) noexcept -> E {
             static_assert(CT::Real<E>, "Pointless for whole numbers");
@@ -79,7 +79,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the floored scalar/vector/register                           
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto Floor(const auto& value) noexcept {
+   auto Floor(auto const& value) noexcept {
       return AttemptUnary<0, FORCE_OUT>(value,
          []<class R>(const R& v) noexcept {
             LANGULUS_SIMD_VERBOSE("Flooring (SIMD) as ", NameOf<R>());

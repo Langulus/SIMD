@@ -275,7 +275,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the product scalar/vector                                    
    template<bool SATURATE = false, CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto MultiplyConstexpr(const auto& lhs, const auto& rhs) noexcept {
+   constexpr auto MultiplyConstexpr(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs, nullptr,
          []<class E>(const E& l, const E& r) noexcept -> E {
             return MultiplyFallback<SATURATE>(l, r);
@@ -289,7 +289,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the product scalar/vector/register                           
    template<bool SATURATE = false, CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto Multiply(const auto& lhs, const auto& rhs) noexcept {
+   constexpr auto Multiply(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
          []<class R>(const R& l, const R& r) noexcept {
             LANGULUS_SIMD_VERBOSE("Multiplying (SIMD) as ", NameOf<R>());

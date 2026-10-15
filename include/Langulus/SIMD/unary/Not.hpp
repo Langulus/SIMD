@@ -28,7 +28,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the notted scalar/vector                                     
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto NotConstexpr(const auto& value) noexcept {
+   constexpr auto NotConstexpr(auto const& value) noexcept {
       return AttemptUnary<0, FORCE_OUT>(value, nullptr,
          []<class E>(const E& f) noexcept -> E {
             return ~f;
@@ -41,7 +41,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the notted scalar/vector/register                            
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto Not(const auto& value) noexcept {
+   auto Not(auto const& value) noexcept {
       return AttemptUnary<0, FORCE_OUT>(value,
          []<class R>(const R& v) noexcept {
             LANGULUS_SIMD_VERBOSE("Not (SIMD) as ", NameOf<R>());

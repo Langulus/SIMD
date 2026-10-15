@@ -123,7 +123,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the shifted scalar/vector                                    
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto ShiftRightConstexpr(const auto& lhs, const auto& rhs) noexcept {
+   constexpr auto ShiftRightConstexpr(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs, nullptr,
          []<class E>(const E& l, const E& r) noexcept -> E {
             // Well defined condition in SIMD calls, that is            
@@ -147,7 +147,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the shifted scalar/vector/register                           
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto ShiftRight(const auto& lhs, const auto& rhs) noexcept {
+   auto ShiftRight(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
          []<class R>(const R& l, const R& r) noexcept {
             return ShiftRightSIMD(l, r);

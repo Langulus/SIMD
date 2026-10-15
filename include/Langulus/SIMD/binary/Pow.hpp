@@ -108,7 +108,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the scalar/vector                                            
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto PowerConstexpr(const auto& lhs, const auto& rhs) noexcept {
+   constexpr auto PowerConstexpr(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs, nullptr,
          []<class E>(E l, E r) noexcept -> E {
             if (l == E {1})
@@ -148,7 +148,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the scalar/vector/register                                   
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto Power(const auto& lhs, const auto& rhs) noexcept {
+   auto Power(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
          []<class R>(const R& l, const R& r) noexcept {
             LANGULUS_SIMD_VERBOSE("Exponentiating (SIMD) as ", NameOf<R>());

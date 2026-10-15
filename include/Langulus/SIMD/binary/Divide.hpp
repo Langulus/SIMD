@@ -133,7 +133,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the divided scalar/vector                                    
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto DivideConstexpr(const auto& lhs, const auto& rhs) {
+   constexpr auto DivideConstexpr(auto const& lhs, auto const& rhs) {
       return AttemptBinary<1, FORCE_OUT>(lhs, rhs, nullptr,
          []<class E>(const E& l, const E& r) -> E {
             if (r == E {0})
@@ -149,7 +149,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the divided scalar/vector/register                           
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto Divide(const auto& lhs, const auto& rhs) {
+   auto Divide(auto const& lhs, auto const& rhs) {
       return AttemptBinary<1, FORCE_OUT>(lhs, rhs,
          []<class R>(const R& l, const R& r) {
             LANGULUS_SIMD_VERBOSE("Dividing (SIMD) as ", NameOf<R>());

@@ -69,7 +69,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the absolute scalar/vector                                   
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto AbsConstexpr(const auto& value) noexcept {
+   constexpr auto AbsConstexpr(auto const& value) noexcept {
       return AttemptUnary<0, FORCE_OUT>(value, nullptr,
          []<class E>(const E& f) noexcept -> E {
             static_assert(CT::Signed<E>, "Pointless for unsigned numbers");
@@ -83,7 +83,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the absolute scalar/vector/register                          
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto Abs(const auto& value) noexcept {
+   auto Abs(auto const& value) noexcept {
       return AttemptUnary<0, FORCE_OUT>(value,
          []<class R>(const R& v) noexcept {
             LANGULUS_SIMD_VERBOSE("Absolute (SIMD) as ", NameOf<R>());

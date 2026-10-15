@@ -104,7 +104,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                        
    ///   @return the smallest scalar/vector                                
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto MinConstexpr(const auto& lhs, const auto& rhs) noexcept {
+   constexpr auto MinConstexpr(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs, nullptr,
          []<class E>(const E& l, const E& r) noexcept -> E {
             return ::std::min(l, r);
@@ -117,7 +117,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on               
    ///   @return the smallest scalar/vector/register                       
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto Min(const auto& lhs, const auto& rhs) noexcept {
+   auto Min(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
          []<class R>(const R& l, const R& r) noexcept {
             LANGULUS_SIMD_VERBOSE("Min (SIMD) as ", NameOf<R>());

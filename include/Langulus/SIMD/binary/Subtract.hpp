@@ -205,7 +205,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the difference scalar/vector                                 
    template<bool SATURATE = false, CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto SubtractConstexpr(const auto& lhs, const auto& rhs) noexcept {
+   constexpr auto SubtractConstexpr(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs, nullptr,
          []<class E>(const E& l, const E& r) noexcept -> E {
             return SubtractFallback<SATURATE>(l, r);
@@ -219,7 +219,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the difference scalar/vector/register                        
    template<bool SATURATE = false, CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto Subtract(const auto& lhs, const auto& rhs) noexcept {
+   constexpr auto Subtract(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
          []<class R>(const R& l, const R& r) noexcept {
             LANGULUS_SIMD_VERBOSE("Subtracting (SIMD) as ", NameOf<R>());

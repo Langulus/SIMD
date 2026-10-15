@@ -64,7 +64,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                        
    ///   @return the rounded scalar/vector                                 
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto RoundConstexpr(const auto& value) noexcept {
+   constexpr auto RoundConstexpr(auto const& value) noexcept {
       return AttemptUnary<0, FORCE_OUT>(value, nullptr,
          []<class E>(const E& f) noexcept -> E {
             static_assert(CT::Signed<E>, "Pointless for unsigned numbers");
@@ -78,7 +78,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on               
    ///   @return the rounded scalar/vector/register                        
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto Round(const auto& value) noexcept {
+   auto Round(auto const& value) noexcept {
       return AttemptUnary<0, FORCE_OUT>(value,
          []<class R>(const R& v) noexcept {
             LANGULUS_SIMD_VERBOSE("Rounded (SIMD) as ", NameOf<R>());

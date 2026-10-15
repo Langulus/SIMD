@@ -63,7 +63,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the ceiled scalar/vector                                     
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto CeilConstexpr(const auto& value) noexcept {
+   constexpr auto CeilConstexpr(auto const& value) noexcept {
       return AttemptUnary<0, FORCE_OUT>(value, nullptr,
          []<class E>(const E& f) noexcept -> E {
             static_assert(CT::Real<E>, "Pointless for whole numbers");
@@ -79,7 +79,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the ceiled scalar/vector/register                            
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto Ceil(const auto& value) noexcept {
+   auto Ceil(auto const& value) noexcept {
       return AttemptUnary<0, FORCE_OUT>(value,
          []<class R>(const R& v) noexcept {
             LANGULUS_SIMD_VERBOSE("Ceiling (SIMD) as ", NameOf<R>());

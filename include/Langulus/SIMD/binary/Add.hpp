@@ -253,7 +253,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector to operate on                           
    ///   @return the summed scalar/vector                                     
    template<bool SATURATE = false, CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   constexpr auto AddConstexpr(const auto& lhs, const auto& rhs) noexcept {
+   constexpr auto AddConstexpr(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs, nullptr,
          []<class E>(const E& l, const E& r) noexcept -> E {
             return AddFallback<SATURATE>(l, r);
@@ -267,7 +267,7 @@ namespace Langulus::SIMD::Inner
    ///   @patam value - scalar/vector/register to operate on                  
    ///   @return the summed scalar/vector/register                            
    template<bool SATURATE = false, CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
-   auto Add(const auto& lhs, const auto& rhs) noexcept {
+   auto Add(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
          []<class R>(const R& l, const R& r) noexcept {
             LANGULUS_SIMD_VERBOSE("Adding (SIMD) as ", NameOf<R>());
