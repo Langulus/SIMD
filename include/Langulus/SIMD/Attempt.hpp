@@ -31,11 +31,11 @@ namespace Langulus::SIMD::Inner
       FSIMD const& opSIMD,
       FFALL const& opFALL
    ) {
-      using OUT = ::std::conditional_t<CT::Void<FORCE_OUT>,
+      using OUT = Tif<CT::Void<FORCE_OUT>,
          SIMD::LosslessArray<VAL>,
          SIMD::LosslessArray<FORCE_OUT>
       >;
-      using E = ::std::conditional_t<CT::Array<OUT>, TypeOf<OUT>, OUT>;
+      using E = Tif<CT::Array<OUT>, TypeOf<OUT>, OUT>;
       using R = decltype(Load<DEF>(Fake<const SIMD::LosslessArray<VAL>&>()));
       
       static_assert(not ::std::is_null_pointer_v<FFALL>,
@@ -92,8 +92,8 @@ namespace Langulus::SIMD::Inner
       FFALL const& opFALL
    ) {
       using LOSSLESS = SIMD::LosslessArray<LHS, RHS>;
-      using OUT = ::std::conditional_t<CT::Void<FORCE_OUT>, LOSSLESS, SIMD::LosslessArray<FORCE_OUT>>;
-      using E   = ::std::conditional_t<CT::Array<OUT>, TypeOf<OUT>, OUT>;
+      using OUT = Tif<CT::Void<FORCE_OUT>, LOSSLESS, SIMD::LosslessArray<FORCE_OUT>>;
+      using E   = Tif<CT::Array<OUT>, TypeOf<OUT>, OUT>;
       using R   = decltype(Load<DEF>(Fake<const LOSSLESS&>()));
 
       static_assert(not ::std::is_null_pointer_v<FFALL>,
