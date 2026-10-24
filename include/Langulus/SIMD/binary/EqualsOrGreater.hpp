@@ -162,7 +162,7 @@ namespace Langulus::SIMD
    ///      in order to fit the result in 'out'. Use Inner::EqualsOrGreater   
    ///      if you don't want this.                                           
    template<class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED)
-   constexpr void EqualsOrGreater(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+   constexpr void EqualsOrGreater(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
       if consteval {
          Store(Inner::EqualsOrGreaterConstexpr<OUT>(DeintCast(lhs), DeintCast(rhs)), out);
       }
@@ -180,7 +180,7 @@ namespace Langulus::SIMD
    ///      Inner::EqualsOrGreater if you don't want this.                    
    template<class LHS, class RHS, CT::NoIntent OUT = BitmaskFromOverlap<LHS, RHS>>
    LANGULUS(INLINED)
-   constexpr OUT EqualsOrGreater(const LHS& lhs, const RHS& rhs) noexcept {
+   constexpr OUT EqualsOrGreater(LHS const& lhs, RHS const& rhs) noexcept {
       OUT out;
       EqualsOrGreater(DeintCast(lhs), DeintCast(rhs), out);
       return out;

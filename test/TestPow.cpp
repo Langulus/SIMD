@@ -41,7 +41,7 @@ constexpr auto Pow(B base, E exponent) noexcept {
 }
 
 template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
-void ControlPow(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+void ControlPow(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
    out = Pow(lhs, rhs);
 }
 

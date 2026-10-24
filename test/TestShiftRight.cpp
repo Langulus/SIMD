@@ -9,7 +9,7 @@
 
 
 template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
-void ControlSR(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+void ControlSR(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
    static_assert(CT::IntegerX<LHS, RHS>, "Can only shift integers");
    // Well defined condition in SIMD calls, that is otherwise           
    // undefined behavior by C++ standard                                

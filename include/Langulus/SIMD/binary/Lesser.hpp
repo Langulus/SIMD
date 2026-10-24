@@ -112,7 +112,7 @@ namespace Langulus::SIMD
    ///      don't want this.                                                  
    template<class LHS, class RHS, class OUT> 
    requires CT::NoIntent<LHS, RHS, OUT> LANGULUS(INLINED)
-   constexpr void Lesser(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+   constexpr void Lesser(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
       if consteval {
          Store(Inner::LesserConstexpr<OUT>(lhs, rhs), out);
       }
@@ -130,7 +130,7 @@ namespace Langulus::SIMD
    ///      Inner::Lesser if you don't want this.                             
    template<class LHS, class RHS, class OUT = BitmaskFromOverlap<LHS, RHS>>
    requires CT::NoIntent<LHS, RHS, OUT> LANGULUS(INLINED)
-   constexpr OUT Lesser(const LHS& lhs, const RHS& rhs) noexcept {
+   constexpr OUT Lesser(LHS const& lhs, RHS const& rhs) noexcept {
       OUT out;
       Lesser(lhs, rhs, out);
       return out;

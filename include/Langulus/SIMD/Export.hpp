@@ -385,9 +385,10 @@ namespace Langulus::SIMD
    namespace Inner
    {
       /// Pick a lossless register capable of representing T                  
+      ///   @return either a SIMD type, or No if not supported for T          
       template<CT::NoIntent T>
       consteval auto LosslessRegister() {
-         using InnerT = ::std::conditional_t<CT::Array<T>, TypeOf<T>, T>;
+         using InnerT = Tif<CT::Array<T>, TypeOf<T>, T>;
          #if LANGULUS_SIMD(128BIT)
             if constexpr (sizeof(T) <= 16)
                return ::std::type_identity<V128<InnerT>> {};
@@ -406,11 +407,13 @@ namespace Langulus::SIMD
             return ::std::type_identity<No> {};
       }
 
-      /// Pick a lossless register capable of representing an array           
+      /// Overlap all extents of LHS and RHS, and form an ::std::array of     
+      /// with that overlapped extent, with the lossless type between the two.
+      ///   @return the overlapped ::std::array, or No if not supported       
       template<CT::NoIntent LHS, CT::NoIntent RHS>
       consteval auto LosslessArray() {
-         using LT = ::std::conditional_t<CT::Array<LHS>, TypeOf<LHS>, LHS>;
-         using RT = ::std::conditional_t<CT::Array<RHS>, TypeOf<RHS>, RHS>;
+         using LT = Tif<CT::Array<LHS>, TypeOf<LHS>, LHS>;
+         using RT = Tif<CT::Array<RHS>, TypeOf<RHS>, RHS>;
          constexpr size_t C = LglsOverlapExtents(LHS{}, RHS{});
 
          if constexpr (CT::Void<LHS, RHS>) {
@@ -422,8 +425,6 @@ namespace Langulus::SIMD
             // a register, a scalar, or an array                        
             if constexpr (CT::SIMD<RHS>)
                return ::std::type_identity<RHS> {};
-            else if constexpr (C == 1)
-               return ::std::type_identity<RT> {};
             else
                return ::std::type_identity<std::array<RT, C>> {};
          }
@@ -432,34 +433,23 @@ namespace Langulus::SIMD
             // a register, a scalar, or an array                        
             if constexpr (CT::SIMD<LHS>)
                return ::std::type_identity<LHS> {};
-            else if constexpr (C == 1)
-               return ::std::type_identity<LT> {};
             else
                return ::std::type_identity<std::array<LT, C>> {};
          }
          else if constexpr (CT::SIMD<LHS> and not CT::SIMD<RHS>) {
             // Both sides are known, LHS is a register, so we rely only 
             // on RHS, which can be either scalar, or an array          
-            if constexpr (ExtentOf<RHS> == 1)
-               return ::std::type_identity<RT> {};
-            else
-               return ::std::type_identity<std::array<RT, ExtentOf<RHS>>> {};
+            return ::std::type_identity<std::array<RT, ExtentOf<RHS>>> {};
          }
          else if constexpr (not CT::SIMD<LHS> and CT::SIMD<RHS>) {
             // Both sides are known, RHS is a register, so we rely only 
             // on LHS, which can be either scalar, or an array          
-            if constexpr (ExtentOf<LHS> == 1)
-               return ::std::type_identity<LT> {};
-            else
-               return ::std::type_identity<std::array<LT, ExtentOf<LHS>>> {};
+            return ::std::type_identity<std::array<LT, ExtentOf<LHS>>> {};
          }
          else {
             // Both sides are known, and none are registers, so pick    
             // the most lossless of the two                             
-            if constexpr (C == 1)
-               return ::std::type_identity<Lossless<LT, RT>> {};
-            else
-               return ::std::type_identity<std::array<Lossless<LT, RT>, C>> {};
+            return ::std::type_identity<std::array<Lossless<LT, RT>, C>> {};
          }
       }
 
@@ -488,7 +478,7 @@ namespace Langulus::SIMD
 
    /// Clamp a real value inside the interval [0:1]                           
    /// Clamp integers in the numerical limits of provided AS                  
-   ///   @param v - saturate the value by converting T to a smaller type and  
+   ///   @param v saturate the value by converting T to a smaller type and    
    ///      clamping to the min/max if value exceeds the smaller range        
    template<CT::NoIntent AS, CT::NoIntent T> LANGULUS(INLINED)
    constexpr AS Saturate(T const& v) noexcept {

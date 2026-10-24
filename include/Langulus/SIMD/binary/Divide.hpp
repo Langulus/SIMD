@@ -175,7 +175,7 @@ namespace Langulus::SIMD
    ///      in order to fit the result in 'out'. Use Inner::Divide if you     
    ///      don't want this.                                                  
    template<class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED)
-   constexpr void Divide(const LHS& lhs, const RHS& rhs, OUT& out) {
+   constexpr void Divide(LHS const& lhs, RHS const& rhs, OUT& out) {
       if constexpr (CT::SIMD<OUT>)
          out = Inner::Divide<OUT>(lhs, rhs);
       else if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>)
@@ -199,7 +199,7 @@ namespace Langulus::SIMD
    ///      Inner::Divide if you don't want this.                             
    template<class LHS, class RHS, CT::NoIntent OUT = LosslessArray<LHS, RHS>>
    LANGULUS(INLINED)
-   constexpr auto Divide(const LHS& lhs, const RHS& rhs) {
+   constexpr auto Divide(LHS const& lhs, RHS const& rhs) {
       OUT out;
       Divide(DeintCast(lhs), DeintCast(rhs), out);
 

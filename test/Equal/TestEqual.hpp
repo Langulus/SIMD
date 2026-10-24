@@ -11,14 +11,14 @@
 
 /// Compare two scalars and put result in a bit                               
 template<CT::Scalar LHS, CT::Scalar RHS> LANGULUS(INLINED)
-void ControlEqualM(const LHS& lhs, const RHS& rhs, SIMD::Bitmask<1>& out) noexcept {
+void ControlEqualM(LHS const& lhs, RHS const& rhs, SIMD::Bitmask<1>& out) noexcept {
    out = (lhs == rhs);
 }
 
 /// Compare two vectors and put the result in a bitmask vector                
 template<CT::Vector LHS, CT::Vector RHS, class OUT = SIMD::Bitmask<CountOf<LHS>>>
 LANGULUS(INLINED)
-void ControlEqualM(const LHS& lhsArray, const RHS& rhsArray, OUT& out)
+void ControlEqualM(LHS const& lhsArray, RHS const& rhsArray, OUT& out)
 noexcept requires (CountOf<LHS> == CountOf<RHS>) {
    using T = typename OUT::Type;
    auto lhs = lhsArray.mArray;
@@ -29,13 +29,13 @@ noexcept requires (CountOf<LHS> == CountOf<RHS>) {
 
 /// Compare two scalars and put result in a boolean									
 template<class LHS, class RHS, CT::Bool OUT> LANGULUS(INLINED)
-void ControlEqualV(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+void ControlEqualV(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
    out = (lhs == rhs);
 }
 
 /// Compare two vectors and put the result in a vector of bools               
 template<CT::Vector LHS, CT::Vector RHS, CT::Bool OUT> LANGULUS(INLINED)
-void ControlEqualV(const LHS& lhsArray, const RHS& rhsArray, Vector<OUT, CountOf<LHS>>& out)
+void ControlEqualV(LHS const& lhsArray, RHS const& rhsArray, Vector<OUT, CountOf<LHS>>& out)
 noexcept requires (CountOf<LHS> == CountOf<RHS>) {
    auto r = out.mArray;
    auto lhs = lhsArray.mArray;

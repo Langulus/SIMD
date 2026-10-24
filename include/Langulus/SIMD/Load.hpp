@@ -30,7 +30,7 @@ namespace Langulus::SIMD
    ///   @param v - the register to load                                      
    ///   @return the register, or Unsupported if not possible                 
    template<auto DEF, class FORCE_OUT = void> LANGULUS(INLINED)
-   auto Load(const CT::SIMD auto& v) noexcept {
+   auto Load(CT::SIMD auto const& v) noexcept {
       using R = Deref<decltype(v)>;
       constexpr auto S = Inner::DecideCount<R, FORCE_OUT>();
 

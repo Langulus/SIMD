@@ -9,7 +9,7 @@
 
 
 template<class VAL, class OUT> LANGULUS(INLINED)
-void ControlFloor(const VAL& val, OUT& out) noexcept {
+void ControlFloor(VAL const& val, OUT& out) noexcept {
    out = std::floor(val);
 }
 

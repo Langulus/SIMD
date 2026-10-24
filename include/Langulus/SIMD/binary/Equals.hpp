@@ -15,10 +15,7 @@ namespace Langulus::SIMD::Inner
    LANGULUS(INLINED)
    constexpr No EqualsSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept { return {}; }
    
-   /// Compare two registers                                                  
-   ///   @param lhs - left register                                           
-   ///   @param rhs - right register                                          
-   ///   @return the resulting register                                       
+   /// Compare two registers using SIMD                                       
    template<CT::SIMD R> LANGULUS(INLINED)
    R EqualsSIMD(R lhs, R rhs) noexcept {
       using T = TypeOf<R>;
@@ -64,10 +61,9 @@ namespace Langulus::SIMD::Inner
    }
    
    /// Compare values as constexpr, if possible                               
-   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
-   ///   @patam value - scalar/vector to operate on                           
+   ///   @tparam FORCE_OUT the desired element type (lossless if void)        
    ///   @return bool/bitmask                                                 
-   template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
+   template<class FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto EqualsConstexpr(auto const& lhs, auto const& rhs) noexcept {
       // Will always return a std::array<bool>                          
       constexpr size_t S = LglsOverlapExtents(lhs, rhs);
@@ -81,15 +77,15 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Compare values as a register, if possible                              
-   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
-   ///   @patam value - scalar/vector/register to operate on                  
+   ///   @tparam FORCE_OUT the desired element type (lossless if void)        
+   ///   @param value scalar/vector/register to operate on                    
    ///   @return bool/bitmask/register                                        
-   template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
+   template<class FORCE_OUT = void> LANGULUS(INLINED)
    auto Equals(auto const& lhs, auto const& rhs) noexcept {
       // Will return either a std::array<bool>, or a masked register,   
       // depending whether SIMD operation is supported or not           
       constexpr size_t S = LglsOverlapExtents(lhs, rhs);
-      using OUT = ::std::conditional_t<CT::SIMD<FORCE_OUT>, FORCE_OUT, ::std::array<bool, S>>;
+      using OUT = Tif<CT::SIMD<FORCE_OUT>, FORCE_OUT, ::std::array<bool, S>>;
 
       return AttemptBinary<0, OUT>(lhs, rhs,
          []<class R>(const R& l, const R& r) noexcept {
@@ -107,34 +103,34 @@ namespace Langulus::SIMD::Inner
 namespace Langulus::SIMD
 {
    /// Compare numbers for equality, force output to desired place            
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (deducible)                   
+   ///   @param lhs left array, scalar, or register                           
+   ///   @param rhs right array, scalar, or register                          
+   ///   @param out [out] output                                              
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in 'out'. Use Inner::Equals if you     
    ///      don't want this.                                                  
-   template<class LHS, class RHS, CT::NoIntent OUT> LANGULUS(INLINED)
-   constexpr void Equals(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+   template<class LHS, class RHS, class OUT>
+   requires CT::NoIntent<LHS, RHS, OUT> LANGULUS(INLINED)
+   constexpr void Equals(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
       if consteval {
-         Store(Inner::EqualsConstexpr<OUT>(DeintCast(lhs), DeintCast(rhs)), out);
+         Store(Inner::EqualsConstexpr<OUT>(lhs, rhs), out);
       }
       else {
-         Store(Inner::Equals<OUT>(DeintCast(lhs), DeintCast(rhs)), out);
+         Store(Inner::Equals<OUT>(lhs, rhs), out);
       }
    }
 
    /// Compare numbers for equality                                           
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired output type (lossless array by default)    
+   ///   @param lhs left array, scalar, or register                           
+   ///   @param rhs right array, scalar, or register                          
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in an instance of 'OUT'. Use           
    ///      Inner::Equals if you don't want this.                             
-   template<class LHS, class RHS, CT::NoIntent OUT = BitmaskFromOverlap<LHS, RHS>>
-   LANGULUS(INLINED)
-   constexpr OUT Equals(const LHS& lhs, const RHS& rhs) noexcept {
+   template<class LHS, class RHS, class OUT = BitmaskFromOverlap<LHS, RHS>>
+   requires CT::NoIntent<LHS, RHS, OUT> LANGULUS(INLINED)
+   constexpr OUT Equals(LHS const& lhs, RHS const& rhs) noexcept {
       OUT out;
-      Equals(DeintCast(lhs), DeintCast(rhs), out);
+      Equals(lhs, rhs, out);
       return out;
    }
 }

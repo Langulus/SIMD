@@ -49,28 +49,30 @@ namespace Langulus::SIMD::Inner
       }
    }
    
-   /// Fallback OP with two arguments                                         
-   /// It converts LHS and RHS to the most lossless of the two                
-   ///   @tparam OUT - the desired output array/vector/scalar                 
-   ///   @param lhs - left argument                                           
-   ///   @param rhs - right argument                                          
-   ///   @param op - the fallback function to invoke                          
-   ///   @return the resulting number/bool/std::array of numbers/bools        
+   /// Fallback OP with two arguments.                                        
+   /// It converts LHS and RHS to the most lossless of the two.               
+   ///   @tparam OUT the desired output array/vector/scalar                   
+   ///   @param op the fallback lambda to invoke                              
+   ///   @return the resulting number/bool/std::array of numbers/bools, or No 
+   ///      if operation is not supported for the chosen arguments            
    template<class OUT, class LHS, class RHS, class FFALL> LANGULUS(INLINED)
-   constexpr auto FallbackBinary(LHS& lhs, RHS& rhs, FFALL&& op) {
-      if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>) {
+   constexpr auto FallbackBinary(LHS const& lhs, RHS const& rhs, FFALL&& op) {
+      /*if constexpr (CT::SIMD<LHS> or CT::SIMD<RHS>) {
          // Fallback routine can't handle registers, but the function   
          // instantiation is still needed in the Evaluate function      
          return No {};
       }
-      else {
-         using RETURN = SIMD::LosslessArray<LHS, RHS>;
-         using LOSSLESS = TypeOf<RETURN>;
-         constexpr auto S = ExtentOf<RETURN>;
+      else {*/
+         static_assert(CT::Array<OUT>);
+         //using RETURN = SIMD::LosslessArray<LHS, RHS>;
+         //using LOSSLESS = TypeOf<RETURN>;
+         //constexpr auto S = ExtentOf<RETURN>;
+         using LOSSLESS = TypeOf<OUT>;
+         constexpr size_t S = ExtentOf<OUT>;
 
          if constexpr (CT::Vector<LHS, RHS>) {
             // Vector OP Vector                                         
-            RETURN output;
+            OUT output;
             for (size_t i = 0; i < S; ++i) {
                output[i] = static_cast<LOSSLESS>(op(
                   static_cast<LOSSLESS>(lhs[i]),
@@ -82,7 +84,7 @@ namespace Langulus::SIMD::Inner
          }
          else if constexpr (CT::Vector<LHS>) {
             // Vector OP Scalar                                         
-            RETURN output;
+            OUT output;
             const auto same_rhs = static_cast<LOSSLESS>(GetFirst(rhs));
             for (size_t i = 0; i < S; ++i) {
                output[i] = static_cast<LOSSLESS>(op(
@@ -95,7 +97,7 @@ namespace Langulus::SIMD::Inner
          }
          else if constexpr (CT::Vector<RHS>) {
             // Scalar OP Vector                                         
-            RETURN output;
+            OUT output;
             const auto same_lhs = static_cast<LOSSLESS>(GetFirst(lhs));
             for (size_t i = 0; i < S; ++i) {
                output[i] = static_cast<LOSSLESS>(op(
@@ -114,6 +116,6 @@ namespace Langulus::SIMD::Inner
                static_cast<LOSSLESS>(GetFirst(rhs))
             ));
          }
-      }
+      //}
    }
 }

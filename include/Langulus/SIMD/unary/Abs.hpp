@@ -16,7 +16,7 @@ namespace Langulus::SIMD::Inner
    constexpr No AbsSIMD(CT::NotSIMD auto) noexcept { return {}; }
 
    /// Get absolute values via SIMD                                           
-   ///   @param v - the register                                              
+   ///   @param v the register                                                
    ///   @return the absolute values                                          
    LANGULUS(INLINED)
    auto AbsSIMD(CT::SIMD auto v) noexcept {
@@ -65,8 +65,8 @@ namespace Langulus::SIMD::Inner
    }
    
    /// Get absolute values as constexpr, if possible                          
-   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
-   ///   @patam value - scalar/vector to operate on                           
+   ///   @tparam FORCE_OUT the desired element type (lossless if void)        
+   ///   @patam value scalar/vector to operate on                             
    ///   @return the absolute scalar/vector                                   
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto AbsConstexpr(auto const& value) noexcept {
@@ -79,8 +79,8 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Get absolute values as a register, if possible                         
-   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
-   ///   @patam value - scalar/vector/register to operate on                  
+   ///   @tparam FORCE_OUT the desired element type (lossless if void)        
+   ///   @patam value scalar/vector/register to operate on                    
    ///   @return the absolute scalar/vector/register                          
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
    auto Abs(auto const& value) noexcept {

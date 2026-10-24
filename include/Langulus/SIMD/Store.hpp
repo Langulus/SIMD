@@ -18,7 +18,7 @@ namespace Langulus::SIMD::Inner
    ///   @param from the source register                                      
    ///   @param to [out] the destination vector                               
    LANGULUS(INLINED)
-   void StoreSIMD(const CT::SIMD auto& from, CT::Bitmask auto& to) noexcept {
+   void StoreSIMD(CT::SIMD auto const& from, CT::Bitmask auto& to) noexcept {
       using R = Deref<decltype(from)>;
       using T = TypeOf<R>;
       (void)to;
@@ -304,14 +304,11 @@ namespace Langulus::SIMD::Inner
             }
             else static_assert(false, "Bad output to store a bitmask");
          }
-         else if constexpr (CT::Scalar<TO>) {
-            if constexpr (CT::Bool<E>) {
-               // Collapse the entire bitmask to a single boolean       
-               GetFirst(to) = from;
-            }
-            else static_assert(false, "Bad output to store a bitmask");
+         else {
+            // Collapse the entire bitmask to a single boolean       
+            static_assert(CT::Bool<E>, "Unsupported destination");
+            GetFirst(to) = from;
          }
-         else static_assert(false, "Unsupported destination");
       }
       else if constexpr (CT::Vector<FROM>) {
          // Extract from any range                                      
@@ -325,7 +322,7 @@ namespace Langulus::SIMD::Inner
             for (size_t i = 0; i < S; ++i)
                to[i] = from[i];
          }
-         else if constexpr (CT::Scalar<TO>) {
+         else {
             // Store as a scalar                                        
             if constexpr (CT::Bool<E>) {
                // Collect all booleans, so that we don't lose the       
@@ -340,18 +337,16 @@ namespace Langulus::SIMD::Inner
             }
             else GetFirst(to) = from;
          }
-         else static_assert(false, "Unsupported destination");
       }
-      else if constexpr (CT::Scalar<FROM>) {
+      else {
          // Extract from a scalar                                       
          if constexpr (CT::Vector<TO>) {
             // Multicast to a vector output                             
             for (size_t i = 0; i < S; ++i)
                to[i] = from;
          }
-         else GetFirst(to) = from;
+         else GetFirst(to) = GetFirst(from);
       }
-      else static_assert(false, "Unsupported source");
    }
 }
 
@@ -364,10 +359,10 @@ namespace Langulus::SIMD
    constexpr void Store(FROM const& from, CT::NotSIMD auto& to) noexcept {
       if constexpr (CT::SIMD<FROM>)
          Inner::StoreSIMD(from, to);
-      else if constexpr (CT::Supported<FROM>)
+      else {
+         static_assert(CT::Supported<FROM>, "Source not supported");
          Inner::StoreConstexpr(from, to);
-      //else
-      //   static_assert(false, "Source not supported");
+      }
    }
 }
 
@@ -375,7 +370,7 @@ namespace Langulus::SIMD
 #define LANGULUS_SIMD_ARITHMETHIC_API(OP) \
    template<class LHS, class RHS, class OUT> \
    requires CT::NoIntent<LHS, RHS, OUT> LANGULUS(INLINED) \
-   constexpr void OP(const LHS& lhs, const RHS& rhs, OUT& out) noexcept { \
+   constexpr void OP(LHS const& lhs, RHS const& rhs, OUT& out) noexcept { \
       if consteval { \
          Store(Inner::OP##Constexpr<OUT>(lhs, rhs), out); \
       } else { \
@@ -385,17 +380,12 @@ namespace Langulus::SIMD
             Store(Inner::OP<OUT>(lhs, rhs), out); \
       } \
    } \
-   template<class LHS, class RHS, class OUT = LosslessArray<LHS, RHS>> \
+   template<class OUT = void, class LHS, class RHS> \
    requires CT::NoIntent<LHS, RHS, OUT> LANGULUS(INLINED) \
-   constexpr auto OP(const LHS& lhs, const RHS& rhs) noexcept { \
-      OUT out; \
+   constexpr auto OP(LHS const& lhs, RHS const& rhs) noexcept { \
+      Tif<::std::is_void_v<OUT>, LosslessArray<LHS, RHS>, OUT> out; \
       OP(lhs, rhs, out); \
-      if constexpr (::std::derived_from<Decay<LHS>, Decay<RHS>>) \
-         return LHS {out}; \
-      else if constexpr (::std::derived_from<Decay<RHS>, Decay<LHS>>) \
-         return RHS {out}; \
-      else \
-         return out; \
+      return out; \
    }
 
 
@@ -403,7 +393,7 @@ namespace Langulus::SIMD
 #define LANGULUS_SIMD_ARITHMETHIC_WITH_SATURATION_API(OP) \
    template<bool SATURATE = false, class LHS, class RHS, class OUT> \
    requires CT::NoIntent<LHS, RHS, OUT> LANGULUS(INLINED) \
-   constexpr void OP(const LHS& lhs, const RHS& rhs, OUT& out) noexcept { \
+   constexpr void OP(LHS const& lhs, RHS const& rhs, OUT& out) noexcept { \
       constexpr bool saturated = SATURATE or CT::Saturated<LHS> or CT::Saturated<RHS>; \
       if consteval { \
          Store(Inner::OP##Constexpr<saturated, OUT>(lhs, rhs), out); \
@@ -414,18 +404,13 @@ namespace Langulus::SIMD
             Store(Inner::OP<saturated, OUT>(lhs, rhs), out); \
       } \
    } \
-   template<bool SATURATE = false, class LHS, class RHS, class OUT = LosslessArray<LHS, RHS>> \
+   template<bool SATURATE = false, class OUT = void, class LHS, class RHS> \
    requires CT::NoIntent<LHS, RHS, OUT> LANGULUS(INLINED) \
-   constexpr auto OP(const LHS& lhs, const RHS& rhs) noexcept { \
+   constexpr auto OP(LHS const& lhs, RHS const& rhs) noexcept { \
       constexpr bool saturated = SATURATE or CT::Saturated<LHS> or CT::Saturated<RHS>; \
-      OUT out; \
+      Tif<::std::is_void_v<OUT>, LosslessArray<LHS, RHS>, OUT> out; \
       OP<SATURATE or saturated>(lhs, rhs, out); \
-      if constexpr (::std::derived_from<Decay<LHS>, Decay<RHS>>) \
-         return LHS {out}; \
-      else if constexpr (::std::derived_from<Decay<RHS>, Decay<LHS>>) \
-         return RHS {out}; \
-      else \
-         return out; \
+      return out; \
    }
 
 
@@ -433,7 +418,7 @@ namespace Langulus::SIMD
 #define LANGULUS_SIMD_ARITHMETHIC_UNARY_API(OP) \
    template<class VAL, class OUT> \
    requires CT::NoIntent<VAL, OUT> LANGULUS(INLINED) \
-   constexpr void OP(const VAL& val, OUT& out) noexcept { \
+   constexpr void OP(VAL const& val, OUT& out) noexcept { \
       if consteval { \
          Store(Inner::OP##Constexpr<OUT>(val), out); \
       } else { \
@@ -443,8 +428,10 @@ namespace Langulus::SIMD
             Store(Inner::OP<OUT>(val), out); \
       } \
    } \
-   template<class VAL, class OUT = LosslessArray<VAL>> \
+   template<class OUT = void, class VAL> \
    requires CT::NoIntent<VAL, OUT> LANGULUS(INLINED) \
-   constexpr auto OP(const VAL& val) noexcept { \
-      OUT out; OP(val, out); return out; \
+   constexpr auto OP(VAL const& val) noexcept { \
+      Tif<::std::is_void_v<OUT>, VAL, OUT> out; \
+      OP(val, out); \
+      return out; \
    }

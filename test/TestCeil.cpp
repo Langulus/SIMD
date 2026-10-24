@@ -9,7 +9,7 @@
 
 
 template<class VAL, class OUT> LANGULUS(INLINED)
-void ControlCeil(const VAL& val, OUT& out) noexcept {
+void ControlCeil(VAL const& val, OUT& out) noexcept {
    out = std::ceil(val);
 }
 

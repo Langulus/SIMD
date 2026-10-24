@@ -12,14 +12,11 @@
 namespace Langulus::SIMD::Inner
 {
    /// Used to detect missing SIMD routine                                    
-   template<bool SATURATE> LANGULUS(INLINED)
-   constexpr No AddSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept { return {}; }
+   /*template<bool SATURATE> LANGULUS(INLINED)
+   constexpr No AddSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept { return {}; }*/
 
    /// Add two registers                                                      
-   ///   @tparam SATURATE - whether to clamp to [min;max]                     
-   ///   @param lhs - left register                                           
-   ///   @param rhs - right register                                          
-   ///   @return the resulting register                                       
+   ///   @tparam SATURATE whether to clamp to [min;max]                       
    template<bool SATURATE, CT::SIMD R> LANGULUS(INLINED)
    auto AddSIMD(R lhs, R rhs) noexcept {
       using T = TypeOf<R>;
@@ -33,7 +30,7 @@ namespace Langulus::SIMD::Inner
             else if constexpr (CT::SignedInteger16<T>)   return R {simde_mm_adds_epi16    (lhs, rhs)};
             else if constexpr (CT::UnsignedInteger16<T>) return R {simde_mm_adds_epu16    (lhs, rhs)};
             else if constexpr (CT::SignedInteger32<T>) {
-               // https://stackoverflow.com/questions/29498824       
+               // https://stackoverflow.com/questions/29498824          
                const auto int_max  = simde_mm_set1_epi32(::std::numeric_limits<T>::max());
                const auto res      = simde_mm_add_epi32 (lhs, rhs);
                const auto sign_bit = simde_mm_srli_epi32(lhs, 31);
@@ -70,12 +67,12 @@ namespace Langulus::SIMD::Inner
                #endif
             }
             else if constexpr (CT::Real32<T>) {
-               // Clamp to [0;1] range                               
+               // Clamp to [0;1] range                                  
                return R {simde_mm_max_ps(simde_mm_min_ps(
                   simde_mm_add_ps(lhs, rhs), simde_mm_set1_ps(1)), simde_mm_set1_ps(0))};
             }
             else if constexpr (CT::Real64<T>) {
-               // Clamp to [0;1] range                               
+               // Clamp to [0;1] range                                  
                return R {simde_mm_max_pd(simde_mm_min_pd(
                   simde_mm_add_pd(lhs, rhs), simde_mm_set1_pd(1)), simde_mm_set1_pd(0))};
             }
@@ -90,7 +87,7 @@ namespace Langulus::SIMD::Inner
             else if constexpr (CT::SignedInteger16<T>)   return R {simde_mm256_adds_epi16 (lhs, rhs)};
             else if constexpr (CT::UnsignedInteger16<T>) return R {simde_mm256_adds_epu16 (lhs, rhs)};
             else if constexpr (CT::SignedInteger32<T>) {
-               // https://stackoverflow.com/questions/29498824       
+               // https://stackoverflow.com/questions/29498824          
                const auto int_max  = simde_mm256_set1_epi32(::std::numeric_limits<T>::max());
                const auto res      = simde_mm256_add_epi32 (lhs, rhs);
                const auto sign_bit = simde_mm256_srli_epi32(lhs, 31);
@@ -127,12 +124,12 @@ namespace Langulus::SIMD::Inner
                #endif
             }
             else if constexpr (CT::Real32<T>) {
-               // Clamp to [0;1] range                               
+               // Clamp to [0;1] range                                  
                return R {simde_mm256_max_ps(simde_mm256_min_ps(
                   simde_mm256_add_ps(lhs, rhs), simde_mm256_set1_ps(1)), simde_mm256_set1_ps(0))};
             }
             else if constexpr (CT::Real64<T>) {
-               // Clamp to [0;1] range                               
+               // Clamp to [0;1] range                                  
                return R {simde_mm256_max_pd(simde_mm256_min_pd(
                   simde_mm256_add_pd(lhs, rhs), simde_mm256_set1_pd(1)), simde_mm256_set1_pd(0))};
             }
@@ -147,7 +144,7 @@ namespace Langulus::SIMD::Inner
             else if constexpr (CT::SignedInteger16<T>)   return R {simde_mm512_adds_epi16 (lhs, rhs)};
             else if constexpr (CT::UnsignedInteger16<T>) return R {simde_mm512_adds_epu16 (lhs, rhs)};
             else if constexpr (CT::SignedInteger32<T>){
-               // https://stackoverflow.com/questions/29498824       
+               // https://stackoverflow.com/questions/29498824          
                const auto int_max  = simde_mm512_set1_epi32(::std::numeric_limits<T>::max());
                const auto res      = simde_mm512_add_epi32 (lhs, rhs);
                const auto sign_bit = simde_mm512_srli_epi32(lhs, 31);
@@ -165,12 +162,12 @@ namespace Langulus::SIMD::Inner
                return R {simde_mm512_add_epi64(mx, rhs)};
             }
             else if constexpr (CT::Real32<T>) {
-               // Clamp to [0;1] range                               
+               // Clamp to [0;1] range                                  
                return R {simde_mm512_max_ps(simde_mm512_min_ps(
                   simde_mm512_add_ps(lhs, rhs), simde_mm512_set1_ps(1)), simde_mm512_set1_ps(0))};
             }
             else if constexpr (CT::Real64<T>) {
-               // Clamp to [0;1] range                               
+               // Clamp to [0;1] range                                  
                return R {simde_mm512_max_pd(simde_mm512_min_pd(
                   simde_mm512_add_pd(lhs, rhs), simde_mm512_set1_pd(1)), simde_mm512_set1_pd(0))};
             }
@@ -222,7 +219,7 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Fallback addition                                                      
-   ///   @tparam SATURATE - whether to clamp to max if overflow occurs        
+   ///   @tparam SATURATE whether to clamp to max if overflow occurs          
    template<bool SATURATE, class E> LANGULUS(INLINED)
    constexpr E AddFallback(const E& lhs, const E& rhs) noexcept {
       if constexpr (SATURATE) {
@@ -248,11 +245,11 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Get sum of values as constexpr, if possible                            
-   ///   @tparam SATURATE - whether to clamp to max if overflow occurs        
-   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
-   ///   @patam value - scalar/vector to operate on                           
+   ///   @tparam SATURATE whether to clamp to max if overflow occurs          
+   ///   @tparam FORCE_OUT the desired element type (lossless if void)        
+   ///   @param value scalar/vector to operate on                             
    ///   @return the summed scalar/vector                                     
-   template<bool SATURATE = false, CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
+   template<bool SATURATE = false, class FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto AddConstexpr(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs, nullptr,
          []<class E>(const E& l, const E& r) noexcept -> E {
@@ -262,11 +259,11 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Get summed values as a register, if possible                           
-   ///   @tparam SATURATE - whether to clamp to max if overflow occurs        
-   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
-   ///   @patam value - scalar/vector/register to operate on                  
+   ///   @tparam SATURATE whether to clamp to max if overflow occurs          
+   ///   @tparam FORCE_OUT the desired element type (lossless if void)        
+   ///   @param value scalar/vector/register to operate on                    
    ///   @return the summed scalar/vector/register                            
-   template<bool SATURATE = false, CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
+   template<bool SATURATE = false, class FORCE_OUT = void> LANGULUS(INLINED)
    auto Add(auto const& lhs, auto const& rhs) noexcept {
       return AttemptBinary<0, FORCE_OUT>(lhs, rhs,
          []<class R>(const R& l, const R& r) noexcept {

@@ -9,7 +9,7 @@
 
 
 template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
-void ControlMin(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+void ControlMin(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
    out = lhs < rhs ? lhs : rhs;
 }
 

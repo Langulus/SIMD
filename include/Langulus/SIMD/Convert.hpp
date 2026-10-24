@@ -155,7 +155,8 @@ namespace Langulus::SIMD
    ///   @param out what scalar/array/register are we converting into?        
    template<auto DEF, class INPUT, class OUTPUT>
    requires (CT::NoIntent<INPUT, OUTPUT>) LANGULUS(INLINED)
-   constexpr void Convert(const INPUT& val, OUTPUT& out) noexcept {
+   constexpr void Convert(INPUT const& val, OUTPUT& out) noexcept {
+      static_assert(CT::Typed<OUTPUT>);
       using TO = TypeOf<OUTPUT>;
 
       if constexpr (CT::Vector<OUTPUT>) {
@@ -258,7 +259,8 @@ namespace Langulus::SIMD
    /// Convert scalar/array/register                                          
    ///   @tparam OUT the desired output type (lossless array by default)      
    ///   @param val what scalar/array/register are we converting?             
-   template<CT::NoIntent VAL, CT::NoIntent OUT = LosslessArray<VAL, VAL>> LANGULUS(INLINED)
+   template<class OUT, class VAL>
+   requires CT::NoIntent<VAL, OUT> LANGULUS(INLINED)
    constexpr OUT Convert(VAL const& val) noexcept {
       OUT out;
       Convert(val, out);

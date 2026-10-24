@@ -11,14 +11,14 @@
 
 /// Scalar * Scalar  (either dense or sparse, wrapped or not)                 
 template<bool SATURATE, CT::Scalar LHS, CT::Scalar RHS, CT::Scalar OUT> LANGULUS(INLINED)
-void ControlMul(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+void ControlMul(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
    auto& fout = FundamentalCast(out);
    fout = SIMD::Inner::MultiplyFallback<SATURATE>(FundamentalCast(lhs), FundamentalCast(rhs));
 }
 
 /// Vector * Vector  (either dense or sparse, wrapped or not)                 
 template<bool SATURATE, CT::Vector LHS, CT::Vector RHS, CT::Vector OUT> LANGULUS(INLINED)
-void ControlMul(const LHS& lhsArray, const RHS& rhsArray, OUT& out) noexcept {
+void ControlMul(LHS const& lhsArray, RHS const& rhsArray, OUT& out) noexcept {
    static_assert(LHS::MemberCount == RHS::MemberCount
              and LHS::MemberCount == OUT::MemberCount,
       "Vector sizes must match");
@@ -33,7 +33,7 @@ void ControlMul(const LHS& lhsArray, const RHS& rhsArray, OUT& out) noexcept {
 
 /// Scalar * Vector  (either dense or sparse, wrapped or not)                 
 template<bool SATURATE, CT::Scalar LHS, CT::Vector RHS, CT::Vector OUT> LANGULUS(INLINED)
-void ControlMul(const LHS& lhs, const RHS& rhsArray, OUT& out) noexcept {
+void ControlMul(LHS const& lhs, RHS const& rhsArray, OUT& out) noexcept {
    static_assert(RHS::MemberCount == OUT::MemberCount,
       "Vector sizes must match");
 
@@ -46,6 +46,6 @@ void ControlMul(const LHS& lhs, const RHS& rhsArray, OUT& out) noexcept {
 
 /// Vector * Scalar  (either dense or sparse, wrapped or not)                 
 template<bool SATURATE, CT::Vector LHS, CT::Scalar RHS, CT::Vector OUT> LANGULUS(INLINED)
-void ControlMul(const LHS& lhsArray, const RHS& rhs, OUT& out) noexcept {
+void ControlMul(LHS const& lhsArray, RHS const& rhs, OUT& out) noexcept {
    ControlMul<SATURATE>(rhs, lhsArray, out);
 }

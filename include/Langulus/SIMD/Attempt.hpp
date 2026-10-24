@@ -92,7 +92,7 @@ namespace Langulus::SIMD::Inner
       FFALL const& opFALL
    ) {
       using LOSSLESS = SIMD::LosslessArray<LHS, RHS>;
-      using OUT = Tif<CT::Void<FORCE_OUT>, LOSSLESS, SIMD::LosslessArray<FORCE_OUT>>;
+      using OUT = Tif<CT::Void<FORCE_OUT>, LOSSLESS, FORCE_OUT>;
       using E   = Tif<CT::Array<OUT>, TypeOf<OUT>, OUT>;
       using R   = decltype(Load<DEF>(Fake<const LOSSLESS&>()));
 

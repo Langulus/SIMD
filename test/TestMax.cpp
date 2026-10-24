@@ -9,7 +9,7 @@
 
 
 template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
-void ControlMax(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+void ControlMax(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
    out = lhs > rhs ? lhs : rhs;
 }
 
