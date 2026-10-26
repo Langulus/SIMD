@@ -11,7 +11,7 @@
 template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
 void ControlDiv(LHS const& lhs, RHS const& rhs, OUT& out) {
    if (rhs == RHS {0})
-      LANGULUS_THROW(ZeroDivision, "Division by zero");
+      throw Exception("Division by zero");
    out = lhs / rhs;
 }
 
