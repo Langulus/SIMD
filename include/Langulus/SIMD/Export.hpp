@@ -414,7 +414,7 @@ namespace Langulus::SIMD
       consteval auto LosslessArray() {
          using LT = Tif<CT::Array<LHS>, TypeOf<LHS>, LHS>;
          using RT = Tif<CT::Array<RHS>, TypeOf<RHS>, RHS>;
-         constexpr size_t C = LglsOverlapExtents(LHS{}, RHS{});
+         constexpr size_t C = LglsOverlapExtents(Fake<LHS>(), Fake<RHS>());
 
          if constexpr (CT::Void<LHS, RHS>) {
             // Both sides are void                                      
