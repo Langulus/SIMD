@@ -51,7 +51,7 @@ namespace Langulus::SIMD
          const Type& bitset;
 
          iterator() = delete;
-         iterator(const size_t a, const Type& set)
+         iterator(size_t const a, const Type& set)
             : marker {a}
             , bitset {set} {}
 
@@ -129,7 +129,7 @@ namespace Langulus::SIMD
          return *this;
       }
 
-      constexpr bool operator [] (const size_t& idx) const assumptious {
+      constexpr bool operator [] (size_t const& idx) const assumptious {
          LglsAssumeUser(idx < C, "Index out of limits");
          return 0 != (mValue & (Type {1} << idx));
       }
@@ -147,7 +147,7 @@ namespace Langulus::SIMD
          }
       };
 
-      constexpr BitSwitcher operator [] (const size_t& idx) assumptious {
+      constexpr BitSwitcher operator [] (size_t const& idx) assumptious {
          LglsAssumeUser(idx < C, "Index out of limits");
          return BitSwitcher {*this, Type {1} << idx};
       }
