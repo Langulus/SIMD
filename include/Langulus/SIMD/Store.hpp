@@ -343,7 +343,7 @@ namespace Langulus::SIMD::Inner
          if constexpr (CT::Vector<TO>) {
             // Multicast to a vector output                             
             for (size_t i = 0; i < S; ++i)
-               to[i] = from;
+               to[i] = GetFirst(from);
          }
          else GetFirst(to) = GetFirst(from);
       }
