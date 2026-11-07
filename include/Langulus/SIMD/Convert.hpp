@@ -157,7 +157,7 @@ namespace Langulus::SIMD
    requires (CT::NoIntent<INPUT, OUTPUT>) LANGULUS(INLINED)
    constexpr void Convert(INPUT const& val, OUTPUT& out) noexcept {
       static_assert(CT::Typed<OUTPUT>);
-      using TO = TypeOf<OUTPUT>;
+      using TO = Deref<decltype(FundamentalCast(Fake<TypeOf<OUTPUT>>()))>;
 
       if constexpr (CT::Vector<OUTPUT>) {
          if consteval {
