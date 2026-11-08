@@ -376,10 +376,18 @@ namespace Langulus::SIMD
    /// Get the first element of an array or vector, or just the scalar        
    LANGULUS(ALWAYS_INLINED)
    constexpr decltype(auto) GetFirst(CT::NotSIMD auto&& a) noexcept {
-      if constexpr (requires { a[0]; })
-         return (a[0]);
-      else
-         return LglsFwd(a);
+      if constexpr (requires { a[0]; }) {
+         if constexpr (requires { FundamentalCast(a[0]); })
+            return FundamentalCast(a[0]);
+         else
+            return (a[0]);
+      }
+      else {
+         if constexpr (requires { FundamentalCast(LglsFwd(a)); })
+            return FundamentalCast(LglsFwd(a));
+         else
+            return LglsFwd(a);
+      }
    }
 
    namespace Inner
