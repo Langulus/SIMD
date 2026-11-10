@@ -19,6 +19,7 @@ fetch_external_module(
    SIMDe
    GIT_REPOSITORY  https://github.com/simd-everywhere/simde.git
    GIT_TAG         v0.8.4-rc3
+   GIT_SHALLOW     TRUE
 )
 
 # Build and install SIMD library                                            

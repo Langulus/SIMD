@@ -22,7 +22,7 @@ void ControlCeil(const Vector<VAL, C>& a, Vector<OUT, C>& out) noexcept {
       ControlCeil(*va++, *r++);
 }
 
-TEMPLATE_TEST_CASE("Ceil", "[ceil]"
+TEST_CASE_TEMPLATE("Ceil", T
    , NUMBERS_REAL()
    , VECTORS_REAL(1)
    , VECTORS_REAL(2)
@@ -36,8 +36,6 @@ TEMPLATE_TEST_CASE("Ceil", "[ceil]"
    , VECTORS_REAL(32)
    , VECTORS_REAL(33)
 ) {
-   using T = TestType;
-
    GIVEN("ceil(x) = r") {
       T x;
       T r, rCheck;

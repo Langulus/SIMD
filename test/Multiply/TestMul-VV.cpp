@@ -8,7 +8,7 @@
 #include "TestMul.hpp"
 
 
-TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
+TEST_CASE_TEMPLATE("Vector * Vector", T
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -22,8 +22,6 @@ TEMPLATE_TEST_CASE("Vector * Vector", "[multiply]"
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
-   using T = TestType;
-
    static_assert(SIMD::Multiply<true >(T (0), T (5)) == T (0));
    static_assert(SIMD::Multiply<false>(T (0), T (5)) == T (0));
 

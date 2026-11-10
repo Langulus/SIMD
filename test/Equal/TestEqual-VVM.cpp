@@ -9,7 +9,7 @@
 
 
 ///                                                                           
-TEMPLATE_TEST_CASE("Vector == Vector -> Bitmask", "[compare]"
+TEST_CASE_TEMPLATE("Vector == Vector -> Bitmask", T
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -25,8 +25,6 @@ TEMPLATE_TEST_CASE("Vector == Vector -> Bitmask", "[compare]"
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
-   using T = TestType;
-
    GIVEN("x == y = bitmask") {
       T x, y;
       MaskEquivalentTo<T> r, rCheck;

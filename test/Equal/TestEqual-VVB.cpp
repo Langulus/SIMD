@@ -9,7 +9,7 @@
 
 
 ///                                                                           
-TEMPLATE_TEST_CASE("Vector == Vector -> Bool", "[compare]"
+TEST_CASE_TEMPLATE("Vector == Vector -> Bool", T
    , VECTORS_ALL(5)
    , VECTORS_ALL(6)
    , VECTORS_ALL(7)
@@ -25,8 +25,6 @@ TEMPLATE_TEST_CASE("Vector == Vector -> Bool", "[compare]"
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
 ) {
-   using T = TestType;
-
    GIVEN("x == y = bools") {
       T x, y;
       BooleanEquivalentTo<T> r, rCheck;

@@ -25,7 +25,7 @@ void ControlDiv(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, 
       ControlDiv(*lhs++, *rhs++, *r++);
 }
 
-TEMPLATE_TEST_CASE("Divide", "[divide]"
+TEST_CASE_TEMPLATE("Divide", T
    , VECTORS_ALL(2)
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
@@ -39,8 +39,6 @@ TEMPLATE_TEST_CASE("Divide", "[divide]"
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
-   using T = TestType;
-
    GIVEN("x / y = r") {
       T x, y;
       T r, rCheck;
@@ -49,7 +47,7 @@ TEMPLATE_TEST_CASE("Divide", "[divide]"
          InitOne(x, 1);
          InitOne(y, -5);
       }
-      else for (size_t i = 0; i < CountOf<T>; ++i) {
+      else for (size_t i = 0; i < ExtentOf<T>; ++i) {
          if (x[i] == 0)
             x[i] = 1;
          if (y[i] == 0)

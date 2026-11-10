@@ -8,7 +8,7 @@
 #include "TestAdd.hpp"
 
 
-TEMPLATE_TEST_CASE("Vector + Scalar", "[add]"
+TEST_CASE_TEMPLATE("Vector + Scalar", T
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -22,9 +22,8 @@ TEMPLATE_TEST_CASE("Vector + Scalar", "[add]"
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
-   using T = TestType;
-   using E = TypeOf<T>;
-   static_assert(CountOf<Vector<signed char, 2>> == 2);
+   using E = Tif<CT::Typed<T>, TypeOf<T>, T>;
+   static_assert(ExtentOf<Vector<signed char, 2>> == 2);
 
    GIVEN("Vector<T,N> + Scalar<T> = Vector<T,N>") {
       T x;
@@ -37,7 +36,7 @@ TEMPLATE_TEST_CASE("Vector + Scalar", "[add]"
       }
       else InitOne(y, -5);
 
-      static_assert(SIMD::Add<true>(T {0}, E {5}) == T {CT::Real<TypeOf<T>> ? 1 : 5});
+      static_assert(SIMD::Add<true >(T {0}, E {5}) == T {CT::Real<TypeOf<T>> ? 1 : 5});
       static_assert(SIMD::Add<false>(T {0}, E {5}) == static_cast<T>(5));
 
       WHEN("Added (with saturation)") {

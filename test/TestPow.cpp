@@ -55,7 +55,7 @@ void ControlPow(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, 
       ControlPow(*lhs++, *rhs++, *r++);
 }
 
-TEMPLATE_TEST_CASE("Power", "[power]"
+TEST_CASE_TEMPLATE("Power", T
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -69,8 +69,6 @@ TEMPLATE_TEST_CASE("Power", "[power]"
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
-   using T = TestType;
-
    GIVEN("pow(x, y) = r") {
       T x, y;
       T r, rCheck;

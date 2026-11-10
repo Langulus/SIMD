@@ -22,7 +22,7 @@ void ControlFloor(const Vector<VAL, C>& a, Vector<OUT, C>& out) noexcept {
       ControlFloor(*va++, *r++);
 }
 
-TEMPLATE_TEST_CASE("Floor", "[floor]"
+TEST_CASE_TEMPLATE("Floor", T
    , NUMBERS_REAL()
    , VECTORS_REAL(1)
    , VECTORS_REAL(2)
@@ -36,8 +36,6 @@ TEMPLATE_TEST_CASE("Floor", "[floor]"
    , VECTORS_REAL(32)
    , VECTORS_REAL(33)
 ) {
-   using T = TestType;
-
    GIVEN("floor(x) = r") {
       T x;
       T r, rCheck;

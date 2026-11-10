@@ -28,7 +28,7 @@ void ControlSL(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, V
       ControlSL(*(lhs++), *(rhs++), *(r++));
 }
 
-TEMPLATE_TEST_CASE("Shift left", "[shift]"
+TEST_CASE_TEMPLATE("Shift left", T
    , VECTORS_INT(8)
    , NUMBERS_INT()
    , VECTORS_INT(1)
@@ -42,8 +42,6 @@ TEMPLATE_TEST_CASE("Shift left", "[shift]"
    , VECTORS_INT(32)
    , VECTORS_INT(33)
 ) {
-   using T = TestType;
-
    GIVEN("x << y = r") {
       T x, y;
       T r, rCheck;

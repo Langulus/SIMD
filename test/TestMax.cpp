@@ -23,7 +23,7 @@ void ControlMax(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, 
       ControlMax(*lhs++, *rhs++, *r++);
 }
 
-TEMPLATE_TEST_CASE("Max", "[max]"
+TEST_CASE_TEMPLATE("Max", T
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -37,8 +37,6 @@ TEMPLATE_TEST_CASE("Max", "[max]"
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
-   using T = TestType;
-
    GIVEN("max(x, y) = r") {
       T x, y;
       T r, rCheck;

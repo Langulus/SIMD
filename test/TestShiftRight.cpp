@@ -28,7 +28,7 @@ void ControlSR(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, V
       ControlSR(*lhs++, *rhs++, *r++);
 }
 
-TEMPLATE_TEST_CASE("Shift right", "[shift]"
+TEST_CASE_TEMPLATE("Shift right", T
    , NUMBERS_INT()
    , VECTORS_INT(1)
    , VECTORS_INT(2)
@@ -42,8 +42,6 @@ TEMPLATE_TEST_CASE("Shift right", "[shift]"
    , VECTORS_INT(32)
    , VECTORS_INT(33)
 ) {
-   using T = TestType;
-
    GIVEN("x >> y = r") {
       T x, y;
       T r, rCheck;

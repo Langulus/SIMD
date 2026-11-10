@@ -5,12 +5,11 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-
-/// INTENTIONALLY NOT GUARDED                                                 
-/// Include this file once in each cpp file, after all other headers          
-#include <Langulus/SIMD/SIMD.hpp>
+#pragma once
 #include <Langulus/Testing.hpp>
+#include <Langulus/SIMD/SIMD.hpp>
 
+using namespace Langulus;
 using namespace SIMD;
 
 #include <cstdint>
@@ -59,42 +58,42 @@ using namespace SIMD;
    NUMBERS_SIGNED(),  \
    NUMBERS_UNSIGNED()
 
-#define VECTORS_REAL(S)         \
-   (Vector<float, S>),          \
-   (Vector<double, S>)
+#define VECTORS_REAL(S)       \
+   Vector<float, S>,          \
+   Vector<double, S>
 
-#define VECTORS_SIGNED(S)       \
-   (Vector<::std::int16_t, S>), \
-   (Vector<::std::int8_t, S>),  \
-   (Vector<::std::int32_t, S>), \
-   (Vector<::std::int64_t, S>), \
+#define VECTORS_SIGNED(S)     \
+   Vector<::std::int16_t, S>, \
+   Vector<::std::int8_t, S>,  \
+   Vector<::std::int32_t, S>, \
+   Vector<::std::int64_t, S>, \
    VECTORS_REAL(S)
 
-#define VECTORS_UNSIGNED(S)     \
-   (Vector<::std::uint8_t,  S>),\
-   (Vector<::std::uint16_t, S>),\
-   (Vector<::std::uint32_t, S>),\
-   (Vector<::std::uint64_t, S>),\
-   (Vector<Byte, S>),           \
-   (Vector<char8_t, S>),        \
-   (Vector<char16_t, S>),       \
-   (Vector<char32_t, S>),       \
-   (Vector<wchar_t, S>)
+#define VECTORS_UNSIGNED(S)   \
+   Vector<::std::uint8_t,  S>,\
+   Vector<::std::uint16_t, S>,\
+   Vector<::std::uint32_t, S>,\
+   Vector<::std::uint64_t, S>,\
+   Vector<Byte, S>,           \
+   Vector<char8_t, S>,        \
+   Vector<char16_t, S>,       \
+   Vector<char32_t, S>,       \
+   Vector<wchar_t, S>
 
-#define VECTORS_INT(S)          \
-   (Vector<::std::int8_t, S>),  \
-   (Vector<::std::int16_t, S>), \
-   (Vector<::std::int32_t, S>), \
-   (Vector<::std::int64_t, S>), \
-   (Vector<::std::uint8_t, S>), \
-   (Vector<::std::uint16_t, S>),\
-   (Vector<::std::uint32_t, S>),\
-   (Vector<::std::uint64_t, S>),\
-   (Vector<Byte, S>),           \
-   (Vector<char8_t, S>),        \
-   (Vector<char16_t, S>),       \
-   (Vector<char32_t, S>),       \
-   (Vector<wchar_t, S>)
+#define VECTORS_INT(S)        \
+   Vector<::std::int8_t, S>,  \
+   Vector<::std::int16_t, S>, \
+   Vector<::std::int32_t, S>, \
+   Vector<::std::int64_t, S>, \
+   Vector<::std::uint8_t, S>, \
+   Vector<::std::uint16_t, S>,\
+   Vector<::std::uint32_t, S>,\
+   Vector<::std::uint64_t, S>,\
+   Vector<Byte, S>,           \
+   Vector<char8_t, S>,        \
+   Vector<char16_t, S>,       \
+   Vector<char32_t, S>,       \
+   Vector<wchar_t, S>
 
 #define VECTORS_ALL(S)  \
    VECTORS_UNSIGNED(S), \
@@ -109,7 +108,12 @@ void InitOne(T& a, A&& b) noexcept {
          delete a;
       a = new DT {static_cast<DT>(b)};
    }
-   else a = static_cast<Decay<TypeOf<T>>>(b);
+   else {
+      if constexpr (CT::Typed<T>)
+         a = static_cast<Decay<TypeOf<T>>>(b);
+      else
+         a = static_cast<Decay<T>>(b);
+   }
 }
 
 ///                                                                           
@@ -119,8 +123,8 @@ void InitOne(T& a, A&& b) noexcept {
 #pragma pack(push, 1)
 template<CT::Dense T, size_t C>
 struct Vector {
-   using CTTI_InnerType = T;
-   static constexpr size_t MemberCount = C;
+   using CTTI_Typed = T;
+   using CTTI_Array = Yes<C>;
 
    T mArray[C];
 
@@ -160,14 +164,20 @@ struct Vector {
       return iterator {mArray + C};
    }
 
-   Vector() {
-      static std::random_device rd;
-      static std::mt19937 gen(rd());
+   constexpr Vector() {
+      if consteval {
+         for (auto& i : mArray)
+            i = T{1};
+      }
+      else {
+         static std::random_device rd;
+         static std::mt19937 gen(rd());
 
-      for (auto& i : mArray) {
-         i = static_cast<T>(gen() % 66);
-         if (i == T {0})
-            i = T {1};
+         for (auto& i : mArray) {
+            i = static_cast<T>(gen() % 66);
+            if (i == T {0})
+               i = T {1};
+         }
       }
    }
    

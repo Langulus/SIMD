@@ -8,7 +8,7 @@
 #include "TestMul.hpp"
 
 
-TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
+TEST_CASE_TEMPLATE("Vector * Scalar", T
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -22,9 +22,8 @@ TEMPLATE_TEST_CASE("Vector * Scalar", "[multiply]"
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
-   using T = TestType;
    using E = TypeOf<T>;
-   static_assert(CountOf<Vector<signed char, 2>> == 2);
+   static_assert(ExtentOf<Vector<signed char, 2>> == 2);
 
    GIVEN("Vector<T,N> * Scalar<T> = Vector<T,N>") {
       T x;

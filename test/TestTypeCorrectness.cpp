@@ -18,31 +18,29 @@ using Vec2i16 = Vector<::std::int16_t,  2>;
 using Vec2i32 = Vector<::std::int32_t,  2>;
 using Vec2i64 = Vector<::std::int64_t,  2>;
 
-using Vec2f = Vector<Float, 2>;
-using Vec2d = Vector<Double, 2>;
+using Vec2f = Vector<float, 2>;
+using Vec2d = Vector<double, 2>;
 
 
-TEMPLATE_TEST_CASE("Testing vector checks", "[vector]", 
+TEST_CASE_TEMPLATE("Testing vector checks", TestType, 
    Vec2u8, Vec2u16, Vec2u32, Vec2u64, 
    Vec2i8, Vec2i16, Vec2i32, Vec2i64, 
    Vec2f, Vec2d
 ) {
    static_assert(    CT::Vector<TestType>);
    static_assert(not CT::Scalar<TestType>);
-   static_assert(CountOf <TestType> == 2);
+   static_assert(ExtentOf <TestType> == 2);
    static_assert(ExtentOf<TestType> == 1);
 }
 
-TEMPLATE_TEST_CASE("Testing scalar checks", "[scalar]", NUMBERS_ALL()) {
+TEST_CASE_TEMPLATE("Testing scalar checks", TestType, NUMBERS_ALL()) {
    static_assert(not CT::Vector<TestType>);
    static_assert(    CT::Scalar<TestType>);
-   static_assert(CountOf <TestType> == 1);
+   static_assert(ExtentOf <TestType> == 1);
    static_assert(ExtentOf<TestType> == 1);
 }
 
-TEMPLATE_TEST_CASE("Padding and alignment checks", "[sizes]", NUMBERS_ALL()) {
-   using T = TestType;
-
+TEST_CASE_TEMPLATE("Padding and alignment checks", T, NUMBERS_ALL()) {
    static_assert(sizeof(Vector<T, 1>) == sizeof(T) * 1);
    static_assert(sizeof(Vector<T, 2>) == sizeof(T) * 2);
    static_assert(sizeof(Vector<T, 3>) == sizeof(T) * 3);
@@ -56,22 +54,20 @@ TEMPLATE_TEST_CASE("Padding and alignment checks", "[sizes]", NUMBERS_ALL()) {
    static_assert(sizeof(Vector<T, 3>[ 8]) == sizeof(Vector<T, 4>[6]));
 }
 
-TEMPLATE_TEST_CASE("CountOf checks", "[CountOf]", NUMBERS_ALL()) {
-   using T = TestType;
+TEST_CASE_TEMPLATE("ExtentOf checks", T, NUMBERS_ALL()) {
+   static_assert(ExtentOf<T> == 1);
 
-   static_assert(CountOf<T> == 1);
+   static_assert(ExtentOf<Vector<T, 1>> == 1);
+   static_assert(ExtentOf<Vector<T, 2>> == 2);
+   static_assert(ExtentOf<Vector<T, 3>> == 3);
+   static_assert(ExtentOf<Vector<T, 4>> == 4);
 
-   static_assert(CountOf<Vector<T, 1>> == 1);
-   static_assert(CountOf<Vector<T, 2>> == 2);
-   static_assert(CountOf<Vector<T, 3>> == 3);
-   static_assert(CountOf<Vector<T, 4>> == 4);
-
-   static_assert(CountOf<Vector<T, 1>[12]> == 12);
-   static_assert(CountOf<Vector<T, 1>[12]> == 12);
-   static_assert(CountOf<Vector<T, 1>[12]> == 12);
-   static_assert(CountOf<Vector<T, 2>[12]> == 24);
-   static_assert(CountOf<Vector<T, 2>[12]> == 24);
-   static_assert(CountOf<Vector<T, 3>[ 8]> == 24);
+   static_assert(ExtentOf<Vector<T, 1>[12]> == 12);
+   static_assert(ExtentOf<Vector<T, 1>[12]> == 12);
+   static_assert(ExtentOf<Vector<T, 1>[12]> == 12);
+   static_assert(ExtentOf<Vector<T, 2>[12]> == 24);
+   static_assert(ExtentOf<Vector<T, 2>[12]> == 24);
+   static_assert(ExtentOf<Vector<T, 3>[ 8]> == 24);
 }
 
 /*TEST_CASE("OverlapExtents checks", "[OverlapExtents]") {
@@ -101,7 +97,7 @@ TEMPLATE_TEST_CASE("CountOf checks", "[CountOf]", NUMBERS_ALL()) {
    static_assert(OVERLAP_EXTENTS(bigArray,    bigArray   ) == 4);
 }*/
 
-TEST_CASE("OverlapCounts checks", "[OverlapCounts]") {
+TEST_CASE("OverlapCounts checks"") {
    int scalar {};
    int scalarArray[1] {};
    int smallArray[2] {};

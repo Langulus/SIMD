@@ -8,7 +8,7 @@
 #include "TestAdd.hpp"
 
 
-TEMPLATE_TEST_CASE("Vector + Vector", "[add]"
+TEST_CASE_TEMPLATE("Vector + Vector", T
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -22,8 +22,6 @@ TEMPLATE_TEST_CASE("Vector + Vector", "[add]"
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
-   using T = TestType;
-
    GIVEN("x * y = r") {
       T x, y;
       T r, rCheck;

@@ -23,7 +23,7 @@ void ControlMin(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, 
       ControlMin(*lhs++, *rhs++, *r++);
 }
 
-TEMPLATE_TEST_CASE("Min", "[min]"
+TEST_CASE_TEMPLATE("Min", T
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
    , VECTORS_ALL(2)
@@ -37,8 +37,6 @@ TEMPLATE_TEST_CASE("Min", "[min]"
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
-   using T = TestType;
-
    GIVEN("min(x, y) = r") {
       T x, y;
       T r, rCheck;
