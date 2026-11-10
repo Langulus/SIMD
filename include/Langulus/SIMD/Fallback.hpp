@@ -63,16 +63,21 @@ namespace Langulus::SIMD::Inner
          return No {};
       }
       else {*/
-         static_assert(CT::Array<OUT>);
+         static_assert(    CT::NotIntent<OUT>,     "Strip intents");
+         static_assert(    CT::NotReference<OUT>,  "Strip references");
+         static_assert(    CT::Array<OUT>,         "Output must be an array");
+         //static_assert(not CT::BoundedArray<OUT>,  "You were supposed to wrap it in an ::std::array");
+
          //using RETURN = SIMD::LosslessArray<LHS, RHS>;
          //using LOSSLESS = TypeOf<RETURN>;
          //constexpr auto S = ExtentOf<RETURN>;
          using LOSSLESS = TypeOf<OUT>;
          constexpr size_t S = ExtentOf<OUT>;
+         using OUT_NONBOUND = Tif<CT::BoundedArray<OUT>, ::std::array<LOSSLESS, S>, OUT>;
 
          if constexpr (CT::Vector<LHS, RHS>) {
             // Vector OP Vector                                         
-            OUT output;
+            OUT_NONBOUND output;
             for (size_t i = 0; i < S; ++i) {
                output[i] = static_cast<LOSSLESS>(op(
                   static_cast<LOSSLESS>(lhs[i]),
@@ -84,7 +89,7 @@ namespace Langulus::SIMD::Inner
          }
          else if constexpr (CT::Vector<LHS>) {
             // Vector OP Scalar                                         
-            OUT output;
+            OUT_NONBOUND output;
             const auto same_rhs = static_cast<LOSSLESS>(GetFirst(rhs));
             for (size_t i = 0; i < S; ++i) {
                output[i] = static_cast<LOSSLESS>(op(
@@ -97,7 +102,7 @@ namespace Langulus::SIMD::Inner
          }
          else if constexpr (CT::Vector<RHS>) {
             // Scalar OP Vector                                         
-            OUT output;
+            OUT_NONBOUND output;
             const auto same_lhs = static_cast<LOSSLESS>(GetFirst(lhs));
             for (size_t i = 0; i < S; ++i) {
                output[i] = static_cast<LOSSLESS>(op(
