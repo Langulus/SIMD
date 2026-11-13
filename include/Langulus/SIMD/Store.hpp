@@ -385,7 +385,8 @@ namespace Langulus::SIMD
    constexpr auto OP(LHS const& lhs, RHS const& rhs) noexcept { \
       Tif<::std::is_void_v<OUT>, LosslessArray<LHS, RHS>, OUT> out; \
       OP(lhs, rhs, out); \
-      return out; \
+      if constexpr (ExtentOf<decltype(out)> == 1) return GetFirst(out); \
+      else return out; \
    }
 
 
@@ -410,7 +411,8 @@ namespace Langulus::SIMD
       constexpr bool saturated = SATURATE or CT::Saturated<LHS> or CT::Saturated<RHS>; \
       Tif<::std::is_void_v<OUT>, LosslessArray<LHS, RHS>, OUT> out; \
       OP<SATURATE or saturated>(lhs, rhs, out); \
-      return out; \
+      if constexpr (ExtentOf<decltype(out)> == 1) return GetFirst(out); \
+      else return out; \
    }
 
 
@@ -433,5 +435,6 @@ namespace Langulus::SIMD
    constexpr auto OP(VAL const& val) noexcept { \
       Tif<::std::is_void_v<OUT>, VAL, OUT> out; \
       OP(val, out); \
-      return out; \
+      if constexpr (ExtentOf<decltype(out)> == 1) return GetFirst(out); \
+      else return out; \
    }

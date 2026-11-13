@@ -36,7 +36,7 @@ TEST_CASE_TEMPLATE("Vector - Scalar", T
       }
       else InitOne(y, -5);
 
-      static_assert(SIMD::Subtract<true>(T {0}, E {5}) == T {CT::Signed<TypeOf<T>> and not CT::Real<TypeOf<T>> ? -5 : 0});
+      static_assert(SIMD::Subtract<true>(T {0}, E {5}) == T {CT::Signed<E> and not CT::Real<E> ? -5 : 0});
       static_assert(SIMD::Subtract<false>(T {0}, E {5}) == static_cast<T>(-5));
 
       WHEN("Subtracted (with saturation)") {

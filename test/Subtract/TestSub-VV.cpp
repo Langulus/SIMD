@@ -22,6 +22,8 @@ TEST_CASE_TEMPLATE("Vector - Vector", T
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
+   using E = Tif<CT::Typed<T>, TypeOf<T>, T>;
+
    GIVEN("x * y = r") {
       T x, y;
       T r, rCheck;
@@ -31,7 +33,7 @@ TEST_CASE_TEMPLATE("Vector - Vector", T
          InitOne(y, -5);
       }
 
-      static_assert(SIMD::Subtract<true>(T {0}, T {5}) == T {CT::Signed<TypeOf<T>> and not CT::Real<TypeOf<T>> ? -5 : 0});
+      static_assert(SIMD::Subtract<true>(T {0}, T {5}) == T {CT::Signed<E> and not CT::Real<E> ? -5 : 0});
       static_assert(SIMD::Subtract<false>(T {0}, T {5}) == static_cast<T>(-5));
 
       WHEN("Subtracted (with saturation)") {
