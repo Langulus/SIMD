@@ -36,7 +36,7 @@ TEST_CASE_TEMPLATE("Vector + Scalar", T
       }
       else InitOne(y, -5);
 
-      static_assert(SIMD::Add<true >(T {0}, E {5}) == T {CT::Real<TypeOf<T>> ? 1 : 5});
+      static_assert(SIMD::Add<true >(T {0}, E {5}) == T {CT::Real<E> ? 1 : 5});
       static_assert(SIMD::Add<false>(T {0}, E {5}) == static_cast<T>(5));
 
       WHEN("Added (with saturation)") {

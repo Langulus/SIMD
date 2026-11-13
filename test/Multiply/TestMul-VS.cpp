@@ -22,7 +22,7 @@ TEST_CASE_TEMPLATE("Vector * Scalar", T
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
-   using E = TypeOf<T>;
+   using E = Tif<CT::Typed<T>, TypeOf<T>, T>;
    static_assert(ExtentOf<Vector<signed char, 2>> == 2);
 
    GIVEN("Vector<T,N> * Scalar<T> = Vector<T,N>") {

@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #include "Common.hpp"
+#include <Langulus/Logger.hpp>
 
 
 template<CT::Dense B, CT::Dense E> LANGULUS(INLINED)
@@ -13,7 +14,7 @@ constexpr auto Pow(B base, E exponent) noexcept {
    if (base == B {1})
       return B {1};
 
-   if constexpr (CT::IntegerX<B, E>) {
+   if constexpr (CT::Integer<B, E>) {
       if constexpr (CT::Unsigned<B>) {
          B result {1};
          while (exponent != E {0}) {
@@ -83,7 +84,7 @@ TEST_CASE_TEMPLATE("Power", T
          SIMD::Power(x, y, r);
 
          if constexpr (CT::Vector<T> and CT::Real<TypeOf<T>>) {
-            for (size_t i = 0; i < T::MemberCount; ++i) {
+            for (size_t i = 0; i < ExtentOf<T>; ++i) {
                if (r[i] != rCheck[i])
                   Logger::Fatal(x[i], " ^ ", y[i], " = ", rCheck[i], " but got ", r[i]);
             }

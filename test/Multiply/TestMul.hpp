@@ -19,14 +19,13 @@ void ControlMul(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
 /// Vector * Vector  (either dense or sparse, wrapped or not)                 
 template<bool SATURATE, CT::Vector LHS, CT::Vector RHS, CT::Vector OUT> LANGULUS(INLINED)
 void ControlMul(LHS const& lhsArray, RHS const& rhsArray, OUT& out) noexcept {
-   static_assert(LHS::MemberCount == RHS::MemberCount
-             and LHS::MemberCount == OUT::MemberCount,
+   static_assert(ExtentOf<LHS> == ExtentOf<RHS> and ExtentOf<LHS> == ExtentOf<OUT>,
       "Vector sizes must match");
 
    auto r   = out.mArray;
    auto lhs = lhsArray.mArray;
    auto rhs = rhsArray.mArray;
-   const auto lhsEnd = lhs + LHS::MemberCount;
+   const auto lhsEnd = lhs + ExtentOf<LHS>;
    while (lhs != lhsEnd)
       ControlMul<SATURATE>(*lhs++, *rhs++, *r++);
 }
@@ -34,12 +33,11 @@ void ControlMul(LHS const& lhsArray, RHS const& rhsArray, OUT& out) noexcept {
 /// Scalar * Vector  (either dense or sparse, wrapped or not)                 
 template<bool SATURATE, CT::Scalar LHS, CT::Vector RHS, CT::Vector OUT> LANGULUS(INLINED)
 void ControlMul(LHS const& lhs, RHS const& rhsArray, OUT& out) noexcept {
-   static_assert(RHS::MemberCount == OUT::MemberCount,
-      "Vector sizes must match");
+   static_assert(ExtentOf<RHS> == ExtentOf<OUT>, "Vector sizes must match");
 
    auto r   = out.mArray;
    auto rhs = rhsArray.mArray;
-   const auto rhsEnd = rhs + RHS::MemberCount;
+   const auto rhsEnd = rhs + ExtentOf<RHS>;
    while (rhs != rhsEnd)
       ControlMul<SATURATE>(lhs, *rhs++, *r++);
 }

@@ -26,9 +26,9 @@ void ControlDiv(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, 
 }
 
 TEST_CASE_TEMPLATE("Divide", T
-   , VECTORS_ALL(2)
    , NUMBERS_ALL()
    , VECTORS_ALL(1)
+   , VECTORS_ALL(2)
    , VECTORS_ALL(3)
    , VECTORS_ALL(4)
    , VECTORS_ALL(5)

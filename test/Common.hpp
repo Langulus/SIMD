@@ -33,7 +33,6 @@ using namespace SIMD;
    ::std::uint16_t, \
    ::std::uint32_t, \
    ::std::uint64_t, \
-   Byte,            \
    char8_t,         \
    char16_t,        \
    char32_t,        \
@@ -48,7 +47,6 @@ using namespace SIMD;
    ::std::uint16_t, \
    ::std::uint32_t, \
    ::std::uint64_t, \
-   Byte,            \
    char8_t,         \
    char16_t,        \
    char32_t,        \
@@ -74,7 +72,6 @@ using namespace SIMD;
    Vector<::std::uint16_t, S>,\
    Vector<::std::uint32_t, S>,\
    Vector<::std::uint64_t, S>,\
-   Vector<Byte, S>,           \
    Vector<char8_t, S>,        \
    Vector<char16_t, S>,       \
    Vector<char32_t, S>,       \
@@ -89,7 +86,6 @@ using namespace SIMD;
    Vector<::std::uint16_t, S>,\
    Vector<::std::uint32_t, S>,\
    Vector<::std::uint64_t, S>,\
-   Vector<Byte, S>,           \
    Vector<char8_t, S>,        \
    Vector<char16_t, S>,       \
    Vector<char32_t, S>,       \

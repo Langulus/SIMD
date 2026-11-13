@@ -65,13 +65,13 @@ namespace Langulus::SIMD::Inner
       else {*/
          static_assert(    CT::NotIntent<OUT>,     "Strip intents");
          static_assert(    CT::NotReference<OUT>,  "Strip references");
-         static_assert(    CT::Array<OUT>,         "Output must be an array");
+         //static_assert(    CT::Array<OUT>,         "Output must be an array");
          //static_assert(not CT::BoundedArray<OUT>,  "You were supposed to wrap it in an ::std::array");
 
          //using RETURN = SIMD::LosslessArray<LHS, RHS>;
          //using LOSSLESS = TypeOf<RETURN>;
          //constexpr auto S = ExtentOf<RETURN>;
-         using LOSSLESS = TypeOf<OUT>;
+         using LOSSLESS = Tif<CT::Array<OUT>, TypeOf<OUT>, OUT>;
          constexpr size_t S = ExtentOf<OUT>;
          using OUT_NONBOUND = Tif<CT::BoundedArray<OUT>, ::std::array<LOSSLESS, S>, OUT>;
 

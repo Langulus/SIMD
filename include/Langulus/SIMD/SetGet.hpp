@@ -14,12 +14,11 @@
 namespace Langulus::SIMD::Inner
 {
    /// Get an element of an array, or zero if out of range                    
-   ///   @tparam DEF - the default value for the element, if out of S         
-   ///   @tparam IDX - the index to get                                       
-   ///   @tparam MAXS - the maximum number of elements T inside register      
-   ///   @tparam REVERSE - whether or not to count in inverse                 
-   ///   @tparam FROM - the scalar/array/vector to use for setting            
-   ///   @param values - the array to access                                  
+   ///   @tparam DEF the default value for the element, if out of S           
+   ///   @tparam IDX the index to get                                         
+   ///   @tparam MAXS the maximum number of elements T inside register        
+   ///   @tparam REVERSE whether or not to count in inverse                   
+   ///   @param values the array to access                                    
    ///   @return a reference to the element, or DEF if out of range           
    template<class R, auto DEF, size_t IDX, size_t MAXS, bool REVERSE = false, class FROM>
    LANGULUS(INLINED)
@@ -51,11 +50,10 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Inner array iteration and register setting                             
-   ///   @tparam DEF - the default value for the element, if out of S         
-   ///   @tparam CHUNK - the size of register to fill (in bytes)              
-   ///   @tparam FROM - the scalar/array/vector to use for setting            
-   ///   @tparam INDICES - the indices to use                                 
-   ///   @param values - the array to access                                  
+   ///   @tparam DEF the default value for the element, if out of S           
+   ///   @tparam CHUNK the size of register to fill (in bytes)                
+   ///   @tparam INDICES the indices to use                                   
+   ///   @param values the array to access                                    
    ///   @return the register                                                 
    template<auto DEF, size_t CHUNK, CT::Vector FROM, size_t...INDICES>
    LANGULUS(INLINED)
@@ -68,7 +66,7 @@ namespace Langulus::SIMD::Inner
             LANGULUS_SIMD_VERBOSE("Setting 128bit register from ", ExtentOf<FROM>, " elements");
             if      constexpr (CT::Integer8<T>)    return V128<T> {simde_mm_setr_epi8 (Get<int8_t,        DEF, INDICES, 16>(values)...)};
             else if constexpr (Same<T, char16_t>) {
-               // "fixed" an obscure clang 19 code generation error, due to reinterpret_cast<const int16_t&>(char16_t) :| 
+               //WORKAROUND "fixed" an obscure clang 19 code generation error, due to reinterpret_cast<const int16_t&>(char16_t) :| 
                return V128<T> {simde_mm_setr_epi16(Get<char16_t, DEF, INDICES, 8>(values)...)};
             }
             else if constexpr (CT::Integer16<T>)   return V128<T> {simde_mm_setr_epi16(Get<int16_t,       DEF, INDICES,  8>(values)...)};
@@ -87,15 +85,15 @@ namespace Langulus::SIMD::Inner
             LANGULUS_SIMD_VERBOSE("Setting 256bit register from ", ExtentOf<FROM>, " elements");
             if      constexpr (CT::Integer8<T>)    return V256<T> {simde_mm256_setr_epi8 (Get<int8_t,  DEF, INDICES, 32>(values)...)};
             else if constexpr (Same<T, char16_t>) {
-               // "fixed" an obscure clang 19 code generation error, due to reinterpret_cast<const int16_t&>(char16_t) :| 
+               //WORKAROUND "fixed" an obscure clang 19 code generation error, due to reinterpret_cast<const int16_t&>(char16_t) :| 
                return V256<T> {simde_mm256_setr_epi16(Get<char16_t, DEF, INDICES, 16>(values)...)};
             }
             else if constexpr (CT::Integer16<T>)   return V256<T> {simde_mm256_setr_epi16(Get<int16_t, DEF, INDICES, 16>(values)...)};
             else if constexpr (CT::Integer32<T>)   return V256<T> {simde_mm256_setr_epi32(Get<int32_t, DEF, INDICES,  8>(values)...)};
             else if constexpr (CT::Integer64<T>) {
-               // This hits a very nasty MSVC compiler bug              
-               // The workaround is temporary, hopefully                
-               // https://stackoverflow.com/questions/77191454          
+               //WORKAROUND This hits a very nasty MSVC compiler bug              
+               //WORKAROUND The workaround is temporary, hopefully                
+               //WORKAROUND https://stackoverflow.com/questions/77191454          
                #if LANGULUS_COMPILER(MSVC) and LANGULUS_BITNESS() == 32 and (LANGULUS_SIMD(AVX) or LANGULUS_SIMD(AVX2))
                   alignas(32) const int64_t temp[4] {Get<int64_t, DEF, INDICES, 4>(values)...};
                   return V256<T> {simde_mm256_load_si256(reinterpret_cast<const simde__m256i*>(temp))};
@@ -116,7 +114,7 @@ namespace Langulus::SIMD::Inner
             LANGULUS_SIMD_VERBOSE("Setting 512bit register from ", ExtentOf<FROM>, " elements");
             if      constexpr (CT::Integer8<T>)    return V512<T> {simde_mm512_setr_epi8 (Get<int8_t,        DEF, INDICES, 64>(values)...)};
             else if constexpr (Same<T, char16_t>) {
-               // "fixed" an obscure clang 19 code generation error, due to reinterpret_cast<const int16_t&>(char16_t) :| 
+               //WORKAROUND "fixed" an obscure clang 19 code generation error, due to reinterpret_cast<const int16_t&>(char16_t) :| 
                return V512<T> {simde_mm512_setr_epi16(Get<char16_t, DEF, INDICES, 32>(values)...)};
             }
             else if constexpr (CT::Integer16<T>)   return V512<T> {simde_mm512_setr_epi16(Get<int16_t,       DEF, INDICES, 32>(values)...)};
@@ -135,10 +133,9 @@ namespace Langulus::SIMD::Inner
 namespace Langulus::SIMD
 {
    /// Construct a register manually                                          
-   ///   @tparam DEF - the default value for the element, if out of S         
-   ///   @tparam CHUNK - the size of the chunk to set                         
-   ///   @tparam FROM - the scalar/array/vector to use for setting            
-   ///   @param values - the array to wrap                                    
+   ///   @tparam DEF the default value for the element, if out of S           
+   ///   @tparam CHUNK the size of the chunk to set                           
+   ///   @param values the array to wrap                                      
    ///   @return the register                                                 
    template<auto DEF = 0, size_t CHUNK = Alignment, CT::Vector FROM> LANGULUS(INLINED)
    auto Set(const FROM& values) noexcept {

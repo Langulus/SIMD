@@ -6,6 +6,8 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #include "TestAdd.hpp"
+#include <Langulus/CT/Real.hpp>
+#include <Langulus/CT/Typed.hpp>
 
 
 TEST_CASE_TEMPLATE("Vector + Vector", T
@@ -22,6 +24,8 @@ TEST_CASE_TEMPLATE("Vector + Vector", T
    , VECTORS_ALL(32)
    , VECTORS_ALL(33)
 ) {
+   constexpr bool is_real = CT::Typed<T> ? CT::Real<TypeOf<T>> : CT::Real<T>;
+   
    GIVEN("x * y = r") {
       T x, y;
       T r, rCheck;
@@ -32,7 +36,7 @@ TEST_CASE_TEMPLATE("Vector + Vector", T
       }
 
       WHEN("Added as constexpr (with saturation)") {
-         static_assert(SIMD::Add<true>(T {0}, T {5}) == T {CT::Real<TypeOf<T>> ? 1 : 5});
+         static_assert(SIMD::Add<true>(T {0}, T {5}) == T {is_real ? 1 : 5});
       }
 
       WHEN("Added as constexpr (without saturation)") {

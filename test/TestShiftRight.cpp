@@ -10,7 +10,7 @@
 
 template<class LHS, class RHS, class OUT> LANGULUS(INLINED)
 void ControlSR(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
-   static_assert(CT::IntegerX<LHS, RHS>, "Can only shift integers");
+   static_assert(CT::Integer<LHS, RHS>, "Can only shift integers");
    // Well defined condition in SIMD calls, that is otherwise           
    // undefined behavior by C++ standard                                
    out = rhs < RHS {sizeof(RHS) * 8} and rhs >= 0
@@ -19,7 +19,7 @@ void ControlSR(LHS const& lhs, RHS const& rhs, OUT& out) noexcept {
 
 template<class LHS, class RHS, size_t C, class OUT> LANGULUS(INLINED)
 void ControlSR(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
-   static_assert(CT::IntegerX<LHS, RHS>, "Can only shift integers");
+   static_assert(CT::Integer<LHS, RHS>, "Can only shift integers");
    auto r = out.mArray;
    auto lhs = lhsArray.mArray;
    auto rhs = rhsArray.mArray;

@@ -29,14 +29,12 @@ TEST_CASE_TEMPLATE("Testing vector checks", TestType,
 ) {
    static_assert(    CT::Vector<TestType>);
    static_assert(not CT::Scalar<TestType>);
-   static_assert(ExtentOf <TestType> == 2);
-   static_assert(ExtentOf<TestType> == 1);
+   static_assert(ExtentOf<TestType> == 2);
 }
 
 TEST_CASE_TEMPLATE("Testing scalar checks", TestType, NUMBERS_ALL()) {
    static_assert(not CT::Vector<TestType>);
    static_assert(    CT::Scalar<TestType>);
-   static_assert(ExtentOf <TestType> == 1);
    static_assert(ExtentOf<TestType> == 1);
 }
 
@@ -65,39 +63,16 @@ TEST_CASE_TEMPLATE("ExtentOf checks", T, NUMBERS_ALL()) {
    static_assert(ExtentOf<Vector<T, 1>[12]> == 12);
    static_assert(ExtentOf<Vector<T, 1>[12]> == 12);
    static_assert(ExtentOf<Vector<T, 1>[12]> == 12);
-   static_assert(ExtentOf<Vector<T, 2>[12]> == 24);
-   static_assert(ExtentOf<Vector<T, 2>[12]> == 24);
-   static_assert(ExtentOf<Vector<T, 3>[ 8]> == 24);
+   static_assert(ExtentOf<Vector<T, 2>[12]> == 12);
+   static_assert(ExtentOf<Vector<T, 2>[12]> == 12);
+   static_assert(ExtentOf<Vector<T, 3>[ 8]> ==  8);
+
+   static_assert(AllExtentsOf<Vector<T, 2>[12]> == 24);
+   static_assert(AllExtentsOf<Vector<T, 2>[12]> == 24);
+   static_assert(AllExtentsOf<Vector<T, 3>[ 8]> == 24);
 }
 
-/*TEST_CASE("OverlapExtents checks", "[OverlapExtents]") {
-   int scalar {};
-   int scalarArray[1] {};
-   int smallArray[2] {};
-   int bigArray[4] {};
-
-   static_assert(OVERLAP_EXTENTS(scalar,      scalar     ) == 1);
-   static_assert(OVERLAP_EXTENTS(scalar,      scalarArray) == 1);
-   static_assert(OVERLAP_EXTENTS(scalar,      smallArray ) == 2);
-   static_assert(OVERLAP_EXTENTS(scalar,      bigArray   ) == 4);
-
-   static_assert(OVERLAP_EXTENTS(scalarArray, scalar     ) == 1);
-   static_assert(OVERLAP_EXTENTS(scalarArray, scalarArray) == 1);
-   static_assert(OVERLAP_EXTENTS(scalarArray, smallArray ) == 2);
-   static_assert(OVERLAP_EXTENTS(scalarArray, bigArray   ) == 4);
-
-   static_assert(OVERLAP_EXTENTS(smallArray,  scalar     ) == 2);
-   static_assert(OVERLAP_EXTENTS(smallArray,  scalarArray) == 2);
-   static_assert(OVERLAP_EXTENTS(smallArray,  smallArray ) == 2);
-   static_assert(OVERLAP_EXTENTS(smallArray,  bigArray   ) == 2);
-
-   static_assert(OVERLAP_EXTENTS(bigArray,    scalar     ) == 4);
-   static_assert(OVERLAP_EXTENTS(bigArray,    scalarArray) == 4);
-   static_assert(OVERLAP_EXTENTS(bigArray,    smallArray ) == 2);
-   static_assert(OVERLAP_EXTENTS(bigArray,    bigArray   ) == 4);
-}*/
-
-TEST_CASE("OverlapCounts checks"") {
+TEST_CASE("LglsOverlapExtents checks") {
    int scalar {};
    int scalarArray[1] {};
    int smallArray[2] {};
@@ -111,240 +86,240 @@ TEST_CASE("OverlapCounts checks"") {
    Vector<int, 2> v2x2[2];
    Vector<int, 4> v4x2[2];
 
-   static_assert(OverlapCounts<decltype(scalar),      decltype(scalar)     >() == 1);
-   static_assert(OverlapCounts<decltype(scalar),      decltype(scalarArray)>() == 1);
-   static_assert(OverlapCounts<decltype(scalar),      decltype(smallArray) >() == 2);
-   static_assert(OverlapCounts<decltype(scalar),      decltype(bigArray)   >() == 4);
-   static_assert(OverlapCounts<decltype(scalar),      decltype(v1)         >() == 1);
-   static_assert(OverlapCounts<decltype(scalar),      decltype(v2)         >() == 2);
-   static_assert(OverlapCounts<decltype(scalar),      decltype(v4)         >() == 4);
-   static_assert(OverlapCounts<decltype(scalar),      decltype(v1x2)       >() == 1*2);
-   static_assert(OverlapCounts<decltype(scalar),      decltype(v2x2)       >() == 2*2);
-   static_assert(OverlapCounts<decltype(scalar),      decltype(v4x2)       >() == 4*2);
+   static_assert(LglsOverlapExtents(scalar,      scalar     ) == 1);
+   static_assert(LglsOverlapExtents(scalar,      scalarArray) == 1);
+   static_assert(LglsOverlapExtents(scalar,      smallArray ) == 2);
+   static_assert(LglsOverlapExtents(scalar,      bigArray   ) == 4);
+   static_assert(LglsOverlapExtents(scalar,      v1         ) == 1);
+   static_assert(LglsOverlapExtents(scalar,      v2         ) == 2);
+   static_assert(LglsOverlapExtents(scalar,      v4         ) == 4);
+   static_assert(LglsOverlapExtents(scalar,      v1x2       ) == 1*2);
+   static_assert(LglsOverlapExtents(scalar,      v2x2       ) == 2*2);
+   static_assert(LglsOverlapExtents(scalar,      v4x2       ) == 4*2);
 
-   static_assert(OverlapCounts<decltype(scalarArray), decltype(scalar)     >() == 1);
-   static_assert(OverlapCounts<decltype(scalarArray), decltype(scalarArray)>() == 1);
-   static_assert(OverlapCounts<decltype(scalarArray), decltype(smallArray) >() == 2);
-   static_assert(OverlapCounts<decltype(scalarArray), decltype(bigArray)   >() == 4);
-   static_assert(OverlapCounts<decltype(scalarArray), decltype(v1)         >() == 1);
-   static_assert(OverlapCounts<decltype(scalarArray), decltype(v2)         >() == 2);
-   static_assert(OverlapCounts<decltype(scalarArray), decltype(v4)         >() == 4);
-   static_assert(OverlapCounts<decltype(scalarArray), decltype(v1x2)       >() == 1*2);
-   static_assert(OverlapCounts<decltype(scalarArray), decltype(v2x2)       >() == 2*2);
-   static_assert(OverlapCounts<decltype(scalarArray), decltype(v4x2)       >() == 4*2);
+   static_assert(LglsOverlapExtents(scalarArray, scalar     ) == 1);
+   static_assert(LglsOverlapExtents(scalarArray, scalarArray) == 1);
+   static_assert(LglsOverlapExtents(scalarArray, smallArray ) == 2);
+   static_assert(LglsOverlapExtents(scalarArray, bigArray   ) == 4);
+   static_assert(LglsOverlapExtents(scalarArray, v1         ) == 1);
+   static_assert(LglsOverlapExtents(scalarArray, v2         ) == 2);
+   static_assert(LglsOverlapExtents(scalarArray, v4         ) == 4);
+   static_assert(LglsOverlapExtents(scalarArray, v1x2       ) == 1*2);
+   static_assert(LglsOverlapExtents(scalarArray, v2x2       ) == 2*2);
+   static_assert(LglsOverlapExtents(scalarArray, v4x2       ) == 4*2);
 
-   static_assert(OverlapCounts<decltype(smallArray),  decltype(scalar)     >() == 2);
-   static_assert(OverlapCounts<decltype(smallArray),  decltype(scalarArray)>() == 2);
-   static_assert(OverlapCounts<decltype(smallArray),  decltype(smallArray) >() == 2);
-   static_assert(OverlapCounts<decltype(smallArray),  decltype(bigArray)   >() == 2);
-   static_assert(OverlapCounts<decltype(smallArray),  decltype(v1)         >() == 2);
-   static_assert(OverlapCounts<decltype(smallArray),  decltype(v2)         >() == 2);
-   static_assert(OverlapCounts<decltype(smallArray),  decltype(v4)         >() == 2);
-   static_assert(OverlapCounts<decltype(smallArray),  decltype(v1x2)       >() == 2);
-   static_assert(OverlapCounts<decltype(smallArray),  decltype(v2x2)       >() == 2);
-   static_assert(OverlapCounts<decltype(smallArray),  decltype(v4x2)       >() == 2);
+   static_assert(LglsOverlapExtents(smallArray,  scalar     ) == 2);
+   static_assert(LglsOverlapExtents(smallArray,  scalarArray) == 2);
+   static_assert(LglsOverlapExtents(smallArray,  smallArray ) == 2);
+   static_assert(LglsOverlapExtents(smallArray,  bigArray   ) == 2);
+   static_assert(LglsOverlapExtents(smallArray,  v1         ) == 2);
+   static_assert(LglsOverlapExtents(smallArray,  v2         ) == 2);
+   static_assert(LglsOverlapExtents(smallArray,  v4         ) == 2);
+   static_assert(LglsOverlapExtents(smallArray,  v1x2       ) == 2);
+   static_assert(LglsOverlapExtents(smallArray,  v2x2       ) == 2);
+   static_assert(LglsOverlapExtents(smallArray,  v4x2       ) == 2);
 
-   static_assert(OverlapCounts<decltype(bigArray),    decltype(scalar)     >() == 4);
-   static_assert(OverlapCounts<decltype(bigArray),    decltype(scalarArray)>() == 4);
-   static_assert(OverlapCounts<decltype(bigArray),    decltype(smallArray) >() == 2);
-   static_assert(OverlapCounts<decltype(bigArray),    decltype(bigArray)   >() == 4);
-   static_assert(OverlapCounts<decltype(bigArray),    decltype(v1)         >() == 4);
-   static_assert(OverlapCounts<decltype(bigArray),    decltype(v2)         >() == 2);
-   static_assert(OverlapCounts<decltype(bigArray),    decltype(v4)         >() == 4);
-   static_assert(OverlapCounts<decltype(bigArray),    decltype(v1x2)       >() == 2);
-   static_assert(OverlapCounts<decltype(bigArray),    decltype(v2x2)       >() == 4);
-   static_assert(OverlapCounts<decltype(bigArray),    decltype(v4x2)       >() == 4);
+   static_assert(LglsOverlapExtents(bigArray,    scalar     ) == 4);
+   static_assert(LglsOverlapExtents(bigArray,    scalarArray) == 4);
+   static_assert(LglsOverlapExtents(bigArray,    smallArray ) == 2);
+   static_assert(LglsOverlapExtents(bigArray,    bigArray   ) == 4);
+   static_assert(LglsOverlapExtents(bigArray,    v1         ) == 4);
+   static_assert(LglsOverlapExtents(bigArray,    v2         ) == 2);
+   static_assert(LglsOverlapExtents(bigArray,    v4         ) == 4);
+   static_assert(LglsOverlapExtents(bigArray,    v1x2       ) == 2);
+   static_assert(LglsOverlapExtents(bigArray,    v2x2       ) == 4);
+   static_assert(LglsOverlapExtents(bigArray,    v4x2       ) == 4);
 
-   static_assert(OverlapCounts<decltype(v1),          decltype(scalar)     >() == 1);
-   static_assert(OverlapCounts<decltype(v1),          decltype(scalarArray)>() == 1);
-   static_assert(OverlapCounts<decltype(v1),          decltype(smallArray) >() == 2);
-   static_assert(OverlapCounts<decltype(v1),          decltype(bigArray)   >() == 4);
-   static_assert(OverlapCounts<decltype(v1),          decltype(v1)         >() == 1);
-   static_assert(OverlapCounts<decltype(v1),          decltype(v2)         >() == 2);
-   static_assert(OverlapCounts<decltype(v1),          decltype(v4)         >() == 4);
-   static_assert(OverlapCounts<decltype(v1),          decltype(v1x2)       >() == 1*2);
-   static_assert(OverlapCounts<decltype(v1),          decltype(v2x2)       >() == 2*2);
-   static_assert(OverlapCounts<decltype(v1),          decltype(v4x2)       >() == 4*2);
+   static_assert(LglsOverlapExtents(v1,          scalar     ) == 1);
+   static_assert(LglsOverlapExtents(v1,          scalarArray) == 1);
+   static_assert(LglsOverlapExtents(v1,          smallArray ) == 2);
+   static_assert(LglsOverlapExtents(v1,          bigArray   ) == 4);
+   static_assert(LglsOverlapExtents(v1,          v1         ) == 1);
+   static_assert(LglsOverlapExtents(v1,          v2         ) == 2);
+   static_assert(LglsOverlapExtents(v1,          v4         ) == 4);
+   static_assert(LglsOverlapExtents(v1,          v1x2       ) == 1*2);
+   static_assert(LglsOverlapExtents(v1,          v2x2       ) == 2*2);
+   static_assert(LglsOverlapExtents(v1,          v4x2       ) == 4*2);
 
-   static_assert(OverlapCounts<decltype(v2),          decltype(scalar)     >() == 2);
-   static_assert(OverlapCounts<decltype(v2),          decltype(scalarArray)>() == 2);
-   static_assert(OverlapCounts<decltype(v2),          decltype(smallArray) >() == 2);
-   static_assert(OverlapCounts<decltype(v2),          decltype(bigArray)   >() == 2);
-   static_assert(OverlapCounts<decltype(v2),          decltype(v1)         >() == 2);
-   static_assert(OverlapCounts<decltype(v2),          decltype(v2)         >() == 2);
-   static_assert(OverlapCounts<decltype(v2),          decltype(v4)         >() == 2);
-   static_assert(OverlapCounts<decltype(v2),          decltype(v1x2)       >() == 2);
-   static_assert(OverlapCounts<decltype(v2),          decltype(v2x2)       >() == 2);
-   static_assert(OverlapCounts<decltype(v2),          decltype(v4x2)       >() == 2);
+   static_assert(LglsOverlapExtents(v2,          scalar     ) == 2);
+   static_assert(LglsOverlapExtents(v2,          scalarArray) == 2);
+   static_assert(LglsOverlapExtents(v2,          smallArray ) == 2);
+   static_assert(LglsOverlapExtents(v2,          bigArray   ) == 2);
+   static_assert(LglsOverlapExtents(v2,          v1         ) == 2);
+   static_assert(LglsOverlapExtents(v2,          v2         ) == 2);
+   static_assert(LglsOverlapExtents(v2,          v4         ) == 2);
+   static_assert(LglsOverlapExtents(v2,          v1x2       ) == 2);
+   static_assert(LglsOverlapExtents(v2,          v2x2       ) == 2);
+   static_assert(LglsOverlapExtents(v2,          v4x2       ) == 2);
 
-   static_assert(OverlapCounts<decltype(v4),          decltype(scalar)     >() == 4);
-   static_assert(OverlapCounts<decltype(v4),          decltype(scalarArray)>() == 4);
-   static_assert(OverlapCounts<decltype(v4),          decltype(smallArray) >() == 2);
-   static_assert(OverlapCounts<decltype(v4),          decltype(bigArray)   >() == 4);
-   static_assert(OverlapCounts<decltype(v4),          decltype(v1)         >() == 4);
-   static_assert(OverlapCounts<decltype(v4),          decltype(v2)         >() == 2);
-   static_assert(OverlapCounts<decltype(v4),          decltype(v4)         >() == 4);
-   static_assert(OverlapCounts<decltype(v4),          decltype(v1x2)       >() == 2);
-   static_assert(OverlapCounts<decltype(v4),          decltype(v2x2)       >() == 4);
-   static_assert(OverlapCounts<decltype(v4),          decltype(v4x2)       >() == 4);
+   static_assert(LglsOverlapExtents(v4,          scalar     ) == 4);
+   static_assert(LglsOverlapExtents(v4,          scalarArray) == 4);
+   static_assert(LglsOverlapExtents(v4,          smallArray ) == 2);
+   static_assert(LglsOverlapExtents(v4,          bigArray   ) == 4);
+   static_assert(LglsOverlapExtents(v4,          v1         ) == 4);
+   static_assert(LglsOverlapExtents(v4,          v2         ) == 2);
+   static_assert(LglsOverlapExtents(v4,          v4         ) == 4);
+   static_assert(LglsOverlapExtents(v4,          v1x2       ) == 2);
+   static_assert(LglsOverlapExtents(v4,          v2x2       ) == 4);
+   static_assert(LglsOverlapExtents(v4,          v4x2       ) == 4);
 
-   static_assert(OverlapCounts<decltype(v1x2),        decltype(scalar)     >() == 2);
-   static_assert(OverlapCounts<decltype(v1x2),        decltype(scalarArray)>() == 2);
-   static_assert(OverlapCounts<decltype(v1x2),        decltype(smallArray) >() == 2);
-   static_assert(OverlapCounts<decltype(v1x2),        decltype(bigArray)   >() == 2);
-   static_assert(OverlapCounts<decltype(v1x2),        decltype(v1)         >() == 2);
-   static_assert(OverlapCounts<decltype(v1x2),        decltype(v2)         >() == 2);
-   static_assert(OverlapCounts<decltype(v1x2),        decltype(v4)         >() == 2);
-   static_assert(OverlapCounts<decltype(v1x2),        decltype(v1x2)       >() == 2);
-   static_assert(OverlapCounts<decltype(v1x2),        decltype(v2x2)       >() == 2);
-   static_assert(OverlapCounts<decltype(v1x2),        decltype(v4x2)       >() == 2);
+   static_assert(LglsOverlapExtents(v1x2,        scalar     ) == 2);
+   static_assert(LglsOverlapExtents(v1x2,        scalarArray) == 2);
+   static_assert(LglsOverlapExtents(v1x2,        smallArray ) == 2);
+   static_assert(LglsOverlapExtents(v1x2,        bigArray   ) == 2);
+   static_assert(LglsOverlapExtents(v1x2,        v1         ) == 2);
+   static_assert(LglsOverlapExtents(v1x2,        v2         ) == 2);
+   static_assert(LglsOverlapExtents(v1x2,        v4         ) == 2);
+   static_assert(LglsOverlapExtents(v1x2,        v1x2       ) == 2);
+   static_assert(LglsOverlapExtents(v1x2,        v2x2       ) == 2);
+   static_assert(LglsOverlapExtents(v1x2,        v4x2       ) == 2);
 
-   static_assert(OverlapCounts<decltype(v2x2),        decltype(scalar)     >() == 4);
-   static_assert(OverlapCounts<decltype(v2x2),        decltype(scalarArray)>() == 4);
-   static_assert(OverlapCounts<decltype(v2x2),        decltype(smallArray) >() == 2);
-   static_assert(OverlapCounts<decltype(v2x2),        decltype(bigArray)   >() == 4);
-   static_assert(OverlapCounts<decltype(v2x2),        decltype(v1)         >() == 4);
-   static_assert(OverlapCounts<decltype(v2x2),        decltype(v2)         >() == 2);
-   static_assert(OverlapCounts<decltype(v2x2),        decltype(v4)         >() == 4);
-   static_assert(OverlapCounts<decltype(v2x2),        decltype(v1x2)       >() == 2);
-   static_assert(OverlapCounts<decltype(v2x2),        decltype(v2x2)       >() == 4);
-   static_assert(OverlapCounts<decltype(v2x2),        decltype(v4x2)       >() == 4);
+   static_assert(LglsOverlapExtents(v2x2,        scalar     ) == 4);
+   static_assert(LglsOverlapExtents(v2x2,        scalarArray) == 4);
+   static_assert(LglsOverlapExtents(v2x2,        smallArray ) == 2);
+   static_assert(LglsOverlapExtents(v2x2,        bigArray   ) == 4);
+   static_assert(LglsOverlapExtents(v2x2,        v1         ) == 4);
+   static_assert(LglsOverlapExtents(v2x2,        v2         ) == 2);
+   static_assert(LglsOverlapExtents(v2x2,        v4         ) == 4);
+   static_assert(LglsOverlapExtents(v2x2,        v1x2       ) == 2);
+   static_assert(LglsOverlapExtents(v2x2,        v2x2       ) == 4);
+   static_assert(LglsOverlapExtents(v2x2,        v4x2       ) == 4);
 
-   static_assert(OverlapCounts<decltype(v4x2),        decltype(scalar)     >() == 8);
-   static_assert(OverlapCounts<decltype(v4x2),        decltype(scalarArray)>() == 8);
-   static_assert(OverlapCounts<decltype(v4x2),        decltype(smallArray) >() == 2);
-   static_assert(OverlapCounts<decltype(v4x2),        decltype(bigArray)   >() == 4);
-   static_assert(OverlapCounts<decltype(v4x2),        decltype(v1)         >() == 8);
-   static_assert(OverlapCounts<decltype(v4x2),        decltype(v2)         >() == 2);
-   static_assert(OverlapCounts<decltype(v4x2),        decltype(v4)         >() == 4);
-   static_assert(OverlapCounts<decltype(v4x2),        decltype(v1x2)       >() == 2);
-   static_assert(OverlapCounts<decltype(v4x2),        decltype(v2x2)       >() == 4);
-   static_assert(OverlapCounts<decltype(v4x2),        decltype(v4x2)       >() == 8);
+   static_assert(LglsOverlapExtents(v4x2,        scalar     ) == 8);
+   static_assert(LglsOverlapExtents(v4x2,        scalarArray) == 8);
+   static_assert(LglsOverlapExtents(v4x2,        smallArray ) == 2);
+   static_assert(LglsOverlapExtents(v4x2,        bigArray   ) == 4);
+   static_assert(LglsOverlapExtents(v4x2,        v1         ) == 8);
+   static_assert(LglsOverlapExtents(v4x2,        v2         ) == 2);
+   static_assert(LglsOverlapExtents(v4x2,        v4         ) == 4);
+   static_assert(LglsOverlapExtents(v4x2,        v1x2       ) == 2);
+   static_assert(LglsOverlapExtents(v4x2,        v2x2       ) == 4);
+   static_assert(LglsOverlapExtents(v4x2,        v4x2       ) == 8);
 }
 
-TEST_CASE("Lossless checks", "[lossless]") {
+TEST_CASE("Lossless checks") {
    static_assert(not CT::Fundamental<Byte>);
 
-   static_assert(CT::Exact<Lossless<std::uint8_t , std::uint8_t >, std::uint8_t >);
-   static_assert(CT::Exact<Lossless<std::uint8_t , std::uint16_t>, std::uint16_t>);
-   static_assert(CT::Exact<Lossless<std::uint8_t , std::uint32_t>, std::uint32_t>);
-   static_assert(CT::Exact<Lossless<std::uint8_t , std::uint64_t>, std::uint64_t>);
-   static_assert(CT::Exact<Lossless<std::uint8_t , std::int8_t  >, std::int8_t  >);
-   static_assert(CT::Exact<Lossless<std::uint8_t , std::int16_t >, std::int16_t >);
-   static_assert(CT::Exact<Lossless<std::uint8_t , std::int32_t >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::uint8_t , std::int64_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::uint8_t , float        >, float        >);
-   static_assert(CT::Exact<Lossless<std::uint8_t , double       >, double       >);
-   static_assert(CT::Exact<Lossless<std::uint8_t , Byte         >, std::uint8_t >);
+   static_assert(Exact<Lossless<std::uint8_t , std::uint8_t >, std::uint8_t >);
+   static_assert(Exact<Lossless<std::uint8_t , std::uint16_t>, std::uint16_t>);
+   static_assert(Exact<Lossless<std::uint8_t , std::uint32_t>, std::uint32_t>);
+   static_assert(Exact<Lossless<std::uint8_t , std::uint64_t>, std::uint64_t>);
+   static_assert(Exact<Lossless<std::uint8_t , std::int8_t  >, std::int8_t  >);
+   static_assert(Exact<Lossless<std::uint8_t , std::int16_t >, std::int16_t >);
+   static_assert(Exact<Lossless<std::uint8_t , std::int32_t >, std::int32_t >);
+   static_assert(Exact<Lossless<std::uint8_t , std::int64_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::uint8_t , float        >, float        >);
+   static_assert(Exact<Lossless<std::uint8_t , double       >, double       >);
+   static_assert(Exact<Lossless<std::uint8_t , Byte         >, Byte         >);
 
-   static_assert(CT::Exact<Lossless<std::uint16_t, std::uint8_t >, std::uint16_t>);
-   static_assert(CT::Exact<Lossless<std::uint16_t, std::uint16_t>, std::uint16_t>);
-   static_assert(CT::Exact<Lossless<std::uint16_t, std::uint32_t>, std::uint32_t>);
-   static_assert(CT::Exact<Lossless<std::uint16_t, std::uint64_t>, std::uint64_t>);
-   static_assert(CT::Exact<Lossless<std::uint16_t, std::int8_t  >, std::int16_t >);
-   static_assert(CT::Exact<Lossless<std::uint16_t, std::int16_t >, std::int16_t >);
-   static_assert(CT::Exact<Lossless<std::uint16_t, std::int32_t >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::uint16_t, std::int64_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::uint16_t, float        >, float        >);
-   static_assert(CT::Exact<Lossless<std::uint16_t, double       >, double       >);
-   static_assert(CT::Exact<Lossless<std::uint16_t, Byte         >, std::uint16_t>);
+   static_assert(Exact<Lossless<std::uint16_t, std::uint8_t >, std::uint16_t>);
+   static_assert(Exact<Lossless<std::uint16_t, std::uint16_t>, std::uint16_t>);
+   static_assert(Exact<Lossless<std::uint16_t, std::uint32_t>, std::uint32_t>);
+   static_assert(Exact<Lossless<std::uint16_t, std::uint64_t>, std::uint64_t>);
+   static_assert(Exact<Lossless<std::uint16_t, std::int8_t  >, std::int16_t >);
+   static_assert(Exact<Lossless<std::uint16_t, std::int16_t >, std::int16_t >);
+   static_assert(Exact<Lossless<std::uint16_t, std::int32_t >, std::int32_t >);
+   static_assert(Exact<Lossless<std::uint16_t, std::int64_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::uint16_t, float        >, float        >);
+   static_assert(Exact<Lossless<std::uint16_t, double       >, double       >);
+   static_assert(Exact<Lossless<std::uint16_t, Byte         >, Byte         >);
 
-   static_assert(CT::Exact<Lossless<std::uint32_t, std::uint8_t >, std::uint32_t>);
-   static_assert(CT::Exact<Lossless<std::uint32_t, std::uint16_t>, std::uint32_t>);
-   static_assert(CT::Exact<Lossless<std::uint32_t, std::uint32_t>, std::uint32_t>);
-   static_assert(CT::Exact<Lossless<std::uint32_t, std::uint64_t>, std::uint64_t>);
-   static_assert(CT::Exact<Lossless<std::uint32_t, std::int8_t  >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::uint32_t, std::int16_t >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::uint32_t, std::int32_t >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::uint32_t, std::int64_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::uint32_t, float        >, float        >);
-   static_assert(CT::Exact<Lossless<std::uint32_t, double       >, double       >);
-   static_assert(CT::Exact<Lossless<std::uint32_t, Byte         >, std::uint32_t>);
+   static_assert(Exact<Lossless<std::uint32_t, std::uint8_t >, std::uint32_t>);
+   static_assert(Exact<Lossless<std::uint32_t, std::uint16_t>, std::uint32_t>);
+   static_assert(Exact<Lossless<std::uint32_t, std::uint32_t>, std::uint32_t>);
+   static_assert(Exact<Lossless<std::uint32_t, std::uint64_t>, std::uint64_t>);
+   static_assert(Exact<Lossless<std::uint32_t, std::int8_t  >, std::int32_t >);
+   static_assert(Exact<Lossless<std::uint32_t, std::int16_t >, std::int32_t >);
+   static_assert(Exact<Lossless<std::uint32_t, std::int32_t >, std::int32_t >);
+   static_assert(Exact<Lossless<std::uint32_t, std::int64_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::uint32_t, float        >, float        >);
+   static_assert(Exact<Lossless<std::uint32_t, double       >, double       >);
+   static_assert(Exact<Lossless<std::uint32_t, Byte         >, Byte         >);
 
-   static_assert(CT::Exact<Lossless<std::uint64_t, std::uint8_t >, std::uint64_t>);
-   static_assert(CT::Exact<Lossless<std::uint64_t, std::uint16_t>, std::uint64_t>);
-   static_assert(CT::Exact<Lossless<std::uint64_t, std::uint32_t>, std::uint64_t>);
-   static_assert(CT::Exact<Lossless<std::uint64_t, std::uint64_t>, std::uint64_t>);
-   static_assert(CT::Exact<Lossless<std::uint64_t, std::int8_t  >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::uint64_t, std::int16_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::uint64_t, std::int32_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::uint64_t, std::int64_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::uint64_t, float        >, float        >);
-   static_assert(CT::Exact<Lossless<std::uint64_t, double       >, double       >);
-   static_assert(CT::Exact<Lossless<std::uint64_t, Byte         >, std::uint64_t>);
-
-
-   static_assert(CT::Exact<Lossless<std::int8_t  , std::uint8_t >, std::int8_t  >);
-   static_assert(CT::Exact<Lossless<std::int8_t  , std::uint16_t>, std::int16_t >);
-   static_assert(CT::Exact<Lossless<std::int8_t  , std::uint32_t>, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::int8_t  , std::uint64_t>, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int8_t  , std::int8_t  >, std::int8_t  >);
-   static_assert(CT::Exact<Lossless<std::int8_t  , std::int16_t >, std::int16_t >);
-   static_assert(CT::Exact<Lossless<std::int8_t  , std::int32_t >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::int8_t  , std::int64_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int8_t  , float        >, float        >);
-   static_assert(CT::Exact<Lossless<std::int8_t  , double       >, double       >);
-   static_assert(CT::Exact<Lossless<std::int8_t  , Byte         >, std::int8_t  >);
-
-   static_assert(CT::Exact<Lossless<std::int16_t , std::uint8_t >, std::int16_t >);
-   static_assert(CT::Exact<Lossless<std::int16_t , std::uint16_t>, std::int16_t >);
-   static_assert(CT::Exact<Lossless<std::int16_t , std::uint32_t>, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::int16_t , std::uint64_t>, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int16_t , std::int8_t  >, std::int16_t >);
-   static_assert(CT::Exact<Lossless<std::int16_t , std::int16_t >, std::int16_t >);
-   static_assert(CT::Exact<Lossless<std::int16_t , std::int32_t >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::int16_t , std::int64_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int16_t , float        >, float        >);
-   static_assert(CT::Exact<Lossless<std::int16_t , double       >, double       >);
-   static_assert(CT::Exact<Lossless<std::int16_t , Byte         >, std::int16_t >);
-
-   static_assert(CT::Exact<Lossless<std::int32_t , std::uint8_t >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::int32_t , std::uint16_t>, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::int32_t , std::uint32_t>, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::int32_t , std::uint64_t>, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int32_t , std::int8_t  >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::int32_t , std::int16_t >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::int32_t , std::int32_t >, std::int32_t >);
-   static_assert(CT::Exact<Lossless<std::int32_t , std::int64_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int32_t , float        >, float        >);
-   static_assert(CT::Exact<Lossless<std::int32_t , double       >, double       >);
-   static_assert(CT::Exact<Lossless<std::int32_t , Byte         >, std::int32_t >);
-
-   static_assert(CT::Exact<Lossless<std::int64_t , std::uint8_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int64_t , std::uint16_t>, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int64_t , std::uint32_t>, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int64_t , std::uint64_t>, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int64_t , std::int8_t  >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int64_t , std::int16_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int64_t , std::int32_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int64_t , std::int64_t >, std::int64_t >);
-   static_assert(CT::Exact<Lossless<std::int64_t , float        >, float        >);
-   static_assert(CT::Exact<Lossless<std::int64_t , double       >, double       >);
-   static_assert(CT::Exact<Lossless<std::int64_t , Byte         >, std::int64_t >);
+   static_assert(Exact<Lossless<std::uint64_t, std::uint8_t >, std::uint64_t>);
+   static_assert(Exact<Lossless<std::uint64_t, std::uint16_t>, std::uint64_t>);
+   static_assert(Exact<Lossless<std::uint64_t, std::uint32_t>, std::uint64_t>);
+   static_assert(Exact<Lossless<std::uint64_t, std::uint64_t>, std::uint64_t>);
+   static_assert(Exact<Lossless<std::uint64_t, std::int8_t  >, std::int64_t >);
+   static_assert(Exact<Lossless<std::uint64_t, std::int16_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::uint64_t, std::int32_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::uint64_t, std::int64_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::uint64_t, float        >, float        >);
+   static_assert(Exact<Lossless<std::uint64_t, double       >, double       >);
+   static_assert(Exact<Lossless<std::uint64_t, Byte         >, Byte         >);
 
 
-   static_assert(CT::Exact<Lossless<float        , std::uint8_t >, float        >);
-   static_assert(CT::Exact<Lossless<float        , std::uint16_t>, float        >);
-   static_assert(CT::Exact<Lossless<float        , std::uint32_t>, float        >);
-   static_assert(CT::Exact<Lossless<float        , std::uint64_t>, float        >);
-   static_assert(CT::Exact<Lossless<float        , std::int8_t  >, float        >);
-   static_assert(CT::Exact<Lossless<float        , std::int16_t >, float        >);
-   static_assert(CT::Exact<Lossless<float        , std::int32_t >, float        >);
-   static_assert(CT::Exact<Lossless<float        , std::int64_t >, float        >);
-   static_assert(CT::Exact<Lossless<float        , float        >, float        >);
-   static_assert(CT::Exact<Lossless<float        , double       >, double       >);
-   static_assert(CT::Exact<Lossless<float        , Byte         >, float        >);
+   static_assert(Exact<Lossless<std::int8_t  , std::uint8_t >, std::int8_t  >);
+   static_assert(Exact<Lossless<std::int8_t  , std::uint16_t>, std::int16_t >);
+   static_assert(Exact<Lossless<std::int8_t  , std::uint32_t>, std::int32_t >);
+   static_assert(Exact<Lossless<std::int8_t  , std::uint64_t>, std::int64_t >);
+   static_assert(Exact<Lossless<std::int8_t  , std::int8_t  >, std::int8_t  >);
+   static_assert(Exact<Lossless<std::int8_t  , std::int16_t >, std::int16_t >);
+   static_assert(Exact<Lossless<std::int8_t  , std::int32_t >, std::int32_t >);
+   static_assert(Exact<Lossless<std::int8_t  , std::int64_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::int8_t  , float        >, float        >);
+   static_assert(Exact<Lossless<std::int8_t  , double       >, double       >);
+   static_assert(Exact<Lossless<std::int8_t  , Byte         >, Byte         >);
+
+   static_assert(Exact<Lossless<std::int16_t , std::uint8_t >, std::int16_t >);
+   static_assert(Exact<Lossless<std::int16_t , std::uint16_t>, std::int16_t >);
+   static_assert(Exact<Lossless<std::int16_t , std::uint32_t>, std::int32_t >);
+   static_assert(Exact<Lossless<std::int16_t , std::uint64_t>, std::int64_t >);
+   static_assert(Exact<Lossless<std::int16_t , std::int8_t  >, std::int16_t >);
+   static_assert(Exact<Lossless<std::int16_t , std::int16_t >, std::int16_t >);
+   static_assert(Exact<Lossless<std::int16_t , std::int32_t >, std::int32_t >);
+   static_assert(Exact<Lossless<std::int16_t , std::int64_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::int16_t , float        >, float        >);
+   static_assert(Exact<Lossless<std::int16_t , double       >, double       >);
+   static_assert(Exact<Lossless<std::int16_t , Byte         >, Byte         >);
+
+   static_assert(Exact<Lossless<std::int32_t , std::uint8_t >, std::int32_t >);
+   static_assert(Exact<Lossless<std::int32_t , std::uint16_t>, std::int32_t >);
+   static_assert(Exact<Lossless<std::int32_t , std::uint32_t>, std::int32_t >);
+   static_assert(Exact<Lossless<std::int32_t , std::uint64_t>, std::int64_t >);
+   static_assert(Exact<Lossless<std::int32_t , std::int8_t  >, std::int32_t >);
+   static_assert(Exact<Lossless<std::int32_t , std::int16_t >, std::int32_t >);
+   static_assert(Exact<Lossless<std::int32_t , std::int32_t >, std::int32_t >);
+   static_assert(Exact<Lossless<std::int32_t , std::int64_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::int32_t , float        >, float        >);
+   static_assert(Exact<Lossless<std::int32_t , double       >, double       >);
+   static_assert(Exact<Lossless<std::int32_t , Byte         >, Byte         >);
+
+   static_assert(Exact<Lossless<std::int64_t , std::uint8_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::int64_t , std::uint16_t>, std::int64_t >);
+   static_assert(Exact<Lossless<std::int64_t , std::uint32_t>, std::int64_t >);
+   static_assert(Exact<Lossless<std::int64_t , std::uint64_t>, std::int64_t >);
+   static_assert(Exact<Lossless<std::int64_t , std::int8_t  >, std::int64_t >);
+   static_assert(Exact<Lossless<std::int64_t , std::int16_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::int64_t , std::int32_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::int64_t , std::int64_t >, std::int64_t >);
+   static_assert(Exact<Lossless<std::int64_t , float        >, float        >);
+   static_assert(Exact<Lossless<std::int64_t , double       >, double       >);
+   static_assert(Exact<Lossless<std::int64_t , Byte         >, Byte         >);
 
 
-   static_assert(CT::Exact<Lossless<double       , std::uint8_t >, double       >);
-   static_assert(CT::Exact<Lossless<double       , std::uint16_t>, double       >);
-   static_assert(CT::Exact<Lossless<double       , std::uint32_t>, double       >);
-   static_assert(CT::Exact<Lossless<double       , std::uint64_t>, double       >);
-   static_assert(CT::Exact<Lossless<double       , std::int8_t  >, double       >);
-   static_assert(CT::Exact<Lossless<double       , std::int16_t >, double       >);
-   static_assert(CT::Exact<Lossless<double       , std::int32_t >, double       >);
-   static_assert(CT::Exact<Lossless<double       , std::int64_t >, double       >);
-   static_assert(CT::Exact<Lossless<double       , float        >, double       >);
-   static_assert(CT::Exact<Lossless<double       , double       >, double       >);
-   static_assert(CT::Exact<Lossless<double       , Byte         >, double       >);
+   static_assert(Exact<Lossless<float        , std::uint8_t >, float        >);
+   static_assert(Exact<Lossless<float        , std::uint16_t>, float        >);
+   static_assert(Exact<Lossless<float        , std::uint32_t>, float        >);
+   static_assert(Exact<Lossless<float        , std::uint64_t>, float        >);
+   static_assert(Exact<Lossless<float        , std::int8_t  >, float        >);
+   static_assert(Exact<Lossless<float        , std::int16_t >, float        >);
+   static_assert(Exact<Lossless<float        , std::int32_t >, float        >);
+   static_assert(Exact<Lossless<float        , std::int64_t >, float        >);
+   static_assert(Exact<Lossless<float        , float        >, float        >);
+   static_assert(Exact<Lossless<float        , double       >, double       >);
+   static_assert(Exact<Lossless<float        , Byte         >, Byte         >);
+
+
+   static_assert(Exact<Lossless<double       , std::uint8_t >, double       >);
+   static_assert(Exact<Lossless<double       , std::uint16_t>, double       >);
+   static_assert(Exact<Lossless<double       , std::uint32_t>, double       >);
+   static_assert(Exact<Lossless<double       , std::uint64_t>, double       >);
+   static_assert(Exact<Lossless<double       , std::int8_t  >, double       >);
+   static_assert(Exact<Lossless<double       , std::int16_t >, double       >);
+   static_assert(Exact<Lossless<double       , std::int32_t >, double       >);
+   static_assert(Exact<Lossless<double       , std::int64_t >, double       >);
+   static_assert(Exact<Lossless<double       , float        >, double       >);
+   static_assert(Exact<Lossless<double       , double       >, double       >);
+   static_assert(Exact<Lossless<double       , Byte         >, Byte         >);
 }

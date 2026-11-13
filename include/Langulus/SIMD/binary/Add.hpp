@@ -12,8 +12,8 @@
 namespace Langulus::SIMD::Inner
 {
    /// Used to detect missing SIMD routine                                    
-   /*template<bool SATURATE> LANGULUS(INLINED)
-   constexpr No AddSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept { return {}; }*/
+   template<bool SATURATE> LANGULUS(INLINED)
+   constexpr No AddSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept { return {}; }
 
    /// Add two registers                                                      
    ///   @tparam SATURATE whether to clamp to [min;max]                       
