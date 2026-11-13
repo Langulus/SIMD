@@ -17,7 +17,7 @@ namespace Langulus::SIMD::Inner
    
    /// Compare two registers                                                  
    template<CT::SIMD R> LANGULUS(INLINED)
-   R LesserSIMD(R lhs, R rhs) noexcept {
+   auto LesserSIMD(R lhs, R rhs) noexcept {
       using T = TypeOf<R>;
       (void)lhs; (void)rhs;
       
@@ -26,7 +26,7 @@ namespace Langulus::SIMD::Inner
          if      constexpr (CT::Integer8<T>)    return simde_mm_cmplt_epi8    (lhs, rhs);
          else if constexpr (CT::Integer16<T>)   return simde_mm_cmplt_epi16   (lhs, rhs);
          else if constexpr (CT::Integer32<T>)   return simde_mm_cmplt_epi32   (lhs, rhs);
-         else if constexpr (CT::Integer64<T>)   return simde_mm_cmplt_epi64   (lhs, rhs);
+         else if constexpr (CT::Integer64<T>)   return No {}; //simde_mm_cmplt_epi64   (lhs, rhs);
          else if constexpr (CT::Real32<T>)      return simde_mm_cmplt_ps      (lhs, rhs);
          else if constexpr (CT::Real64<T>)      return simde_mm_cmplt_pd      (lhs, rhs);
          else static_assert(false, "Unsupported type for 16-byte package");
@@ -38,7 +38,7 @@ namespace Langulus::SIMD::Inner
          if      constexpr (CT::Integer8<T>)    return simde_mm256_cmplt_epi8 (lhs, rhs);
          else if constexpr (CT::Integer16<T>)   return simde_mm256_cmplt_epi16(lhs, rhs);
          else if constexpr (CT::Integer32<T>)   return simde_mm256_cmplt_epi32(lhs, rhs);
-         else if constexpr (CT::Integer64<T>)   return simde_mm256_cmplt_epi64(lhs, rhs);
+         else if constexpr (CT::Integer64<T>)   return No {}; //simde_mm256_cmplt_epi64(lhs, rhs);
          else if constexpr (CT::Real32<T>)      return simde_mm256_cmp_ps(lhs, rhs, SIMDE_CMP_LT_OQ);
          else if constexpr (CT::Real64<T>)      return simde_mm256_cmp_pd(lhs, rhs, SIMDE_CMP_LT_OQ);
          else static_assert(false, "Unsupported type for 32-byte package");

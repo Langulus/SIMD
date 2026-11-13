@@ -17,7 +17,7 @@ namespace Langulus::SIMD::Inner
    
    /// Compare two registers using SIMD                                       
    template<CT::SIMD R> LANGULUS(INLINED)
-   R EqualsSIMD(R lhs, R rhs) noexcept {
+   auto EqualsSIMD(R lhs, R rhs) noexcept {
       using T = TypeOf<R>;
       (void)lhs; (void)rhs;
 

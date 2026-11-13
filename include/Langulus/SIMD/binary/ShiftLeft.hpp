@@ -23,9 +23,6 @@ namespace Langulus::SIMD::Inner
    ///      this behavior consistent across C++ and SIMD, so the fallback     
    ///      routine has additional overhead for checking the rhs range and    
    ///      zeroing.                                                          
-   ///   @param lhs - left register                                           
-   ///   @param rhs - right register                                          
-   ///   @return the resulting register                                       
    template<CT::SIMD R> LANGULUS(INLINED)
    auto ShiftLeftSIMD(R lhs, R rhs) noexcept {
       using T = TypeOf<R>;

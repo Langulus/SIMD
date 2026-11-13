@@ -18,17 +18,14 @@ namespace Langulus::SIMD::Inner
    constexpr No EqualsOrLesserSIMD(CT::NotSIMD auto, CT::NotSIMD auto) noexcept { return {}; }
    
    /// Compare two registers for equals-or-lesser                             
-   ///   @param lhs - left register                                           
-   ///   @param rhs - right register                                          
-   ///   @return the resulting register                                       
    template<CT::SIMD R> LANGULUS(INLINED)
-   R EqualsOrLesserSIMD(R lhs, R rhs) noexcept {
+   auto EqualsOrLesserSIMD(R lhs, R rhs) noexcept {
       return NotSIMD(GreaterSIMD(lhs, rhs));
    }
    
    /// Compare values as constexpr, if possible                               
-   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
-   ///   @patam value - scalar/vector to operate on                           
+   ///   @tparam FORCE_OUT the desired element type (lossless if void)        
+   ///   @patam value scalar/vector to operate on                             
    ///   @return bool/bitmask                                                 
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
    constexpr auto EqualsOrLesserConstexpr(auto const& lhs, auto const& rhs) noexcept {
@@ -44,8 +41,8 @@ namespace Langulus::SIMD::Inner
    }
 
    /// Compare values as a register, if possible                              
-   ///   @tparam FORCE_OUT - the desired element type (lossless if void)      
-   ///   @patam value - scalar/vector/register to operate on                  
+   ///   @tparam FORCE_OUT the desired element type (lossless if void)        
+   ///   @patam value scalar/vector/register to operate on                    
    ///   @return bool/bitmask/register                                        
    template<CT::NoIntent FORCE_OUT = void> LANGULUS(INLINED)
    auto EqualsOrLesser(auto const& lhs, auto const& rhs) noexcept {
@@ -70,9 +67,9 @@ namespace Langulus::SIMD::Inner
 namespace Langulus::SIMD
 {
    /// Compare numbers for equal-or-less, force output to desired place       
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired element type (deducible)                   
+   ///   @tparam LHS left array, scalar, or register (deducible)              
+   ///   @tparam RHS right array, scalar, or register (deducible)             
+   ///   @tparam OUT the desired element type (deducible)                     
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in 'out'. Use Inner::EqualsOrGreater   
    ///      if you don't want this.                                           
@@ -87,9 +84,9 @@ namespace Langulus::SIMD
    }
 
    /// Compare numbers for equal-or-less                                      
-   ///   @tparam LHS - left array, scalar, or register (deducible)            
-   ///   @tparam RHS - right array, scalar, or register (deducible)           
-   ///   @tparam OUT - the desired output type (lossless array by default)    
+   ///   @tparam LHS left array, scalar, or register (deducible)              
+   ///   @tparam RHS right array, scalar, or register (deducible)             
+   ///   @tparam OUT the desired output type (lossless array by default)      
    ///   @attention will generate additional store (and convert) instructions 
    ///      in order to fit the result in an instance of 'OUT'. Use           
    ///      Inner::EqualsOrGreater if you don't want this.                    

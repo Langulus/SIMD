@@ -77,11 +77,11 @@ namespace Langulus::SIMD
          }
       };
 
-      auto begin() const noexcept {
+      constexpr auto begin() const noexcept {
          return iterator {0, mValue};
       }
 
-      auto end() const noexcept {
+      constexpr auto end() const noexcept {
          return iterator {C, mValue};
       }
 
@@ -91,21 +91,21 @@ namespace Langulus::SIMD
          return mValue == Mask;
       }
 
-      Bitmask& operator = (const Bitmask&) noexcept = default;
+      constexpr Bitmask& operator = (const Bitmask&) noexcept = default;
 
-      Bitmask& operator = (const Type& a) noexcept {
+      constexpr Bitmask& operator = (const Type& a) noexcept {
          mValue = a & Mask;
          return *this;
       }
 
-      Bitmask& operator = (const ::std::array<bool, C>& a) noexcept {
+      constexpr Bitmask& operator = (const ::std::array<bool, C>& a) noexcept {
          mValue = {};
          for (Type i = 0; i < Type {C}; ++i)
             mValue |= (static_cast<Type>(a[i]) << i);
          return *this;
       }
 
-      Bitmask& operator = (bool a) noexcept requires (C == 1) {
+      constexpr Bitmask& operator = (bool a) noexcept requires (C == 1) {
          mValue = a;
          return *this;
       }
@@ -114,17 +114,17 @@ namespace Langulus::SIMD
          return mValue == a.mValue;
       }
 
-      Bitmask& operator |= (const Type& a) noexcept {
+      constexpr Bitmask& operator |= (const Type& a) noexcept {
          mValue |= a;
          return *this;
       }
 
-      Bitmask& operator &= (const Type& a) noexcept {
+      constexpr Bitmask& operator &= (const Type& a) noexcept {
          mValue &= a;
          return *this;
       }
 
-      Bitmask& operator ^= (const Type& a) noexcept {
+      constexpr Bitmask& operator ^= (const Type& a) noexcept {
          mValue ^= a;
          return *this;
       }
